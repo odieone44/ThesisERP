@@ -30,7 +30,7 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 var jwtConfig = builder.Configuration.GetSection("JwtSettings");
 
 builder.Services.Configure<JwtSettings>(jwtConfig);
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureJWT(builder.Configuration);
@@ -59,12 +59,12 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.UseEndpoints(endpoints=> endpoints.MapControllers());
+app.UseEndpoints(endpoints=> endpoints.MapControllers());
 
-app.MapControllers();
+//app.MapControllers();
 Log.Information("App is starting...");
 app.Run();
