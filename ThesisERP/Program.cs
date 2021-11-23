@@ -1,12 +1,16 @@
+using AutoMapper.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using ThesisERP.Core.Extensions;
+using ThesisERP.Core.Models;
 using ThesisERP.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
+
 builder.Host.UseSerilog(
     (ctx, loggerConf) => 
     {
@@ -18,12 +22,23 @@ builder.Host.UseSerilog(
                       restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
     });
 
+string? connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
 builder.Services.AddDbContext<DatabaseContext>(options =>
-    options.UseSqlServer(connectionString: connString)
+    options.UseSqlServer(connectionString: connString ?? string.Empty)
 );
 
+var jwtConfig = builder.Configuration.GetSection("JwtSettings");
+
+builder.Services.Configure<JwtSettings>(jwtConfig);
+
+builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
-builder.Services.AddControllers();
+builder.Services.ConfigureJWT(builder.Configuration);
+builder.Services.AddControllers()
+                .AddNewtonsoftJson(op =>
+                    op.SerializerSettings.ReferenceLoopHandling =
+                    Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -44,6 +59,5 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 app.Run();
