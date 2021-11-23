@@ -28,4 +28,8 @@
 		<PackageReference Include="X.PagedList.Mvc.Core" Version="8.1.0" />
 	</ItemGroup>
 	
+	<ItemGroup>
+	  <ProjectReference Include="..\ThesisERP.Data\ThesisERP.Data.csproj" />
+	</ItemGroup>
+	
 </Project>

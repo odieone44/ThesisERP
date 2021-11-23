@@ -19,4 +19,9 @@
 	  </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ThesisERP.Core\ThesisERP.Core.csproj" />
+    <ProjectReference Include="..\ThesisERP.Data\ThesisERP.Data.csproj" />
+  </ItemGroup>
+
 </Project>
