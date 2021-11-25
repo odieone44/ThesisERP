@@ -8,14 +8,14 @@ namespace ThesisERP.Static.Enums
 {
     public static class Addresses
     {
-        public enum AddressType
+        public enum AddressTypes
         {
             billiing = 0,
             shipping = 1,
             general = 2
         }
 
-        public enum EntityType
+        public enum EntityTypes 
         {
             client = 0,
             supplier = 1,
@@ -24,7 +24,7 @@ namespace ThesisERP.Static.Enums
             warehouse = 4
         }
 
-        public enum CountryCode
+        public enum CountryCodes
         {
 
         }

@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace ThesisERP.Static.Enums
 {
-    public static class Entities
+    public static class Products
     {
-        public enum EntityTypes
+        public enum Types
         {
-            client = 0,
-            supplier = 1,
-            supplier_and_client = 2
+            product = 0,
+            service = 1
         }
     }
 }
