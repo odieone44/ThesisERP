@@ -15,9 +15,16 @@ namespace ThesisERP.Data
         [Key]
         public int Id { get; set; }
         public Entities.EntityTypes EntityType { get; set; }
+        public string? Organization { get; set; }
         public string FirstName { get; set; }        
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
+        
+        [Required]
         public string Email { get; set; }
+
+        public DateTime DateCreated { get; set; }
+        public DateTime? DateUpdated { get; set; }
+
         public virtual ICollection<Product> RelatedProducts { get; set; }
         public virtual ICollection<EntityAddress> EntityAdresses { get; set; }
 

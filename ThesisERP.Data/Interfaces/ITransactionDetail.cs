@@ -15,10 +15,10 @@ namespace ThesisERP.Data.Interfaces
         public decimal UnitPrice { get; set; } 
         public int? DiscountID { get; set; }
         public int? TaxID { get; set; }
-        public decimal LineTotalTax { get; set; } 
-        public decimal LineTotalDiscount { get; set; } 
+        public decimal LineTotalTax { get; } 
+        public decimal LineTotalDiscount { get; } 
         public decimal LineTotalNet { get; }
         public decimal LineTotalGross { get; }
-        
+
     }
 }

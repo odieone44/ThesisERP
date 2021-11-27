@@ -22,9 +22,12 @@ namespace ThesisERP.Data
         [ForeignKey(nameof(Product))]
         public int ProductId { get; set; }
         public Product Product { get; set; }
+
+        private decimal _productQuantity;
+        public decimal ProductQuantity {get => _productQuantity; set => _productQuantity = value.RoundTo(4); }
         
-        public decimal ProductQuantity { get; set; }
-        public decimal UnitPrice { get; set; } = decimal.Zero;
+        private decimal _unitPrice = decimal.Zero;
+        public decimal UnitPrice { get => _unitPrice; set => _unitPrice = value.RoundTo(2); }
         
         [ForeignKey(nameof(Discount))]
         public int? DiscountID { get; set; }
@@ -38,8 +41,8 @@ namespace ThesisERP.Data
         public int ParentDocumentId { get; set; }
         public Document ParentDocument { get; set; }
         
-        public decimal LineTotalTax { get; set; } = decimal.Zero;
-        public decimal LineTotalDiscount { get; set; } = decimal.Zero;
+        public decimal LineTotalTax { get; private set; } = decimal.Zero;
+        public decimal LineTotalDiscount { get; private set; } = decimal.Zero;
 
         [Timestamp]
         public byte[] Timestamp { get; set; }
@@ -47,10 +50,37 @@ namespace ThesisERP.Data
         private decimal _lineTotalNet;
         public decimal LineTotalNet
         {
-            get => (UnitPrice * ProductQuantity).RoundTo2();
-            private set => _lineTotalNet = (UnitPrice * ProductQuantity).RoundTo2();
+            get => _lineTotalNet;
+            private set => _lineTotalNet = value.RoundTo(2);
         }
-        public decimal LineTotalGross => (LineTotalNet + LineTotalTax - LineTotalDiscount).RoundTo2();
+
+        private decimal _lineTotalGross;
+        public decimal LineTotalGross
+        {
+            get => _lineTotalGross;
+            private set => _lineTotalGross = value.RoundTo(2);
+        }        
+        
+        public DocumentDetail(Product product, decimal quantity, decimal price, Tax? tax = null, Discount? discount = null)
+        {
+            this.Product = product;
+            this.Discount = discount;
+            this.Tax = tax;
+            this.ProductQuantity = quantity;
+            this.UnitPrice = price;
+
+            this.LineTotalNet = quantity * price;
+            this.LineTotalTax = tax == null ? decimal.Zero : (price * tax.Amount * quantity).RoundTo(2);
+            this.LineTotalDiscount = discount == null ? decimal.Zero : (price * discount.Amount * quantity).RoundTo(2);
+
+            this.LineTotalGross = LineTotalNet + LineTotalTax - LineTotalDiscount;
+
+        }
+
+        public DocumentDetail()
+        {
+
+        }
 
     }
 }

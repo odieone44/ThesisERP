@@ -8,9 +8,9 @@ namespace ThesisERP.Static.Extensions
 {
     public static class Numbers
     {
-        public static decimal RoundTo2(this decimal d)
+        public static decimal RoundTo(this decimal d, int digits)
         {
-            return decimal.Round(d, 2, MidpointRounding.AwayFromZero);
+            return decimal.Round(d, digits, MidpointRounding.AwayFromZero);
         }
     }
 }

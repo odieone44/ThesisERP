@@ -31,7 +31,7 @@ namespace ThesisERP.Data
         }
         
         public Transactions.Status Status { get; set; }
-        public ICollection<DocumentAddress> DocumentAddresses { get; set; }
+        public ICollection<DocumentAddress> DocumentAddresses { get; set; } = new List<DocumentAddress>();
         ICollection<IAddress> ITransaction.TransactionAddresses
         {
             get { return DocumentAddresses.Cast<IAddress>().ToList(); }
@@ -41,7 +41,7 @@ namespace ThesisERP.Data
         public DocumentAddress BillingAddress => DocumentAddresses.FirstOrDefault(add=>add.AddressType == Addresses.AddressTypes.billiing);
         public DocumentAddress ShippingAddress => DocumentAddresses.FirstOrDefault(add => add.AddressType == Addresses.AddressTypes.shipping);
         
-        public ICollection<DocumentDetail> Details { get; set; }
+        public ICollection<DocumentDetail> Details { get; set; } = new List<DocumentDetail>();
         ICollection<ITransactionDetail> ITransaction.Details
         {
             get { return Details.Cast<ITransactionDetail>().ToList(); }
@@ -50,6 +50,7 @@ namespace ThesisERP.Data
 
         [Timestamp]
         public byte[] Timestamp { get; set; }
-        
+        public DateTime DateCreated { get; set; }
+        public DateTime? DateUpdated { get; set; }
     }
 }

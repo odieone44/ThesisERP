@@ -13,9 +13,11 @@ namespace ThesisERP.Data
         [Required]
         public string SKU { get; set; }
         public string Description { get; set; }
-        public string LongDescription { get; set; }
-        public decimal DefaultPurchasePrice { get; set; }
-        public decimal DefaultSaleSPrice { get; set; }
+        public string? LongDescription { get; set; }
+        public decimal? DefaultPurchasePrice { get; set; }
+        public decimal? DefaultSaleSPrice { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime DateUpdated { get; set; }
         public virtual ICollection<Entity> RelatedEntities { get; set; }
 
     }
