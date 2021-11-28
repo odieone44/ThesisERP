@@ -29,7 +29,11 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <ProjectReference Include="..\ThesisERP.Data\ThesisERP.Data.csproj" />
+	  <Folder Include="Helpers\" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\ThesisERP.Static\ThesisERP.Static.csproj" />
 	</ItemGroup>
 	
 </Project>

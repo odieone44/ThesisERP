@@ -1,25 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ThesisERP.Core.Interfaces;
 using ThesisERP.Static.Enums;
 
-namespace ThesisERP.Data
+namespace ThesisERP.Core.Entites
 {
-    [Owned]
-    [Table("EntityAddresses")]
     public class EntityAddress : IAddress
     {
-        [Key]
-        public int Id { get; set; }                
+        public int Id { get; set; }
         public int EntityId { get; set; }
         public string Organization { get; set; }
-        public string FirstName { get; set; } 
-        public string LastName { get; set; } 
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
         public string TaxId { get; set; }

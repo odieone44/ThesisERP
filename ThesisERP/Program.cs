@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using ThesisERP.Core.Extensions;
+using ThesisERP.Extensions;
 using ThesisERP.Core.Models;
-using ThesisERP.Data;
+using ThesisERP.Infrastracture;
 
 var builder = WebApplication.CreateBuilder(args);
 

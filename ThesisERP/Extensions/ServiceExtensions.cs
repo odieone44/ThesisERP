@@ -1,22 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ThesisERP.Core.Configurations;
+using ThesisERP.Core.Entites;
 using ThesisERP.Core.Models;
-using ThesisERP.Data;
+using ThesisERP.Infrastracture;
 
-namespace ThesisERP.Core.Extensions
+namespace ThesisERP.Extensions
 {
     public static class ServiceExtensions
     {

@@ -1,50 +1,38 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ThesisERP.Data.Interfaces;
+﻿using ThesisERP.Core.Interfaces;
 using ThesisERP.Static.Extensions;
 
-namespace ThesisERP.Data
+namespace ThesisERP.Core.Entites
 {
-    [Owned]
-    [Table("DocumentDetails")]
+
+
     public class DocumentDetail : ITransactionDetail
     {
-        [Key]
+
         public int Id { get; set; }
-        
-        [Required]
-        [ForeignKey(nameof(Product))]
         public int ProductId { get; set; }
         public Product Product { get; set; }
 
         private decimal _productQuantity;
-        public decimal ProductQuantity {get => _productQuantity; set => _productQuantity = value.RoundTo(4); }
-        
+        public decimal ProductQuantity { get => _productQuantity; set => _productQuantity = value.RoundTo(4); }
+
         private decimal _unitPrice = decimal.Zero;
         public decimal UnitPrice { get => _unitPrice; set => _unitPrice = value.RoundTo(2); }
-        
-        [ForeignKey(nameof(Discount))]
+
+
         public int? DiscountID { get; set; }
         public Discount? Discount { get; set; }
-        
-        [ForeignKey(nameof(Tax))]
-        public int? TaxID { get; set; }        
+
+
+        public int? TaxID { get; set; }
         public Tax? Tax { get; set; }
-        
-        [ForeignKey(nameof(ParentDocument))]
+
+
         public int ParentDocumentId { get; set; }
         public Document ParentDocument { get; set; }
-        
+
         public decimal LineTotalTax { get; private set; } = decimal.Zero;
         public decimal LineTotalDiscount { get; private set; } = decimal.Zero;
 
-        [Timestamp]
         public byte[] Timestamp { get; set; }
 
         private decimal _lineTotalNet;
@@ -59,8 +47,8 @@ namespace ThesisERP.Data
         {
             get => _lineTotalGross;
             private set => _lineTotalGross = value.RoundTo(2);
-        }        
-        
+        }
+
         public DocumentDetail(Product product, decimal quantity, decimal price, Tax? tax = null, Discount? discount = null)
         {
             this.Product = product;

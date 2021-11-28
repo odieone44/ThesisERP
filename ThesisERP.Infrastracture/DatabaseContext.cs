@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using ThesisERP.Data.Configurations.Entities;
+using System.Reflection;
+using ThesisERP.Core.Entites;
+using ThesisERP.Infrastracture.Configurations.Entities;
 
-namespace ThesisERP.Data
+namespace ThesisERP.Infrastracture
 {
     public class DatabaseContext : IdentityDbContext<AppUser>
     {
@@ -27,12 +29,8 @@ namespace ThesisERP.Data
                 property.SetPrecision(18);
                 property.SetScale(6);
             }
-
-            builder.Entity<AppUser>().OwnsMany(t => t.RefreshTokens);
-
-            builder.ApplyConfiguration(new DocumentConfiguration());
-            builder.ApplyConfiguration(new EntityConfiguration());
-            builder.ApplyConfiguration(new RoleConfiguration());
+            
+            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());          
         }
     }
 }

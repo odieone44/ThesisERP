@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ThesisERP.Static.Enums;
+﻿using ThesisERP.Static.Enums;
 
-namespace ThesisERP.Data.Interfaces
+namespace ThesisERP.Core.Interfaces
 {
     public interface ITransaction
     {

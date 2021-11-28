@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ThesisERP.Data.Configurations.Entities
+namespace ThesisERP.Infrastracture.Configurations.Entities
 {
     public class RoleConfiguration : IEntityTypeConfiguration<IdentityRole>
     {

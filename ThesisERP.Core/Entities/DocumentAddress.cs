@@ -1,24 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ThesisERP.Core.Interfaces;
 using ThesisERP.Static.Enums;
 
-namespace ThesisERP.Data
+namespace ThesisERP.Core.Entites
 {
-    [Owned]
-    [Table("DocumentAddresses")]
     public class DocumentAddress : IAddress
     {
-        [Key]
         public int Id { get; set; }
         public Addresses.AddressTypes AddressType { get; set; }
-        
-        [ForeignKey(nameof(Document))]
+
         public int DocumentId { get; set; }
         public Document Document { get; set; }
 
@@ -34,8 +23,6 @@ namespace ThesisERP.Data
         public string Region { get; set; }
         public string PostalCode { get; set; }
         public Addresses.CountryCodes Country { get; set; }
-        
 
-    
     }
 }
