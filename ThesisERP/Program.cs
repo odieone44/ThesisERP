@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using ThesisERP.Extensions;
 using ThesisERP.Core.Models;
-using ThesisERP.Infrastracture;
+using ThesisERP.Infrastracture.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

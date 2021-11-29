@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using ThesisERP.Infrastracture;
+using ThesisERP.Infrastracture.Data;
 
 #nullable disable
 
@@ -66,15 +66,15 @@ namespace ThesisERP.Infrastracture.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "6456e552-20ca-4db4-896f-a280b75c398e",
-                            ConcurrencyStamp = "2acd18e8-cc9c-4afd-9425-f538413368e5",
+                            Id = "585498e7-51eb-492e-9a7c-55d7cf85ab9a",
+                            ConcurrencyStamp = "affbb3e9-2564-431c-b210-48b74c2c868b",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "1110f5ba-547f-452b-a65d-76c3df42ad75",
-                            ConcurrencyStamp = "33e68ee5-a1ce-41a6-be01-dc84256feca3",
+                            Id = "6eac5143-aa77-4874-ba66-89673f23593a",
+                            ConcurrencyStamp = "2a6b2ee4-c076-4a40-b952-bd5f5ef8dd8d",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });

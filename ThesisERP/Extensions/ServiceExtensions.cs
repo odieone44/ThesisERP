@@ -7,7 +7,7 @@ using System.Text;
 using ThesisERP.Core.Configurations;
 using ThesisERP.Core.Entites;
 using ThesisERP.Core.Models;
-using ThesisERP.Infrastracture;
+using ThesisERP.Infrastracture.Data;
 
 namespace ThesisERP.Extensions
 {

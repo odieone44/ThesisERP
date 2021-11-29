@@ -2,21 +2,21 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using ThesisERP.Core.Entites;
-using ThesisERP.Infrastracture.Configurations.Entities;
+using ThesisERP.Infrastracture.Data.Configurations.Entities;
 
-namespace ThesisERP.Infrastracture
+namespace ThesisERP.Infrastracture.Data
 {
     public class DatabaseContext : IdentityDbContext<AppUser>
     {
         public DatabaseContext(DbContextOptions options) : base(options)
         { }
 
-        public DbSet<AppUser> AppUsers { get; set; }
-        public DbSet<Entity> Entities { get; set; }
-        public DbSet<Document> Documents { get; set; }
-        public DbSet<Tax> Taxes { get; set; }
-        public DbSet<Discount> Discounts { get; set; }
-        public DbSet<Product> Products { get; set; }
+        public DbSet<AppUser> AppUsers => Set<AppUser>();
+        public DbSet<Entity> Entities => Set<Entity>();
+        public DbSet<Document> Documents => Set<Document>();
+        public DbSet<Tax> Taxes => Set<Tax>();
+        public DbSet<Discount> Discounts => Set<Discount>();
+        public DbSet<Product> Products => Set<Product>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

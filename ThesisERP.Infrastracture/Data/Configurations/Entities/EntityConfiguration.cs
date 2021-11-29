@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ThesisERP.Core.Entites;
 
-namespace ThesisERP.Infrastracture.Configurations.Entities
+namespace ThesisERP.Infrastracture.Data.Configurations.Entities
 {
     internal class EntityConfiguration : IEntityTypeConfiguration<Entity>
     {
