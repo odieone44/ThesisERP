@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ThesisERP.Static.Enums
+﻿namespace ThesisERP.Core.Enums
 {
     public static class Transactions
     {
@@ -28,7 +22,7 @@ namespace ThesisERP.Static.Enums
             approved = 2,
             completed = 3,
             cancelled = 4
-        }        
+        }
 
     }
 }

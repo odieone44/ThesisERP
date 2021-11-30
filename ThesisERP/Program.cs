@@ -1,18 +1,11 @@
-using AutoMapper.Configuration;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using ThesisERP.Extensions;
-using ThesisERP.Core.Models;
-using ThesisERP.Infrastracture.Data;
-
+using ThesisERP.Infrastracture;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Host.UseSerilog(
-    (ctx, loggerConf) => 
+    (ctx, loggerConf) =>
     {
         loggerConf
         .WriteTo.Console()
@@ -22,24 +15,12 @@ builder.Host.UseSerilog(
                       restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
     });
 
-string? connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
-builder.Services.AddDbContext<DatabaseContext>(options =>
-    options.UseSqlServer(connectionString: connString ?? string.Empty)
-);
+builder.Services.AddInfrastructure(builder.Configuration);
 
-var jwtConfig = builder.Configuration.GetSection("JwtSettings");
-
-builder.Services.Configure<JwtSettings>(jwtConfig);
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthentication();
-builder.Services.ConfigureIdentity();
-builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.AddControllers()
                 .AddNewtonsoftJson(op =>
                     op.SerializerSettings.ReferenceLoopHandling =
                     Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-
-builder.Services.ConfigureAutoMapper();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -52,18 +33,22 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();    
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    string swaggerJsonBasePath = string.IsNullOrEmpty(c.RoutePrefix) ? "." : "..";
+    c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json", "ThesisERPApi v1");
+});
 
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints=> endpoints.MapControllers());
+app.UseEndpoints(endpoints => endpoints.MapControllers());
 
 //app.MapControllers();
 Log.Information("App is starting...");

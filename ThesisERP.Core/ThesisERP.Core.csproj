@@ -28,12 +28,4 @@
 		<PackageReference Include="X.PagedList.Mvc.Core" Version="8.1.0" />
 	</ItemGroup>
 	
-	<ItemGroup>
-	  <Folder Include="Helpers\" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <ProjectReference Include="..\ThesisERP.Static\ThesisERP.Static.csproj" />
-	</ItemGroup>
-	
 </Project>

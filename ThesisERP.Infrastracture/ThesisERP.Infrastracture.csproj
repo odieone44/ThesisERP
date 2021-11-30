@@ -22,8 +22,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\ThesisERP.Application\ThesisERP.Application.csproj" />
 	  <ProjectReference Include="..\ThesisERP.Core\ThesisERP.Core.csproj" />
-	  <ProjectReference Include="..\ThesisERP.Static\ThesisERP.Static.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Data\Migrations\" />
 	</ItemGroup>
 
 </Project>

@@ -3,17 +3,19 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ThesisERP.Infrastracture.Data;
 
 #nullable disable
 
-namespace ThesisERP.Infrastracture.Migrations
+namespace ThesisERP.Infrastracture.Data.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20211130213353_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,15 +68,15 @@ namespace ThesisERP.Infrastracture.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "585498e7-51eb-492e-9a7c-55d7cf85ab9a",
-                            ConcurrencyStamp = "affbb3e9-2564-431c-b210-48b74c2c868b",
+                            Id = "e3098126-b47e-4576-ab2f-d256dd02de8d",
+                            ConcurrencyStamp = "2dd77bc9-ad69-41b4-8dde-fbf80212db49",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "6eac5143-aa77-4874-ba66-89673f23593a",
-                            ConcurrencyStamp = "2a6b2ee4-c076-4a40-b952-bd5f5ef8dd8d",
+                            Id = "d64737fd-912c-44e4-843c-0dae40332930",
+                            ConcurrencyStamp = "5d20c542-96c5-4869-911c-77ea74d5d9da",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });

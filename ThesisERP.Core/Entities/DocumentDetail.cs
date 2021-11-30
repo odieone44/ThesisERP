@@ -1,5 +1,5 @@
 ﻿using ThesisERP.Core.Interfaces;
-using ThesisERP.Static.Extensions;
+using ThesisERP.Core.Extensions;
 
 namespace ThesisERP.Core.Entites
 {

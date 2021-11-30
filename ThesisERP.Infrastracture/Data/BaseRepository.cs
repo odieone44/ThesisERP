@@ -1,13 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using ThesisERP.Static.Interfaces;
+using ThesisERP.Application.Interfaces;
 
 namespace ThesisERP.Infrastracture.Data
 {
@@ -34,8 +28,8 @@ namespace ThesisERP.Infrastracture.Data
             _dbContext.Entry(entity).State = EntityState.Modified;
 
             await SaveChangesAsync();
-        }     
-      
+        }
+
         public virtual async Task DeleteAsync(T entity)
         {
             _dbContext.Set<T>().Remove(entity);
@@ -86,6 +80,6 @@ namespace ThesisERP.Infrastracture.Data
             await _dbContext.SaveChangesAsync();
         }
 
-       
+
     }
 }

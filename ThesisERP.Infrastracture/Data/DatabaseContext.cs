@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using ThesisERP.Core.Entites;
-using ThesisERP.Infrastracture.Data.Configurations.Entities;
 
 namespace ThesisERP.Infrastracture.Data
 {
@@ -21,7 +20,7 @@ namespace ThesisERP.Infrastracture.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            
+
             foreach (var property in builder.Model.GetEntityTypes()
                                                    .SelectMany(t => t.GetProperties())
                                                    .Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))
@@ -29,8 +28,8 @@ namespace ThesisERP.Infrastracture.Data
                 property.SetPrecision(18);
                 property.SetScale(6);
             }
-            
-            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());          
+
+            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }
 }

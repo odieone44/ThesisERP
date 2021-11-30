@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ThesisERP.Static.Enums
+﻿namespace ThesisERP.Core.Enums
 {
     public static class Addresses
     {
@@ -15,7 +9,7 @@ namespace ThesisERP.Static.Enums
             general = 2
         }
 
-        public enum EntityTypes 
+        public enum EntityTypes
         {
             client = 0,
             supplier = 1,

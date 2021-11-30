@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ThesisERP.Core.Models
+namespace ThesisERP.Application.Models
 {
     public class JwtSettings
     {
