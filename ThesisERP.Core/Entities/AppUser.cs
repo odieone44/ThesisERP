@@ -7,13 +7,21 @@ namespace ThesisERP.Core.Entites
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
 
-        public List<RefreshToken> RefreshTokens { get; set; }        
+        public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+
+        public RefreshToken AddRefreshToken(string ipAddress)
+        {
+            RefreshToken refreshToken = new(ipAddress);
+
+            RefreshTokens.Add(refreshToken);
+
+            return refreshToken;
+        }
 
         public void RemoveExpiredRefreshTokens(int refreshTokenDaysToLive)
         {
            RefreshTokens = RefreshTokens
                             .Where(token=> 
-                                    token.IsActive &&
                                     token.Created.AddDays(refreshTokenDaysToLive) > DateTime.UtcNow)
                             .ToList();              
         }

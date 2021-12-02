@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
-using ThesisERP.Core.Configurations;
 using ThesisERP.Core.Entites;
 using ThesisERP.Application.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +15,9 @@ using Microsoft.AspNetCore.Http;
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using ThesisERP.Application.Mappings;
+using ThesisERP.Application.Interfaces;
+using ThesisERP.Infrastracture.Identity;
 
 namespace ThesisERP.Infrastracture
 {
@@ -29,18 +31,23 @@ namespace ThesisERP.Infrastracture
                 options.UseSqlServer(connectionString: connString)
             );
 
-            services.AddScoped<DatabaseContext>(provider => provider.GetRequiredService<DatabaseContext>());
+            services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<DatabaseContext>());
 
             var jwtConfig = configuration.GetSection("JwtSettings");
 
             services.Configure<JwtSettings>(jwtConfig);
+            services.AddMemoryCache();
             services.ConfigureRateLimiting();
             services.AddHttpContextAccessor();
             services.AddAuthentication();
             services.ConfigureIdentity();
             services.ConfigureJWT(configuration);
             services.ConfigureAutoMapper();
+            services.ConfigureVersioning();
 
+            services.AddScoped(typeof(IRepositoryBase<>), typeof(ThesisEFRepository<>));
+            services.AddScoped<IAuthManager, AuthManager>();
+            
             return services;
         }
 

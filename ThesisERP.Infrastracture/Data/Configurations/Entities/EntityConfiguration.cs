@@ -29,6 +29,7 @@ namespace ThesisERP.Infrastracture.Data.Configurations.Entities
                          .HasForeignKey(e => e.EntityId);
 
             entityBuilder.OwnsMany(a => a.EntityAdresses).HasKey(e => e.Id);
+           
         }
     }
 }

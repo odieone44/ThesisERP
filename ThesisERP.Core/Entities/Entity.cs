@@ -23,5 +23,19 @@ namespace ThesisERP.Core.Entites
         public EntityAddress BillingAddress => EntityAdresses.FirstOrDefault(add => add.AddressType == Addresses.AddressTypes.billiing);
         public EntityAddress ShippingAddress => EntityAdresses.FirstOrDefault(add => add.AddressType == Addresses.AddressTypes.shipping);
 
+        public Entity(){ }
+
+        public Entity(Entities.EntityTypes type, string firstName, string lastName, string email, string? organization = null)
+        {
+            this.EntityType = type;
+            this.FirstName = firstName;
+            this.LastName = lastName;
+            this.Email = email;
+            this.Organization = organization;
+            this.DateCreated = DateTime.Now;
+            this.RelatedProducts = new List<Product>();
+            this.EntityAdresses = new List<EntityAddress>();
+        }
+
     }
 }

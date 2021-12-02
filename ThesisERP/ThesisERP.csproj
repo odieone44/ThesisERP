@@ -24,4 +24,8 @@
     <ProjectReference Include="..\ThesisERP.Infrastracture\ThesisERP.Infrastracture.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
 </Project>
