@@ -1,18 +1,16 @@
-using AutoMapper.Configuration;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using AspNetCoreRateLimit;
 using Serilog;
-using ThesisERP.Core.Extensions;
-using ThesisERP.Core.Models;
-using ThesisERP.Data;
+using System;
+using ThesisERP;
+using ThesisERP.Infrastracture;
+using ThesisERP.Infrastracture.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Host.UseSerilog(
-    (ctx, loggerConf) => 
+    (ctx, loggerConf) =>
     {
         loggerConf
         .WriteTo.Console()
@@ -22,24 +20,23 @@ builder.Host.UseSerilog(
                       restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
     });
 
-string? connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
-builder.Services.AddDbContext<DatabaseContext>(options =>
-    options.UseSqlServer(connectionString: connString ?? string.Empty)
-);
+builder.Services.AddInfrastructure(builder.Configuration);
 
-var jwtConfig = builder.Configuration.GetSection("JwtSettings");
 
-builder.Services.Configure<JwtSettings>(jwtConfig);
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthentication();
-builder.Services.ConfigureIdentity();
-builder.Services.ConfigureJWT(builder.Configuration);
+builder.Services.AddCors(o =>
+{
+    o.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddControllers()
                 .AddNewtonsoftJson(op =>
                     op.SerializerSettings.ReferenceLoopHandling =
                     Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-
-builder.Services.ConfigureAutoMapper();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -52,19 +49,44 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage();    
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    string swaggerJsonBasePath = string.IsNullOrEmpty(c.RoutePrefix) ? "." : "..";
+    c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json", "ThesisERPApi v1");
+});
 
+app.ConfigureExceptionHandler();
+app.UseIpRateLimiting();
 app.UseHttpsRedirection();
+app.UseCors("AllowAll");
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints=> endpoints.MapControllers());
+app.UseEndpoints(endpoints => endpoints.MapControllers());
 
-//app.MapControllers();
+app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    try
+    {
+        var context = services.GetRequiredService<DatabaseContext>();
+
+        context.Database.EnsureCreated();
+        SeedDatabase.Initialize(services);
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Failed to seed database.");
+    }
+}
+
 Log.Information("App is starting...");
 app.Run();

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -21,7 +21,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ThesisERP.Core\ThesisERP.Core.csproj" />
-    <ProjectReference Include="..\ThesisERP.Data\ThesisERP.Data.csproj" />
+    <ProjectReference Include="..\ThesisERP.Infrastracture\ThesisERP.Infrastracture.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
