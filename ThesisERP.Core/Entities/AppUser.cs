@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace ThesisERP.Core.Entites
+namespace ThesisERP.Core.Entities
 {
     public class AppUser : IdentityUser
     {

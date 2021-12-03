@@ -1,31 +1,29 @@
-﻿using ThesisERP.Core.Enums;
+﻿using ThesisERP.Core.Entities;
+using ThesisERP.Core.Enums;
 
-namespace ThesisERP.Core.Entites
+namespace ThesisERP.Core.Entities
 {
     public class Entity
     {
         public int Id { get; set; }
-        public Entities.EntityTypes EntityType { get; set; }
+        public Enums.Entities.EntityTypes EntityType { get; set; }
         public string? Organization { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string? LastName { get; set; }
-
         public string Email { get; set; } = string.Empty;
-
         public DateTime DateCreated { get; set; }
         public DateTime? DateUpdated { get; set; }
 
-        public virtual ICollection<Product>? RelatedProducts { get; set; }
-        public virtual ICollection<EntityAddress>? EntityAdresses { get; set; }
+        public virtual ICollection<Product>? RelatedProducts { get; set; }        
 
         public byte[] Timestamp { get; set; }
 
-        public EntityAddress? BillingAddress => EntityAdresses?.FirstOrDefault(add => add.AddressType == Addresses.AddressTypes.billiing);
-        public EntityAddress? ShippingAddress => EntityAdresses?.FirstOrDefault(add => add.AddressType == Addresses.AddressTypes.shipping);
+        public Address BillingAddress { get; set; }
+        public Address ShippingAddress { get; set; }
 
         public Entity(){ }
 
-        public Entity(Entities.EntityTypes type, string firstName, string lastName, string email, string? organization = null)
+        public Entity(Enums.Entities.EntityTypes type, string firstName, string lastName, string email, string? organization = null)
         {
             this.EntityType = type;
             this.FirstName = firstName;
@@ -33,8 +31,7 @@ namespace ThesisERP.Core.Entites
             this.Email = email;
             this.Organization = organization;
             this.DateCreated = DateTime.Now;
-            this.RelatedProducts = new List<Product>();
-            this.EntityAdresses = new List<EntityAddress>();
+            this.RelatedProducts = new List<Product>();            
         }
 
     }

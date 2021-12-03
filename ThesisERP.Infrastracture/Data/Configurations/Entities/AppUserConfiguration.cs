@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ThesisERP.Core.Entites;
+using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Infrastracture.Data.Configurations.Entities
 {

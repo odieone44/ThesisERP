@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ThesisERP.Application.DTOs;
-using ThesisERP.Core.Entites;
+using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Application.Mappings
 {

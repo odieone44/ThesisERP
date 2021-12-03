@@ -3,19 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ThesisERP.Infrastracture.Data;
 
 #nullable disable
 
-namespace ThesisERP.Infrastracture.Data.Migrations
+namespace ThesisERP.Infrastracture.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20211130213353_InitialCreate")]
-    partial class InitialCreate
+    partial class DatabaseContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,15 +66,15 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "e3098126-b47e-4576-ab2f-d256dd02de8d",
-                            ConcurrencyStamp = "2dd77bc9-ad69-41b4-8dde-fbf80212db49",
+                            Id = "68cdaab2-ed86-4fa8-836b-48ee24951f6f",
+                            ConcurrencyStamp = "916a89e1-416a-4efa-a867-88e5f3e97cce",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "d64737fd-912c-44e4-843c-0dae40332930",
-                            ConcurrencyStamp = "5d20c542-96c5-4869-911c-77ea74d5d9da",
+                            Id = "4243fd0e-4a2e-489b-9374-03cce4893831",
+                            ConcurrencyStamp = "0d6f2697-8e47-44d1-8b6f-7e734f8dc5f1",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -188,7 +186,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("ThesisERP.Core.Entites.AppUser", b =>
+            modelBuilder.Entity("ThesisERP.Core.Entities.AppUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -259,7 +257,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("ThesisERP.Core.Entites.Discount", b =>
+            modelBuilder.Entity("ThesisERP.Core.Entities.Discount", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -280,7 +278,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.ToTable("Discounts", (string)null);
                 });
 
-            modelBuilder.Entity("ThesisERP.Core.Entites.Document", b =>
+            modelBuilder.Entity("ThesisERP.Core.Entities.Document", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -322,7 +320,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.ToTable("Documents", (string)null);
                 });
 
-            modelBuilder.Entity("ThesisERP.Core.Entites.Entity", b =>
+            modelBuilder.Entity("ThesisERP.Core.Entities.Entity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -364,7 +362,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.ToTable("Entities", (string)null);
                 });
 
-            modelBuilder.Entity("ThesisERP.Core.Entites.Product", b =>
+            modelBuilder.Entity("ThesisERP.Core.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -411,7 +409,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.ToTable("Products", (string)null);
                 });
 
-            modelBuilder.Entity("ThesisERP.Core.Entites.Tax", b =>
+            modelBuilder.Entity("ThesisERP.Core.Entities.Tax", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -432,7 +430,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.ToTable("Taxes", (string)null);
                 });
 
-            modelBuilder.Entity("ThesisERP.Core.Entites.TransactionTemplate", b =>
+            modelBuilder.Entity("ThesisERP.Core.Entities.TransactionTemplate", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -482,13 +480,13 @@ namespace ThesisERP.Infrastracture.Data.Migrations
 
             modelBuilder.Entity("EntityProduct", b =>
                 {
-                    b.HasOne("ThesisERP.Core.Entites.Entity", null)
+                    b.HasOne("ThesisERP.Core.Entities.Entity", null)
                         .WithMany()
                         .HasForeignKey("RelatedEntitiesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ThesisERP.Core.Entites.Product", null)
+                    b.HasOne("ThesisERP.Core.Entities.Product", null)
                         .WithMany()
                         .HasForeignKey("RelatedProductsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -506,7 +504,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("ThesisERP.Core.Entites.AppUser", null)
+                    b.HasOne("ThesisERP.Core.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -515,7 +513,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("ThesisERP.Core.Entites.AppUser", null)
+                    b.HasOne("ThesisERP.Core.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -530,7 +528,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ThesisERP.Core.Entites.AppUser", null)
+                    b.HasOne("ThesisERP.Core.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -539,16 +537,16 @@ namespace ThesisERP.Infrastracture.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("ThesisERP.Core.Entites.AppUser", null)
+                    b.HasOne("ThesisERP.Core.Entities.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ThesisERP.Core.Entites.AppUser", b =>
+            modelBuilder.Entity("ThesisERP.Core.Entities.AppUser", b =>
                 {
-                    b.OwnsMany("ThesisERP.Core.Entites.RefreshToken", "RefreshTokens", b1 =>
+                    b.OwnsMany("ThesisERP.Core.Entities.RefreshToken", "RefreshTokens", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -599,29 +597,23 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.Navigation("RefreshTokens");
                 });
 
-            modelBuilder.Entity("ThesisERP.Core.Entites.Document", b =>
+            modelBuilder.Entity("ThesisERP.Core.Entities.Document", b =>
                 {
-                    b.HasOne("ThesisERP.Core.Entites.Entity", "Entity")
+                    b.HasOne("ThesisERP.Core.Entities.Entity", "Entity")
                         .WithMany()
                         .HasForeignKey("EntityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ThesisERP.Core.Entites.TransactionTemplate", "TransactionTemplate")
+                    b.HasOne("ThesisERP.Core.Entities.TransactionTemplate", "TransactionTemplate")
                         .WithMany()
                         .HasForeignKey("TemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsMany("ThesisERP.Core.Entites.DocumentAddress", "DocumentAddresses", b1 =>
+                    b.OwnsOne("ThesisERP.Core.Entities.Address", "BillingAddress", b1 =>
                         {
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"), 1L, 1);
-
-                            b1.Property<int>("AddressType")
+                            b1.Property<int>("DocumentId")
                                 .HasColumnType("int");
 
                             b1.Property<string>("City")
@@ -630,13 +622,6 @@ namespace ThesisERP.Infrastracture.Data.Migrations
 
                             b1.Property<int>("Country")
                                 .HasColumnType("int");
-
-                            b1.Property<int>("DocumentId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("Email")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("FirstName")
                                 .IsRequired()
@@ -654,11 +639,47 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<string>("Organization")
+                            b1.Property<string>("PostalCode")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<string>("Phone")
+                            b1.Property<string>("Region")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("DocumentId");
+
+                            b1.ToTable("Documents");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DocumentId");
+                        });
+
+                    b.OwnsOne("ThesisERP.Core.Entities.Address", "ShippingAddress", b1 =>
+                        {
+                            b1.Property<int>("DocumentId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("Country")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("FirstName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("LastName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Line1")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Line2")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
@@ -670,23 +691,15 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<string>("TaxId")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                            b1.HasKey("DocumentId");
 
-                            b1.HasKey("Id");
+                            b1.ToTable("Documents");
 
-                            b1.HasIndex("DocumentId");
-
-                            b1.ToTable("DocumentAddresses", (string)null);
-
-                            b1.WithOwner("Document")
+                            b1.WithOwner()
                                 .HasForeignKey("DocumentId");
-
-                            b1.Navigation("Document");
                         });
 
-                    b.OwnsMany("ThesisERP.Core.Entites.DocumentDetail", "Details", b1 =>
+                    b.OwnsMany("ThesisERP.Core.Entities.DocumentDetail", "Details", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -748,20 +761,20 @@ namespace ThesisERP.Infrastracture.Data.Migrations
 
                             b1.ToTable("DocumentDetails", (string)null);
 
-                            b1.HasOne("ThesisERP.Core.Entites.Discount", "Discount")
+                            b1.HasOne("ThesisERP.Core.Entities.Discount", "Discount")
                                 .WithMany()
                                 .HasForeignKey("DiscountID");
 
                             b1.WithOwner("ParentDocument")
                                 .HasForeignKey("ParentDocumentId");
 
-                            b1.HasOne("ThesisERP.Core.Entites.Product", "Product")
+                            b1.HasOne("ThesisERP.Core.Entities.Product", "Product")
                                 .WithMany()
                                 .HasForeignKey("ProductId")
                                 .OnDelete(DeleteBehavior.Cascade)
                                 .IsRequired();
 
-                            b1.HasOne("ThesisERP.Core.Entites.Tax", "Tax")
+                            b1.HasOne("ThesisERP.Core.Entities.Tax", "Tax")
                                 .WithMany()
                                 .HasForeignKey("TaxID");
 
@@ -774,26 +787,24 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                             b1.Navigation("Tax");
                         });
 
+                    b.Navigation("BillingAddress")
+                        .IsRequired();
+
                     b.Navigation("Details");
 
-                    b.Navigation("DocumentAddresses");
-
                     b.Navigation("Entity");
+
+                    b.Navigation("ShippingAddress")
+                        .IsRequired();
 
                     b.Navigation("TransactionTemplate");
                 });
 
-            modelBuilder.Entity("ThesisERP.Core.Entites.Entity", b =>
+            modelBuilder.Entity("ThesisERP.Core.Entities.Entity", b =>
                 {
-                    b.OwnsMany("ThesisERP.Core.Entites.EntityAddress", "EntityAdresses", b1 =>
+                    b.OwnsOne("ThesisERP.Core.Entities.Address", "BillingAddress", b1 =>
                         {
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"), 1L, 1);
-
-                            b1.Property<int>("AddressType")
+                            b1.Property<int>("EntityId")
                                 .HasColumnType("int");
 
                             b1.Property<string>("City")
@@ -801,13 +812,6 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<int>("Country")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("Email")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<int>("EntityId")
                                 .HasColumnType("int");
 
                             b1.Property<string>("FirstName")
@@ -826,11 +830,47 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<string>("Organization")
+                            b1.Property<string>("PostalCode")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<string>("Phone")
+                            b1.Property<string>("Region")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("EntityId");
+
+                            b1.ToTable("Entities");
+
+                            b1.WithOwner()
+                                .HasForeignKey("EntityId");
+                        });
+
+                    b.OwnsOne("ThesisERP.Core.Entities.Address", "ShippingAddress", b1 =>
+                        {
+                            b1.Property<int>("EntityId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("Country")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("FirstName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("LastName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Line1")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Line2")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
@@ -842,23 +882,19 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.Property<string>("TaxId")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                            b1.HasKey("EntityId");
 
-                            b1.HasKey("Id");
+                            b1.ToTable("Entities");
 
-                            b1.HasIndex("EntityId");
-
-                            b1.ToTable("EntityAddresses", (string)null);
-
-                            b1.WithOwner("Entity")
+                            b1.WithOwner()
                                 .HasForeignKey("EntityId");
-
-                            b1.Navigation("Entity");
                         });
 
-                    b.Navigation("EntityAdresses");
+                    b.Navigation("BillingAddress")
+                        .IsRequired();
+
+                    b.Navigation("ShippingAddress")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

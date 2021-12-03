@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ThesisERP.Core.Entites;
+using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Application.Interfaces
 {

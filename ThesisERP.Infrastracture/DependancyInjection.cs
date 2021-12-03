@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
-using ThesisERP.Core.Entites;
+using ThesisERP.Core.Entities;
 using ThesisERP.Application.Models;
 using Microsoft.Extensions.DependencyInjection;
 using ThesisERP.Infrastracture.Data;
@@ -25,7 +25,8 @@ namespace ThesisERP.Infrastracture
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            string connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
+            //string connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
+            string connString = Environment.GetEnvironmentVariable("ThesisERPConnection_2");
 
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlServer(connectionString: connString)

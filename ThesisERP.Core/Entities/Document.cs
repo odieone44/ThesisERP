@@ -1,7 +1,8 @@
 ﻿using ThesisERP.Core.Interfaces;
 using ThesisERP.Core.Enums;
+using ThesisERP.Core.Entities;
 
-namespace ThesisERP.Core.Entites
+namespace ThesisERP.Core.Entities
 {
 
     public class Document
@@ -17,11 +18,10 @@ namespace ThesisERP.Core.Entites
 
         public string DocumentNumber { get; set; }        
 
-        public Transactions.Status Status { get; set; }
-        public ICollection<DocumentAddress> DocumentAddresses { get; set; } = new List<DocumentAddress>();       
+        public Transactions.Status Status { get; set; }        
 
-        public DocumentAddress BillingAddress => DocumentAddresses.FirstOrDefault(add => add.AddressType == Addresses.AddressTypes.billiing);
-        public DocumentAddress ShippingAddress => DocumentAddresses.FirstOrDefault(add => add.AddressType == Addresses.AddressTypes.shipping);
+        public Address BillingAddress { get; set; }
+        public Address ShippingAddress { get; set; }
 
         public ICollection<DocumentDetail> Details { get; set; } = new List<DocumentDetail>();       
 

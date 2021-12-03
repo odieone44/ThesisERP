@@ -1,7 +1,7 @@
 ﻿using ThesisERP.Core.Interfaces;
 using ThesisERP.Core.Extensions;
 
-namespace ThesisERP.Core.Entites
+namespace ThesisERP.Core.Entities
 {
 
 

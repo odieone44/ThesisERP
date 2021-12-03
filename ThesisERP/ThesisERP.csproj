@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\**" />
+    <Content Remove="Controllers\**" />
+    <EmbeddedResource Remove="Controllers\**" />
+    <None Remove="Controllers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.0">
 		  <PrivateAssets>all</PrivateAssets>
@@ -22,10 +29,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ThesisERP.Core\ThesisERP.Core.csproj" />
     <ProjectReference Include="..\ThesisERP.Infrastracture\ThesisERP.Infrastracture.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

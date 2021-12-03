@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace ThesisERP.Core.Entites
+namespace ThesisERP.Core.Entities
 {
     public class RefreshToken
     {

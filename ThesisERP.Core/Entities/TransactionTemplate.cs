@@ -1,6 +1,6 @@
 ﻿using ThesisERP.Core.Enums;
 
-namespace ThesisERP.Core.Entites
+namespace ThesisERP.Core.Entities
 {
     public class TransactionTemplate
     {

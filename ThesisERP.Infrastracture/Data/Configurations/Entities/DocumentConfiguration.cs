@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ThesisERP.Core.Entites;
+using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Infrastracture.Data.Configurations.Entities
 {
@@ -34,12 +34,15 @@ namespace ThesisERP.Infrastracture.Data.Configurations.Entities
 
             documentBuilder.OwnsMany(d => d.Details).Property(d => d.Timestamp).IsRowVersion();
 
-            documentBuilder.OwnsMany(d => d.DocumentAddresses)
-                           .ToTable("DocumentAddresses")
-                           .WithOwner(a => a.Document)
-                           .HasForeignKey(d => d.DocumentId);
+            //documentBuilder.OwnsMany(d => d.DocumentAddresses)
+            //               .ToTable("DocumentAddresses")
+            //               .WithOwner(a => a.Document)
+            //               .HasForeignKey(d => d.DocumentId);
 
-            documentBuilder.OwnsMany(d => d.DocumentAddresses).HasKey(d => d.Id);
+            //documentBuilder.OwnsMany(d => d.DocumentAddresses).HasKey(d => d.Id);
+
+            documentBuilder.OwnsOne(s => s.ShippingAddress);
+            documentBuilder.OwnsOne(b => b.BillingAddress);
         }
     }
 }
