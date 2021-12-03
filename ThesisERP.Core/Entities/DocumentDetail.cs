@@ -5,7 +5,7 @@ namespace ThesisERP.Core.Entites
 {
 
 
-    public class DocumentDetail : ITransactionDetail
+    public class DocumentDetail
     {
 
         public int Id { get; set; }
