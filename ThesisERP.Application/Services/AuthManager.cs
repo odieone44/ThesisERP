@@ -2,30 +2,25 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Models;
 using ThesisERP.Core.Entities;
-using ThesisERP.Infrastracture.Data;
 
 
-namespace ThesisERP.Infrastracture.Identity
+namespace ThesisERP.Application.Services
 {
     public class AuthManager : IAuthManager
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly JwtSettings _jwtSettings;
-        private readonly IAppDbContext _context;        
+        private readonly IAppDbContext _context;
         private AppUser _user;
 
-        public AuthManager(UserManager<AppUser> userManager, IOptions<JwtSettings> jwtSettings, DatabaseContext context)
+        public AuthManager(UserManager<AppUser> userManager, IOptions<JwtSettings> jwtSettings, IAppDbContext context)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
@@ -44,9 +39,9 @@ namespace ThesisERP.Infrastracture.Identity
             }
 
             var jwtToken = await _CreateJwtToken();
-            var refreshToken = _user.AddRefreshToken(ipAddress);            
+            var refreshToken = _user.AddRefreshToken(ipAddress);
 
-            _user.RemoveExpiredRefreshTokens(_jwtSettings.RefreshTokenTTL);
+            _user.RemoveOldRefreshTokens(_jwtSettings.RefreshTokenTTL);            
 
             _context.AppUsers.Update(_user);
 
@@ -64,7 +59,7 @@ namespace ThesisERP.Infrastracture.Identity
             {
                 return new AuthError();
             }
-            
+
             var refreshToken = _user.RefreshTokens.Single(x => x.Token == token);
 
             if (refreshToken.IsRevoked)
@@ -88,14 +83,14 @@ namespace ThesisERP.Infrastracture.Identity
             _user.RefreshTokens.Add(newRefreshToken);
 
             // remove old refresh tokens from user
-            _user.RemoveExpiredRefreshTokens(_jwtSettings.RefreshTokenTTL);
+            _user.RemoveOldRefreshTokens(_jwtSettings.RefreshTokenTTL);
 
             // save changes to db
             _context.AppUsers.Update(_user);
             await _context.SaveChangesAsync();
 
             // generate new jwt
-            var jwtToken = await _CreateJwtToken();
+            string jwtToken = await _CreateJwtToken();
 
             return new AuthSuccess(jwtToken, newRefreshToken.Token);
 
@@ -134,7 +129,7 @@ namespace ThesisERP.Infrastracture.Identity
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name, _user.UserName),
-                new Claim(ClaimTypes.GivenName, _user.FirstName + _user.LastName),
+                new Claim(ClaimTypes.GivenName, $"{_user.FirstName} {_user.LastName}"),
             };
 
             var roles = await _userManager.GetRolesAsync(_user);
@@ -148,7 +143,7 @@ namespace ThesisERP.Infrastracture.Identity
         }
 
         private SigningCredentials _GetSigningCredentials()
-{
+        {
             var key = Environment.GetEnvironmentVariable("JWT_KEY");
             var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
 
@@ -165,9 +160,6 @@ namespace ThesisERP.Infrastracture.Identity
 
             return user;
         }
-
         #endregion
-
-
     }
 }

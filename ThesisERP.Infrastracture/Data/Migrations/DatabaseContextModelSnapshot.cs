@@ -8,7 +8,7 @@ using ThesisERP.Infrastracture.Data;
 
 #nullable disable
 
-namespace ThesisERP.Infrastracture.Migrations
+namespace ThesisERP.Infrastracture.Data.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
     partial class DatabaseContextModelSnapshot : ModelSnapshot
@@ -66,15 +66,15 @@ namespace ThesisERP.Infrastracture.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "68cdaab2-ed86-4fa8-836b-48ee24951f6f",
-                            ConcurrencyStamp = "916a89e1-416a-4efa-a867-88e5f3e97cce",
+                            Id = "109f7dbc-c7c5-4871-8283-078b5ef27020",
+                            ConcurrencyStamp = "56d9e7c8-feb7-4bd1-8e06-b3d2ab4cbbf6",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "4243fd0e-4a2e-489b-9374-03cce4893831",
-                            ConcurrencyStamp = "0d6f2697-8e47-44d1-8b6f-7e734f8dc5f1",
+                            Id = "274bbb30-07c5-42fb-9477-0b019373e67f",
+                            ConcurrencyStamp = "8b0ce168-0f9f-4113-a55d-4745af0953b4",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -286,6 +286,10 @@ namespace ThesisERP.Infrastracture.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
@@ -297,6 +301,9 @@ namespace ThesisERP.Infrastracture.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("EntityId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InventoryLocationId")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
@@ -314,6 +321,8 @@ namespace ThesisERP.Infrastracture.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EntityId");
+
+                    b.HasIndex("InventoryLocationId");
 
                     b.HasIndex("TemplateId");
 
@@ -360,6 +369,27 @@ namespace ThesisERP.Infrastracture.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Entities", (string)null);
+                });
+
+            modelBuilder.Entity("ThesisERP.Core.Entities.InventoryLocation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Abbreviation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("InventoryLocations", (string)null);
                 });
 
             modelBuilder.Entity("ThesisERP.Core.Entities.Product", b =>
@@ -409,6 +439,41 @@ namespace ThesisERP.Infrastracture.Migrations
                     b.ToTable("Products", (string)null);
                 });
 
+            modelBuilder.Entity("ThesisERP.Core.Entities.StockLevel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<decimal>("Available")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<decimal>("Incoming")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<int>("InventoryLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Outgoing")
+                        .HasPrecision(18, 6)
+                        .HasColumnType("decimal(18,6)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InventoryLocationId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("StockLevels", (string)null);
+                });
+
             modelBuilder.Entity("ThesisERP.Core.Entities.Tax", b =>
                 {
                     b.Property<int>("Id")
@@ -455,6 +520,9 @@ namespace ThesisERP.Infrastracture.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("NextNumber")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Postfix")
                         .IsRequired()
@@ -605,6 +673,12 @@ namespace ThesisERP.Infrastracture.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ThesisERP.Core.Entities.InventoryLocation", "InventoryLocation")
+                        .WithMany()
+                        .HasForeignKey("InventoryLocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ThesisERP.Core.Entities.TransactionTemplate", "TransactionTemplate")
                         .WithMany()
                         .HasForeignKey("TemplateId")
@@ -623,19 +697,15 @@ namespace ThesisERP.Infrastracture.Migrations
                             b1.Property<int>("Country")
                                 .HasColumnType("int");
 
-                            b1.Property<string>("FirstName")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("LastName")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
                             b1.Property<string>("Line1")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Line2")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Name")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
@@ -667,19 +737,15 @@ namespace ThesisERP.Infrastracture.Migrations
                             b1.Property<int>("Country")
                                 .HasColumnType("int");
 
-                            b1.Property<string>("FirstName")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("LastName")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
                             b1.Property<string>("Line1")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Line2")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Name")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
@@ -794,6 +860,8 @@ namespace ThesisERP.Infrastracture.Migrations
 
                     b.Navigation("Entity");
 
+                    b.Navigation("InventoryLocation");
+
                     b.Navigation("ShippingAddress")
                         .IsRequired();
 
@@ -814,19 +882,15 @@ namespace ThesisERP.Infrastracture.Migrations
                             b1.Property<int>("Country")
                                 .HasColumnType("int");
 
-                            b1.Property<string>("FirstName")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("LastName")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
                             b1.Property<string>("Line1")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Line2")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Name")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
@@ -858,19 +922,15 @@ namespace ThesisERP.Infrastracture.Migrations
                             b1.Property<int>("Country")
                                 .HasColumnType("int");
 
-                            b1.Property<string>("FirstName")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("LastName")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
                             b1.Property<string>("Line1")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<string>("Line2")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Name")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
@@ -895,6 +955,81 @@ namespace ThesisERP.Infrastracture.Migrations
 
                     b.Navigation("ShippingAddress")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ThesisERP.Core.Entities.InventoryLocation", b =>
+                {
+                    b.OwnsOne("ThesisERP.Core.Entities.Address", "Address", b1 =>
+                        {
+                            b1.Property<int>("InventoryLocationId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("Country")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Line1")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Line2")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("PostalCode")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Region")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("InventoryLocationId");
+
+                            b1.ToTable("InventoryLocations");
+
+                            b1.WithOwner()
+                                .HasForeignKey("InventoryLocationId");
+                        });
+
+                    b.Navigation("Address")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ThesisERP.Core.Entities.StockLevel", b =>
+                {
+                    b.HasOne("ThesisERP.Core.Entities.InventoryLocation", "InventoryLocation")
+                        .WithMany("StockLevels")
+                        .HasForeignKey("InventoryLocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ThesisERP.Core.Entities.Product", "Product")
+                        .WithMany("StockLevels")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InventoryLocation");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("ThesisERP.Core.Entities.InventoryLocation", b =>
+                {
+                    b.Navigation("StockLevels");
+                });
+
+            modelBuilder.Entity("ThesisERP.Core.Entities.Product", b =>
+                {
+                    b.Navigation("StockLevels");
                 });
 #pragma warning restore 612, 618
         }

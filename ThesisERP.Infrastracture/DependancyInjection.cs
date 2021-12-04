@@ -17,7 +17,8 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using ThesisERP.Application.Mappings;
 using ThesisERP.Application.Interfaces;
-using ThesisERP.Infrastracture.Identity;
+using ThesisERP.Application.Services;
+using ThesisERP.Core.Exceptions;
 
 namespace ThesisERP.Infrastracture
 {
@@ -134,14 +135,24 @@ namespace ThesisERP.Infrastracture
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                     if (contextFeature != null)
                     {
-                        Log.Error($"Something went wrong in {contextFeature.Error}");
-
+                        string responseMessage = string.Empty;
+                                                
+                        if (contextFeature.Error is ThesisERPException)
+                        {
+                            responseMessage = contextFeature.Error.Message;
+                            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                        } 
+                        else
+                        {
+                            Log.Error($"Something went wrong in {contextFeature.Error}");
+                            responseMessage = "Internal Server Error. Please try again.";
+                        }
                         await context.Response
                         .WriteAsync(
                             new AppError
                             {
                                 StatusCode = context.Response.StatusCode,
-                                Message = "Internal Server Error. Please try again."
+                                Message = responseMessage
                             }
                             .ToString()
                         );

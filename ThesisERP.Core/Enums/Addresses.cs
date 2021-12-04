@@ -20,6 +20,7 @@
 
         public enum CountryCodes
         {
+            NONE,
             AD,
             AE,
             AF,

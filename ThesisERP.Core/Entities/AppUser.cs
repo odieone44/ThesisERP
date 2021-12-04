@@ -18,20 +18,17 @@ namespace ThesisERP.Core.Entities
             return refreshToken;
         }
 
-        public void RemoveExpiredRefreshTokens(int refreshTokenDaysToLive)
+        public void RemoveOldRefreshTokens(int refreshTokenDaysToLive)
         {
-           RefreshTokens = RefreshTokens
-                            .Where(token=> 
-                                    token.Created.AddDays(refreshTokenDaysToLive) > DateTime.UtcNow)
-                            .ToList();              
+           RefreshTokens.RemoveAll((token) => token.Created.AddDays(refreshTokenDaysToLive) <= DateTime.UtcNow);
         }
 
         public void RevokeAllDescendantRefreshTokens(RefreshToken refreshToken, string ipAddress, string reason)
         {
             if (!string.IsNullOrEmpty(refreshToken.ReplacedByToken))
             {
-                var childToken = RefreshTokens.SingleOrDefault(x => x.Token == refreshToken.ReplacedByToken);
-                if (childToken.IsActive)
+                var childToken = RefreshTokens.FirstOrDefault(x => x.Token == refreshToken.ReplacedByToken);
+                if (childToken!.IsActive)
                     childToken.Revoke(ipAddress: ipAddress, reason: reason);
                 else
                     RevokeAllDescendantRefreshTokens(childToken, ipAddress, reason);

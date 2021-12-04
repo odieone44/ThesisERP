@@ -10,7 +10,6 @@ namespace ThesisERP.Infrastracture.Data.Configurations.Entities
         {
             templateBuilder.ToTable("TransactionTemplates").HasKey(t => t.Id);
             templateBuilder.Property(t => t.Timestamp).IsRowVersion();
-
         }
     }
 }

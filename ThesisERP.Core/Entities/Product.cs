@@ -15,6 +15,7 @@ namespace ThesisERP.Core.Entities
         public DateTime DateUpdated { get; set; }
         public byte[] Timestamp { get; set; }
         public virtual ICollection<Entity> RelatedEntities { get; set; }
+        public virtual ICollection<StockLevel> StockLevels { get; set; } = new List<StockLevel>();
 
     }
 }

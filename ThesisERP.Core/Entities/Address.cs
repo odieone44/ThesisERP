@@ -10,19 +10,17 @@ namespace ThesisERP.Core.Entities
 {
     public class Address : ValueObject
     {
-        public string FirstName { get; private set; } = string.Empty;
-        public string LastName { get; private set; } = string.Empty;                     
+        public string Name { get; private set; } = string.Empty;                 
         public string Line1 { get; private set; } = string.Empty;
         public string Line2 { get; private set; } = string.Empty;
         public string City { get; private set; } = string.Empty;
         public string Region { get; private set; } = string.Empty;
         public string PostalCode { get; private set; } = string.Empty;
-        public Addresses.CountryCodes Country { get; private set; }
+        public Addresses.CountryCodes Country { get; private set; } = Addresses.CountryCodes.NONE;
         
         private Address() { }
 
-        public Address(string firstName, 
-                       string lastName, 
+        public Address(string name,                        
                        string line1, 
                        string line2, 
                        string city, 
@@ -30,8 +28,7 @@ namespace ThesisERP.Core.Entities
                        string postalCode, 
                        Addresses.CountryCodes country)
         {
-            FirstName = firstName;
-            LastName = lastName;
+            Name = name;           
             Line1 = line1;
             Line2 = line2;
             City = city;
@@ -39,20 +36,20 @@ namespace ThesisERP.Core.Entities
             PostalCode = postalCode;
             Country = country;
         }
+
+        public Address Copy()
+        {
+            return new(Name, Line1, Line2, City, Region, PostalCode, Country);
+        }
         
         public override string ToString()
         {
-            return $"{FirstName} {LastName}, {Line1} {Line2}, {City}, {Region} {PostalCode}, {Country}";
+            return $"{Name}, {Line1} {Line2}, {City}, {Region} {PostalCode}, {Country}";
         }
 
         protected override IEnumerable<object> GetEqualityComponents()
-        {
-            //yield return Organization;
-            yield return FirstName;
-            yield return LastName;
-            //yield return Email;
-            //yield return Phone;
-            //yield return TaxId;
+        {            
+            yield return Name;            
             yield return Line1;
             yield return Line2;
             yield return City;

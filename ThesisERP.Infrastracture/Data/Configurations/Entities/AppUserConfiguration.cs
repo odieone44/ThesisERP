@@ -9,13 +9,12 @@ namespace ThesisERP.Infrastracture.Data.Configurations.Entities
         public void Configure(EntityTypeBuilder<AppUser> appUserBuilder)
         {
             appUserBuilder
-                .OwnsMany(t => t.RefreshTokens)
-                .ToTable("RefreshTokens")
-                .WithOwner()
-                .HasForeignKey(u => u.UserId);
-
-            appUserBuilder
-                .OwnsMany(t => t.RefreshTokens).HasKey(u => u.Id);
+                .OwnsMany(
+                    t => t.RefreshTokens, token =>
+                    {
+                        token.ToTable("RefreshTokens").HasKey(u => u.Id);
+                        token.WithOwner().HasForeignKey(u => u.UserId);
+                    });                
         }
     }
 }

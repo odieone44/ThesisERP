@@ -10,6 +10,10 @@ namespace ThesisERP.Infrastracture.Data.Configurations.Entities
         {
             productBuilder.ToTable("Products").HasKey(t => t.Id);
             productBuilder.Property(p => p.Timestamp).IsRowVersion();
+
+            productBuilder.HasMany(s => s.StockLevels)
+                          .WithOne(l => l.Product)
+                          .HasForeignKey(k => k.ProductId);            
         }
     }
 }

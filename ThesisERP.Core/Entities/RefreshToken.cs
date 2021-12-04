@@ -28,7 +28,7 @@ namespace ThesisERP.Core.Entities
             CreatedByIp = ipAddress;
         }
 
-        public RefreshToken()
+        private RefreshToken()
         { }
 
         public void Revoke(string ipAddress, string reason, string? replacementToken = null)

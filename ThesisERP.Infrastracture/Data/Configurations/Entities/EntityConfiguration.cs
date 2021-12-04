@@ -23,13 +23,6 @@ namespace ThesisERP.Infrastracture.Data.Configurations.Entities
             entityBuilder.HasMany(e => e.RelatedProducts)
                          .WithMany(x => x.RelatedEntities);
 
-            //entityBuilder.OwnsMany(a => a.EntityAdresses)
-            //             .ToTable("EntityAddresses")
-            //             .WithOwner(e => e.Entity)
-            //             .HasForeignKey(e => e.EntityId);
-
-            //entityBuilder.OwnsMany(a => a.EntityAdresses).HasKey(e => e.Id);
-
             entityBuilder.OwnsOne(s => s.ShippingAddress);
             entityBuilder.OwnsOne(b => b.BillingAddress); 
            
