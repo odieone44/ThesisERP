@@ -10,15 +10,15 @@ namespace ThesisERP.Core.Entities
 {
     public class Address : ValueObject
     {
-        public string Name { get; private set; } = string.Empty;                 
-        public string Line1 { get; private set; } = string.Empty;
-        public string Line2 { get; private set; } = string.Empty;
-        public string City { get; private set; } = string.Empty;
-        public string Region { get; private set; } = string.Empty;
-        public string PostalCode { get; private set; } = string.Empty;
-        public Addresses.CountryCodes Country { get; private set; } = Addresses.CountryCodes.NONE;
+        public string Name { get; set; } = string.Empty;                 
+        public string Line1 { get; set; } = string.Empty;
+        public string Line2 { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+        public string Region { get; set; } = string.Empty;
+        public string PostalCode { get; set; } = string.Empty;
+        public Addresses.CountryCodes Country { get; set; } = Addresses.CountryCodes.NONE;
         
-        private Address() { }
+        public Address() { }
 
         public Address(string name,                        
                        string line1, 

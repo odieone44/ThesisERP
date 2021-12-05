@@ -144,7 +144,7 @@ namespace ThesisERP.Application.Services
 
         private SigningCredentials _GetSigningCredentials()
         {
-            var key = Environment.GetEnvironmentVariable("JWT_KEY");
+            var key = Environment.GetEnvironmentVariable("THESIS_JWT_KEY");
             var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
 
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);

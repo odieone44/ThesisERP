@@ -10,16 +10,4 @@
     <ProjectReference Include="..\ThesisERP.Core\ThesisERP.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\Documents\" />
-    <Folder Include="Services\Discounts\" />
-    <Folder Include="Services\Entities\Clients\" />
-    <Folder Include="Services\Entities\Suppliers\" />
-    <Folder Include="Services\InventoryLocations\" />
-    <Folder Include="Services\TransactionTemplates\" />
-    <Folder Include="Services\StockLevels\" />
-    <Folder Include="Services\Taxes\" />
-    <Folder Include="Services\Products\" />
-  </ItemGroup>
-
 </Project>

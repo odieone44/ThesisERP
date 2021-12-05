@@ -1,9 +1,13 @@
 using AspNetCoreRateLimit;
+using Swashbuckle.AspNetCore;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Serilog;
 using System;
 using ThesisERP;
 using ThesisERP.Infrastracture;
 using ThesisERP.Infrastracture.Data;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,13 +38,21 @@ builder.Services.AddCors(o =>
 });
 
 builder.Services.AddControllers()
-                .AddNewtonsoftJson(op =>
-                    op.SerializerSettings.ReferenceLoopHandling =
-                    Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                })
+                .AddNewtonsoftJson(op => 
+                {
+                    op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;                   
+                });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{   
+    //c.DescribeAllEnumsAsStrings();
+});
 
 
 
@@ -52,11 +64,16 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-app.UseSwagger();
+app.UseSwagger(c =>
+{
+    c.RouteTemplate = "api/{documentname}/swagger.json";
+});
 app.UseSwaggerUI(c =>
 {
     string swaggerJsonBasePath = string.IsNullOrEmpty(c.RoutePrefix) ? "." : "..";
-    c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json", "ThesisERPApi v1");
+
+    c.SwaggerEndpoint($"{swaggerJsonBasePath}/api/v1/swagger.json", "ThesisERPApi v1");
+    c.RoutePrefix = "api";
 });
 
 app.ConfigureExceptionHandler();

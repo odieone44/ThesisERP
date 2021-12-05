@@ -41,7 +41,7 @@ namespace ThesisERP.Infrastracture
             services.AddMemoryCache();
             services.ConfigureRateLimiting();
             services.AddHttpContextAccessor();
-            services.AddAuthentication();
+            //services.AddAuthentication();
             services.ConfigureIdentity();
             services.ConfigureJWT(configuration);
             services.ConfigureAutoMapper();

@@ -44,7 +44,7 @@ namespace ThesisERP.Infrastracture.Data
             await SaveChangesAsync();
         }
 
-        public virtual async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? expression = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null)
+        public virtual async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? expression = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object?>>? include = null)
         {
             IQueryable<T> query = _dbContext.Set<T>();
 
