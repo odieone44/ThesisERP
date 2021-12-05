@@ -36,7 +36,7 @@ namespace ThesisERP.Infrastracture.Data
             {
                 property.SetPrecision(18);
                 property.SetScale(6);
-            }
+            }            
 
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }

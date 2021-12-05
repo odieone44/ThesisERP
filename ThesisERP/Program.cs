@@ -8,6 +8,7 @@ using ThesisERP;
 using ThesisERP.Infrastracture;
 using ThesisERP.Infrastracture.Data;
 using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,20 +42,12 @@ builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                })
-                .AddNewtonsoftJson(op => 
-                {
-                    op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;                   
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{   
-    //c.DescribeAllEnumsAsStrings();
-});
-
-
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 

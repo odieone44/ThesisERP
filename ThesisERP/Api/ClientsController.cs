@@ -13,14 +13,14 @@ using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api
 {    
-    public class ClientController : BaseApiController
+    public class ClientsController : BaseApiController
     {
         
-        private readonly ILogger<ClientController> _logger;
+        private readonly ILogger<ClientsController> _logger;
         private readonly IMapper _mapper;
         private readonly IRepositoryBase<Entity> _entityRepo;
 
-        public ClientController(ILogger<ClientController> logger, IMapper mapper, IRepositoryBase<Entity> entityRepo)
+        public ClientsController(ILogger<ClientsController> logger, IMapper mapper, IRepositoryBase<Entity> entityRepo)
         {
             _logger = logger;
             _mapper = mapper;

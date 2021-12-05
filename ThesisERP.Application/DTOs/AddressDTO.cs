@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json.Converters;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using ThesisERP.Core.Enums;
 
