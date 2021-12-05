@@ -16,22 +16,52 @@ namespace ThesisERP.Application.Mappings
             CreateMap<Entity, ClientDTO>()
                 .ReverseMap()
                     .ForMember(dest => dest.EntityType,
-                               opt => opt.MapFrom(src => Entities.EntityTypes.client));            
+                               opt => opt.MapFrom(val => Entities.EntityTypes.client));            
 
             CreateMap<Entity, CreateClientDTO>()
                 .ReverseMap()
                     .ForMember(dest => dest.EntityType,
-                               opt => opt.MapFrom(src => Entities.EntityTypes.client));
+                               opt => opt.MapFrom(val => Entities.EntityTypes.client))
+                    .ForMember(dest => dest.DateCreated,
+                               opt => opt.MapFrom(val => DateTime.UtcNow));
+
+            CreateMap<Entity, UpdateClientDTO>()
+                .ReverseMap()
+                    .ForMember(dest => dest.EntityType,
+                               opt => opt.MapFrom(val => Entities.EntityTypes.client))
+                    .ForMember(dest => dest.DateCreated, 
+                               opt => opt.UseDestinationValue())
+                    .ForMember(dest => dest.DateUpdated,
+                               opt => opt.MapFrom(val => DateTime.UtcNow));
 
             CreateMap<Entity, SupplierDTO>()
                 .ReverseMap()
                     .ForMember(dest => dest.EntityType,
-                               opt => opt.MapFrom(src => Entities.EntityTypes.supplier));
+                               opt => opt.MapFrom(val => Entities.EntityTypes.supplier));
+
+            CreateMap<Entity, CreateSupplierDTO>()
+               .ReverseMap()
+                   .ForMember(dest => dest.EntityType,
+                              opt => opt.MapFrom(val => Entities.EntityTypes.supplier))
+                   .ForMember(dest => dest.DateCreated,
+                               opt => opt.MapFrom(val => DateTime.UtcNow));
+
+            CreateMap<Entity, UpdateSupplierDTO>()
+                .ReverseMap()
+                    .ForMember(dest => dest.EntityType,
+                               opt => opt.MapFrom(val => Entities.EntityTypes.supplier))
+                    .ForMember(dest => dest.DateCreated,
+                               opt => opt.UseDestinationValue())
+                    .ForMember(dest => dest.DateUpdated,
+                               opt => opt.MapFrom(val => DateTime.UtcNow));
+
 
             CreateMap<Address, AddressDTO>().
                 ForMember(dest=>dest.CountryCode, 
                           opt => opt.MapFrom(src => src.Country))
                 .ReverseMap();
+
+
 
         }
     }

@@ -65,7 +65,7 @@ app.UseSwaggerUI(c =>
 {
     string swaggerJsonBasePath = string.IsNullOrEmpty(c.RoutePrefix) ? "." : "..";
 
-    c.SwaggerEndpoint($"{swaggerJsonBasePath}/api/v1/swagger.json", "ThesisERPApi v1");
+    c.SwaggerEndpoint($"{swaggerJsonBasePath}/api/v1/swagger.json", "ThesisERP API v1");
     c.RoutePrefix = "api";
 });
 
@@ -89,7 +89,7 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<DatabaseContext>();
 
-        context.Database.EnsureCreated();
+        //context.Database.EnsureCreated();
         SeedDatabase.Initialize(services);
     }
     catch (Exception ex)

@@ -66,7 +66,7 @@ namespace ThesisERP.Api
                 return BadRequest();
             }
 
-            var response = await _authManager.ValidateUser(userDTO, ipAddress());
+            var response = await _authManager.ValidateUser(userDTO, _ipAddress());
 
             return _handleAuthorizationAttempt(response);
         }
@@ -74,27 +74,29 @@ namespace ThesisERP.Api
         [HttpPost("refresh-user")]
         public async Task<IActionResult> RefreshToken()
         {
-            var refreshToken = Request.Cookies["refreshToken"];
+            string? refreshToken = Request.Cookies["refreshToken"];
 
             if (refreshToken == null) return BadRequest();
 
-            var response = await _authManager.RefreshUser(refreshToken, ipAddress());
+            AuthResponse response = await _authManager.RefreshUser(refreshToken, _ipAddress());
 
             return _handleAuthorizationAttempt(response);
         }
 
-        private void setTokenCookie(string token)
+        private void _setTokenCookie(string token)
         {
             // append cookie with refresh token to the http response
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
+                SameSite = SameSiteMode.Lax,
+                Secure = true,
                 Expires = DateTime.UtcNow.AddDays(7)
             };
             Response.Cookies.Append("refreshToken", token, cookieOptions);
         }
 
-        private string ipAddress()
+        private string _ipAddress()
         {
             // get source ip address for the current request
             if (Request.Headers.ContainsKey("X-Forwarded-For"))
@@ -110,7 +112,7 @@ namespace ThesisERP.Api
                 return Unauthorized();
             }
 
-            setTokenCookie(response.RefreshToken);
+            _setTokenCookie(response.RefreshToken);
 
             return Ok(new { Token = response.JwtToken });
         }

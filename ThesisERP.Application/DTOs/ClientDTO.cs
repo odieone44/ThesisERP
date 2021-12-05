@@ -21,6 +21,7 @@ namespace ThesisERP.Application.DTOs
         public string? Organization { get; set; }
         
         [Required]
+        [StringLength(60, ErrorMessage = "Length must be between {2} and {1} characters.", MinimumLength = 1)]
         public string FirstName { get; set; } = string.Empty;        
         public string? LastName { get; set; }
         
@@ -30,5 +31,9 @@ namespace ThesisERP.Application.DTOs
                 
         public AddressDTO BillingAddress { get; set; } = new AddressDTO();
         public AddressDTO ShippingAddress { get; set; } = new AddressDTO();
+    }
+
+    public class UpdateClientDTO : CreateClientDTO
+    {   
     }
 }
