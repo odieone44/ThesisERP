@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using ThesisERP.Application.Interfaces;
-using ThesisERP.Core.Entites;
+using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Infrastracture.Data
 {
@@ -14,6 +14,9 @@ namespace ThesisERP.Infrastracture.Data
         public DbSet<AppUser> AppUsers => Set<AppUser>();
         public DbSet<Entity> Entities => Set<Entity>();
         public DbSet<Document> Documents => Set<Document>();
+        public DbSet<TransactionTemplate> TransactionTemplates => Set<TransactionTemplate>();
+        public DbSet<InventoryLocation> InventoryLocations => Set<InventoryLocation>();
+        public DbSet<StockLevel> StockLevels => Set<StockLevel>();
         public DbSet<Tax> Taxes => Set<Tax>();
         public DbSet<Discount> Discounts => Set<Discount>();
         public DbSet<Product> Products => Set<Product>();

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ThesisERP.Core.Entites;
+using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Infrastracture.Data.Configurations.Entities
 {
@@ -21,14 +21,10 @@ namespace ThesisERP.Infrastracture.Data.Configurations.Entities
             entityBuilder.Property(e => e.Timestamp).IsRowVersion();
 
             entityBuilder.HasMany(e => e.RelatedProducts)
-                         .WithMany(x => x.RelatedEntities);            
+                         .WithMany(x => x.RelatedEntities);
 
-            entityBuilder.OwnsMany(a => a.EntityAdresses)
-                         .ToTable("EntityAddresses")
-                         .WithOwner(e => e.Entity)
-                         .HasForeignKey(e => e.EntityId);
-
-            entityBuilder.OwnsMany(a => a.EntityAdresses).HasKey(e => e.Id);
+            entityBuilder.OwnsOne(s => s.ShippingAddress);
+            entityBuilder.OwnsOne(b => b.BillingAddress); 
            
         }
     }

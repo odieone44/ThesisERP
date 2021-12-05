@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Text;
-using ThesisERP.Core.Entites;
+using ThesisERP.Core.Entities;
 using ThesisERP.Application.Models;
 using Microsoft.Extensions.DependencyInjection;
 using ThesisERP.Infrastracture.Data;
@@ -17,7 +17,8 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using ThesisERP.Application.Mappings;
 using ThesisERP.Application.Interfaces;
-using ThesisERP.Infrastracture.Identity;
+using ThesisERP.Application.Services;
+using ThesisERP.Core.Exceptions;
 
 namespace ThesisERP.Infrastracture
 {
@@ -25,7 +26,8 @@ namespace ThesisERP.Infrastracture
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            string connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
+            //string connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
+            string connString = Environment.GetEnvironmentVariable("ThesisERPConnection_2");
 
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlServer(connectionString: connString)
@@ -39,7 +41,7 @@ namespace ThesisERP.Infrastracture
             services.AddMemoryCache();
             services.ConfigureRateLimiting();
             services.AddHttpContextAccessor();
-            services.AddAuthentication();
+            //services.AddAuthentication();
             services.ConfigureIdentity();
             services.ConfigureJWT(configuration);
             services.ConfigureAutoMapper();
@@ -133,14 +135,24 @@ namespace ThesisERP.Infrastracture
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                     if (contextFeature != null)
                     {
-                        Log.Error($"Something went wrong in {contextFeature.Error}");
-
+                        string responseMessage = string.Empty;
+                                                
+                        if (contextFeature.Error is ThesisERPException)
+                        {
+                            responseMessage = contextFeature.Error.Message;
+                            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                        } 
+                        else
+                        {
+                            Log.Error($"Something went wrong in {contextFeature.Error}");
+                            responseMessage = "Internal Server Error. Please try again.";
+                        }
                         await context.Response
                         .WriteAsync(
                             new AppError
                             {
                                 StatusCode = context.Response.StatusCode,
-                                Message = "Internal Server Error. Please try again."
+                                Message = responseMessage
                             }
                             .ToString()
                         );

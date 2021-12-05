@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ThesisERP.Core.Entites;
+using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Infrastracture.Data.Configurations.Entities
 {
@@ -10,7 +10,6 @@ namespace ThesisERP.Infrastracture.Data.Configurations.Entities
         {
             templateBuilder.ToTable("TransactionTemplates").HasKey(t => t.Id);
             templateBuilder.Property(t => t.Timestamp).IsRowVersion();
-
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace ThesisERP.Core.Entites
+namespace ThesisERP.Core.Entities
 {
     public class RefreshToken
     {
@@ -28,7 +28,7 @@ namespace ThesisERP.Core.Entites
             CreatedByIp = ipAddress;
         }
 
-        public RefreshToken()
+        private RefreshToken()
         { }
 
         public void Revoke(string ipAddress, string reason, string? replacementToken = null)

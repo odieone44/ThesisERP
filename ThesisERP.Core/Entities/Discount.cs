@@ -1,4 +1,4 @@
-﻿namespace ThesisERP.Core.Entites
+﻿namespace ThesisERP.Core.Entities
 {
     public class Discount
     {

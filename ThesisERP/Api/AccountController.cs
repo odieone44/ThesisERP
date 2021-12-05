@@ -6,7 +6,7 @@ using System.Web;
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Models;
-using ThesisERP.Core.Entites;
+using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api
 {    
@@ -100,7 +100,7 @@ namespace ThesisERP.Api
             if (Request.Headers.ContainsKey("X-Forwarded-For"))
                 return Request.Headers["X-Forwarded-For"];
             else
-                return HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+                return HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() ?? "0.0.0.0";
         }
 
         private IActionResult _handleAuthorizationAttempt(AuthResponse response)
