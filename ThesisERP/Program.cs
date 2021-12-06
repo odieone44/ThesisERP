@@ -64,7 +64,7 @@ app.UseSwagger(c =>
     c.RouteTemplate = "api/{documentname}/swagger.json";
 });
 app.UseSwaggerUI(c =>
-{    
+{           
     c.InjectStylesheet("../swagger/logo.css");
     c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
     c.RoutePrefix = "api";

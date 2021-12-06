@@ -35,7 +35,7 @@ public class ProductsController : BaseApiController
     }
 
     [HttpGet("{id:int}", Name = "GetProduct")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ProductDTO))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetProduct(int id)
     {
@@ -55,6 +55,7 @@ public class ProductsController : BaseApiController
 
     [Authorize]
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ProductDTO))]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductDTO productDTO)
     {
         if (!ModelState.IsValid)
@@ -75,6 +76,8 @@ public class ProductsController : BaseApiController
 
     [Authorize]
     [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDTO productDTO)
     {
         if (!ModelState.IsValid || id < 1)
@@ -96,6 +99,8 @@ public class ProductsController : BaseApiController
 
     [Authorize()]
     [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteProduct(int id)
     {
         if (id < 1)

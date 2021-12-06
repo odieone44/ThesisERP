@@ -17,9 +17,24 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Product>
         productBuilder.Property(p => p.LongDescription).HasMaxLength(4000);
         //productBuilder.Property(p => p.Type).HasDefaultValue(Products.Types.product);
 
-
         productBuilder.HasMany(s => s.StockLevels)
                       .WithOne(l => l.Product)
                       .HasForeignKey(k => k.ProductId);
+
+        productBuilder
+            .HasIndex(p => p.SKU)
+            .IncludeProperties(
+                p => new
+                {
+                    p.Id,
+                    p.Description, 
+                    p.Type, 
+                    p.DefaultPurchasePrice, 
+                    p.DefaultSaleSPrice,
+                    p.LongDescription,
+                    p.DateCreated,
+                    p.DateUpdated
+                })
+            .IsUnique();
     }
 }

@@ -8,12 +8,16 @@ using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Application.DTOs;
 
-public class ClientDTO : CreateClientDTO
+public class ClientDTO : GetClientDTO
+{   
+    public virtual ICollection<ProductDTO>? RelatedProducts { get; set; } = new List<ProductDTO>();
+}
+
+public class GetClientDTO : CreateClientDTO
 {
     public int Id { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime? DateUpdated { get; set; }
-    public virtual ICollection<ProductDTO>? RelatedProducts { get; set; } = new List<ProductDTO>();
 }
 
 public class CreateClientDTO
