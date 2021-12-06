@@ -25,13 +25,13 @@ namespace ThesisERP.Core.Entities
 
         public Entity(Enums.Entities.EntityTypes type, string firstName, string lastName, string email, string? organization = null)
         {
-            this.EntityType = type;
-            this.FirstName = firstName;
-            this.LastName = lastName;
-            this.Email = email;
-            this.Organization = organization;
-            this.DateCreated = DateTime.Now;
-            this.RelatedProducts = new List<Product>();            
+            EntityType = type;
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
+            Organization = organization;
+            DateCreated = DateTime.Now;
+            RelatedProducts = new List<Product>();            
         }
 
     }
