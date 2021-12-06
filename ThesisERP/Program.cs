@@ -57,16 +57,21 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
+app.UseStaticFiles();
+
 app.UseSwagger(c =>
 {
     c.RouteTemplate = "api/{documentname}/swagger.json";
 });
 app.UseSwaggerUI(c =>
-{
-    string swaggerJsonBasePath = string.IsNullOrEmpty(c.RoutePrefix) ? "." : "..";
+{    
+    c.InjectStylesheet("../swagger/logo.css");
+    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+    c.RoutePrefix = "api";
+    var swaggerJsonBasePath = string.IsNullOrEmpty(c.RoutePrefix) ? "." : "..";
 
     c.SwaggerEndpoint($"{swaggerJsonBasePath}/api/v1/swagger.json", "ThesisERP API v1");
-    c.RoutePrefix = "api";
+    
 });
 
 app.ConfigureExceptionHandler();

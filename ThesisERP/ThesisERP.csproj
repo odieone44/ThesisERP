@@ -31,4 +31,8 @@
     <ProjectReference Include="..\ThesisERP.Infrastracture\ThesisERP.Infrastracture.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\swagger\logo.css" />
+  </ItemGroup>
+
 </Project>

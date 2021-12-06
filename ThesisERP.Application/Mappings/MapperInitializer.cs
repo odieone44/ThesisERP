@@ -3,66 +3,90 @@ using ThesisERP.Application.DTOs;
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Enums;
 
-namespace ThesisERP.Application.Mappings
+namespace ThesisERP.Application.Mappings;
+
+public class MapperInitializer : Profile
 {
-    public class MapperInitializer : Profile
+    public MapperInitializer()
     {
-        public MapperInitializer()
-        {
-            CreateMap<AppUser, UserDTO>().ReverseMap();
-            CreateMap<AppUser, RegisterUserDTO>().ReverseMap();
-            CreateMap<AppUser, LoginUserDTO>().ReverseMap();
 
-            CreateMap<Entity, ClientDTO>()
-                .ReverseMap()
-                    .ForMember(dest => dest.EntityType,
-                               opt => opt.MapFrom(val => Entities.EntityTypes.client));            
+        CreateMap<Address, AddressDTO>().
+           ForMember(dest => dest.CountryCode,
+                     opt => opt.MapFrom(src => src.Country))
+           .ReverseMap();
 
-            CreateMap<Entity, CreateClientDTO>()
-                .ReverseMap()
-                    .ForMember(dest => dest.EntityType,
-                               opt => opt.MapFrom(val => Entities.EntityTypes.client))
-                    .ForMember(dest => dest.DateCreated,
-                               opt => opt.MapFrom(val => DateTime.UtcNow));
+        _createAppUserMaps();
+        _createEntityMaps();
+        _createInventoryLocationMaps();
+    }
 
-            CreateMap<Entity, UpdateClientDTO>()
-                .ReverseMap()
-                    .ForMember(dest => dest.EntityType,
-                               opt => opt.MapFrom(val => Entities.EntityTypes.client))
-                    .ForMember(dest => dest.DateCreated, 
-                               opt => opt.UseDestinationValue())
-                    .ForMember(dest => dest.DateUpdated,
-                               opt => opt.MapFrom(val => DateTime.UtcNow));
+    private void _createAppUserMaps()
+    {
+        CreateMap<AppUser, UserDTO>().ReverseMap();
+        CreateMap<AppUser, RegisterUserDTO>().ReverseMap();
+        CreateMap<AppUser, LoginUserDTO>().ReverseMap();
+    }
 
-            CreateMap<Entity, SupplierDTO>()
-                .ReverseMap()
-                    .ForMember(dest => dest.EntityType,
-                               opt => opt.MapFrom(val => Entities.EntityTypes.supplier));
+    private void _createEntityMaps()
+    {
+        CreateMap<Entity, ClientDTO>()
+            .ReverseMap()
+                .ForMember(dest => dest.EntityType,
+                           opt => opt.MapFrom(val => Entities.EntityTypes.client));
 
-            CreateMap<Entity, CreateSupplierDTO>()
-               .ReverseMap()
-                   .ForMember(dest => dest.EntityType,
-                              opt => opt.MapFrom(val => Entities.EntityTypes.supplier))
-                   .ForMember(dest => dest.DateCreated,
-                               opt => opt.MapFrom(val => DateTime.UtcNow));
+        CreateMap<Entity, CreateClientDTO>()
+            .ReverseMap()
+                .ForMember(dest => dest.EntityType,
+                           opt => opt.MapFrom(val => Entities.EntityTypes.client))
+                .ForMember(dest => dest.DateCreated,
+                           opt => opt.MapFrom(val => DateTime.UtcNow));
 
-            CreateMap<Entity, UpdateSupplierDTO>()
-                .ReverseMap()
-                    .ForMember(dest => dest.EntityType,
-                               opt => opt.MapFrom(val => Entities.EntityTypes.supplier))
-                    .ForMember(dest => dest.DateCreated,
-                               opt => opt.UseDestinationValue())
-                    .ForMember(dest => dest.DateUpdated,
-                               opt => opt.MapFrom(val => DateTime.UtcNow));
+        CreateMap<Entity, UpdateClientDTO>()
+            .ReverseMap()
+                .ForMember(dest => dest.EntityType,
+                           opt => opt.MapFrom(val => Entities.EntityTypes.client))
+                .ForMember(dest => dest.DateCreated,
+                           opt => opt.UseDestinationValue())
+                .ForMember(dest => dest.DateUpdated,
+                           opt => opt.MapFrom(val => DateTime.UtcNow));
 
+        CreateMap<Entity, SupplierDTO>()
+            .ReverseMap()
+                .ForMember(dest => dest.EntityType,
+                           opt => opt.MapFrom(val => Entities.EntityTypes.supplier));
 
-            CreateMap<Address, AddressDTO>().
-                ForMember(dest=>dest.CountryCode, 
-                          opt => opt.MapFrom(src => src.Country))
-                .ReverseMap();
+        CreateMap<Entity, CreateSupplierDTO>()
+           .ReverseMap()
+               .ForMember(dest => dest.EntityType,
+                          opt => opt.MapFrom(val => Entities.EntityTypes.supplier))
+               .ForMember(dest => dest.DateCreated,
+                           opt => opt.MapFrom(val => DateTime.UtcNow));
 
+        CreateMap<Entity, UpdateSupplierDTO>()
+            .ReverseMap()
+                .ForMember(dest => dest.EntityType,
+                           opt => opt.MapFrom(val => Entities.EntityTypes.supplier))
+                .ForMember(dest => dest.DateCreated,
+                           opt => opt.UseDestinationValue())
+                .ForMember(dest => dest.DateUpdated,
+                           opt => opt.MapFrom(val => DateTime.UtcNow));
+    }
 
+    private void _createInventoryLocationMaps()
+    {
+        CreateMap<InventoryLocation, InventoryLocationDTO>()
+            .ReverseMap()
+                .ForMember(dest => dest.StockLevels,
+                           opt => opt.UseDestinationValue());
 
-        }
+        CreateMap<InventoryLocation, CreateInventoryLocationDTO>()
+            .ReverseMap()
+                .ForMember(dest => dest.StockLevels,
+                           opt => opt.UseDestinationValue());
+
+        CreateMap<InventoryLocation, UpdateInventoryLocationDTO>()
+            .ReverseMap()
+                .ForMember(dest => dest.StockLevels,
+                           opt => opt.UseDestinationValue());
     }
 }

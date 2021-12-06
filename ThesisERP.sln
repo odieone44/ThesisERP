@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThesisERP.Infrastracture", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThesisERP.Core", "ThesisERP.Core\ThesisERP.Core.csproj", "{ABBE5828-77E6-4340-8EF1-B89126A9C1EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThesisERP.Application", "ThesisERP.Application\ThesisERP.Application.csproj", "{8F4381AF-6C50-42BC-BBB2-2F76961F77A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThesisERP.Application", "ThesisERP.Application\ThesisERP.Application.csproj", "{8F4381AF-6C50-42BC-BBB2-2F76961F77A2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{14E2BF5F-90F3-44FE-96A1-E18CAD9A6410}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
