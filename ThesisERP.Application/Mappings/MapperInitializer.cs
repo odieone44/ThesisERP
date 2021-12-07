@@ -15,10 +15,13 @@ public class MapperInitializer : Profile
                      opt => opt.MapFrom(src => src.Country))
            .ReverseMap();
 
+        _createStockLevelMaps();
         _createAppUserMaps();
         _createEntityMaps();
         _createInventoryLocationMaps();
         _createProductMaps();
+
+
     }
 
     private void _createAppUserMaps()
@@ -115,5 +118,15 @@ public class MapperInitializer : Profile
               .ReverseMap()
                  .ForMember(dest => dest.RelatedEntities,
                             opt => opt.UseDestinationValue());
+    }
+
+    private void _createStockLevelMaps()
+    {
+        CreateMap<StockLevel, StockLevelDTO>().ReverseMap();
+
+        CreateMap<StockLevel, ProductStockLevelDTO>()
+            .ForMember(dest => dest.ProductSKU, opt => opt.MapFrom(src => src.Product.SKU))
+            .ForMember(dest => dest.ProductDescription, opt => opt.MapFrom(src => src.Product.Description));
+
     }
 }

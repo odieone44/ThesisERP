@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ThesisERP.Core.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 namespace ThesisERP.Application.DTOs;
 
 public class ClientDTO : GetClientDTO
-{   
+{
     public virtual ICollection<ProductDTO>? RelatedProducts { get; set; } = new List<ProductDTO>();
 }
 
