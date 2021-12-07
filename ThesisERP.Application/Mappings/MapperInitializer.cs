@@ -124,9 +124,9 @@ public class MapperInitializer : Profile
     {
         CreateMap<StockLevel, StockLevelDTO>().ReverseMap();
 
-        CreateMap<StockLevel, ProductStockLevelDTO>()
-            .ForMember(dest => dest.ProductSKU, opt => opt.MapFrom(src => src.Product.SKU))
-            .ForMember(dest => dest.ProductDescription, opt => opt.MapFrom(src => src.Product.Description));
+        //CreateMap<StockLevel, ProductStockLevelDTO>()
+        //    .ForMember(dest => dest.ProductSKU, opt => opt.MapFrom(src => src.Product.SKU))
+        //    .ForMember(dest => dest.ProductDescription, opt => opt.MapFrom(src => src.Product.Description));
 
     }
 }

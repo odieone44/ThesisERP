@@ -1,27 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ThesisERP.Core.Entities;
+﻿namespace ThesisERP.Application.DTOs;
 
-namespace ThesisERP.Application.DTOs;
-
-public class StockLevelDTO
+public class StockLevelDTO : StockInfo
 {
-    public int Id { get; set; }
     public int InventoryLocationId { get; set; }
     public InventoryLocationDTO InventoryLocation { get; set; }
     public int ProductId { get; set; }
     public ProductDTO Product { get; set; }
-    public decimal Available { get; set; }
-    public decimal Outgoing { get; set; }
-    public decimal Incoming { get; set; }
-    public decimal OnHand => Available - Outgoing + Incoming;
 }
 
 
-public class LocationStockDTO
+public class GetLocationStockDTO
 {
     public int InventoryLocationId { get; set; }
     public string InventoryLocationName { get; set; }
@@ -30,11 +18,31 @@ public class LocationStockDTO
 
 }
 
-public class ProductStockLevelDTO
+
+public class GetProductStockDTO
 {
-    public int ProductId { get; set; }   
+    public int ProductId { get; set; }
     public string ProductSKU { get; set; }
     public string ProductDescription { get; set; }
+    public ICollection<LocationStockLevelDTO> LocationStockLevels { get; set; } = new List<LocationStockLevelDTO>();
+}
+
+public class ProductStockLevelDTO : StockInfo
+{
+    public int ProductId { get; set; }
+    public string ProductSKU { get; set; }
+    public string ProductDescription { get; set; }
+}
+
+public class LocationStockLevelDTO : StockInfo
+{
+    public int InventoryLocationId { get; set; }
+    public string InventoryLocationName { get; set; }
+    public string InventoryLocationAbbreviation { get; set; }
+}
+
+public abstract class StockInfo
+{
     public decimal Available { get; set; }
     public decimal Outgoing { get; set; }
     public decimal Incoming { get; set; }

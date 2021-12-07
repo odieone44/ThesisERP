@@ -13,7 +13,7 @@ namespace ThesisERP.Application.DTOs
         public int Id { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime? DateUpdated { get; set; }
-        public virtual ICollection<Product>? RelatedProducts { get; set; }
+        public virtual ICollection<ProductDTO>? RelatedProducts { get; set; }
     }
 
     public class CreateSupplierDTO

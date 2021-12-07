@@ -2,6 +2,8 @@
 
 namespace ThesisERP.Core.Entities;
 
+#pragma warning disable CS8618
+
 public class DocumentDetail
 {
 
@@ -30,7 +32,7 @@ public class DocumentDetail
     public decimal LineTotalTax { get; private set; } = decimal.Zero;
     public decimal LineTotalDiscount { get; private set; } = decimal.Zero;
 
-    public byte[] Timestamp { get; set; }
+    public byte[] Timestamp { get; private set; }
 
     private decimal _lineTotalNet;
     public decimal LineTotalNet
@@ -46,21 +48,23 @@ public class DocumentDetail
         private set => _lineTotalGross = value.RoundTo(2);
     }
 
+
     public DocumentDetail(Product product, decimal quantity, decimal price, Tax? tax = null, Discount? discount = null)
     {
-        this.Product = product;
-        this.Discount = discount;
-        this.Tax = tax;
-        this.ProductQuantity = quantity;
-        this.UnitPrice = price;
+        Product = product;
+        Discount = discount;
+        Tax = tax;
+        ProductQuantity = quantity;
+        UnitPrice = price;
 
-        this.LineTotalNet = quantity * price;
-        this.LineTotalTax = tax == null ? decimal.Zero : (price * tax.Amount * quantity).RoundTo(2);
-        this.LineTotalDiscount = discount == null ? decimal.Zero : (price * discount.Amount * quantity).RoundTo(2);
+        LineTotalNet = quantity * price;
+        LineTotalTax = tax == null ? decimal.Zero : (price * tax.Amount * quantity).RoundTo(2);
+        LineTotalDiscount = discount == null ? decimal.Zero : (price * discount.Amount * quantity).RoundTo(2);
 
-        this.LineTotalGross = LineTotalNet + LineTotalTax - LineTotalDiscount;
+        LineTotalGross = LineTotalNet + LineTotalTax - LineTotalDiscount;
 
     }
+
 
     public DocumentDetail()
     {
@@ -68,4 +72,5 @@ public class DocumentDetail
     }
 
 }
+#pragma warning restore CS8618
 

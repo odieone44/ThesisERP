@@ -34,7 +34,7 @@ namespace ThesisERP.Core.Entities
 
         public string CreatedBy { get; set; }
 
-        private Document() { }
+        public Document() { }
 
         public static Document CreateSalesDocument(Entity entity, 
                                                    InventoryLocation location, 
@@ -44,9 +44,11 @@ namespace ThesisERP.Core.Entities
                                                    List<DocumentDetail> details,
                                                    string username)
         {
-            if (entity.EntityType != Enums.Entities.EntityTypes.client) 
+            if (entity.EntityType != Enums.Entities.EntityTypes.client)
+            {
                 throw new ThesisERPException($"Entity needs to be of type '{Enums.Entities.EntityTypes.client}' for this document template.");
-            
+            }
+
             return new Document()
             {
                 Entity = entity,
@@ -57,8 +59,8 @@ namespace ThesisERP.Core.Entities
                 Details = details,
                 BillingAddress = billingAddress,
                 ShippingAddress = shippingAddress,
-                DateCreated = DateTime.Now,
-                DateUpdated = DateTime.Now,
+                DateCreated = DateTime.UtcNow,
+                DateUpdated = DateTime.UtcNow,
                 CreatedBy = username
             };
         }

@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Diagnostics.Metrics;
-using System.Linq.Expressions;
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Core.Entities;
@@ -29,7 +25,7 @@ public class SuppliersController : BaseApiController
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetSuppliers() //[FromQuery] RequestParams requestParams
+    public async Task<IActionResult> GetSuppliers()
     {
         var suppliers = await _entityRepo
                             .GetAllAsync

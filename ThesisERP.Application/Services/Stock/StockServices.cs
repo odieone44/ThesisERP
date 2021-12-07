@@ -13,34 +13,62 @@ namespace ThesisERP.Application.Services.Stock;
 
 public static class StockServices
 {
-    public async static Task<List<LocationStockDTO>> GetLocationStock(this IRepositoryBase<StockLevel> stockRepo, int? locationId)
+    public async static Task<List<GetLocationStockDTO>> GetLocationStock(this IRepositoryBase<StockLevel> stockRepo, int? locationId)
     {
-
-        Expression<Func<StockLevel, bool>> queryExp = x => (locationId == null || x.InventoryLocationId == locationId);
-
         var stock = await stockRepo
-                            .GetAllAsync(
-                            expression: queryExp,
-                               orderBy: o => o.OrderBy(d => d.InventoryLocationId).ThenBy(x => x.ProductId),
-                               include: x => x.Include(p => p.Product).Include(l => l.InventoryLocation));
-        
+                            .GetAllAsync(expression: x => (locationId == null || x.InventoryLocationId == locationId),
+                                            orderBy: o => o.OrderBy(d => d.InventoryLocationId).ThenBy(x => x.ProductId),
+                                            include: i => i.Include(p => p.Product).Include(l => l.InventoryLocation));
+
         var results = stock
                         .GroupBy(x => x.InventoryLocationId)
-                        .Select(x => new LocationStockDTO()
+                        .Select(x => (id: x.Key, stockList: x.ToList()))
+                        .Select(
+                            x => new GetLocationStockDTO()
+                            {
+                                InventoryLocationId = x.id,
+                                InventoryLocationName = x.stockList.FirstOrDefault().InventoryLocation.Name,
+                                InventoryLocationAbbreviation = x.stockList.FirstOrDefault().InventoryLocation.Abbreviation,
+                                ProductStockLevels = x.stockList.Select(s => new ProductStockLevelDTO()
                                 {
-                                    InventoryLocationId = x.Key,
-                                    InventoryLocationName = x.Select(l => l.InventoryLocation.Name).FirstOrDefault()!,
-                                    InventoryLocationAbbreviation = x.Select(l => l.InventoryLocation.Abbreviation).FirstOrDefault()!,
-                                    ProductStockLevels = x.Select(s => new ProductStockLevelDTO()
-                                    {
-                                        ProductSKU = s.Product.SKU!,
-                                        ProductId = s.ProductId,
-                                        ProductDescription = s.Product.Description!,
-                                        Available = s.Available,
-                                        Incoming = s.Incoming,
-                                        Outgoing = s.Outgoing
-                                    }).ToList()
-                                });
+                                    ProductSKU = s.Product.SKU!,
+                                    ProductId = s.ProductId,
+                                    ProductDescription = s.Product.Description!,
+                                    Available = s.Available,
+                                    Incoming = s.Incoming,
+                                    Outgoing = s.Outgoing
+                                }).ToList()
+                            });
+
+        return results.ToList();
+    }
+
+    public async static Task<List<GetProductStockDTO>> GetProductStock(this IRepositoryBase<StockLevel> stockRepo, int? productId)
+    {
+        var stock = await stockRepo
+                            .GetAllAsync(expression: x => (productId == null || x.ProductId == productId),
+                                            orderBy: o => o.OrderBy(d => d.ProductId).ThenBy(x => x.InventoryLocationId),
+                                            include: i => i.Include(p => p.Product).Include(l => l.InventoryLocation));
+
+        var results = stock
+                        .GroupBy(x => x.ProductId)
+                        .Select(x => (id: x.Key, stockList: x.ToList()))
+                        .Select(
+                            x => new GetProductStockDTO()
+                            {
+                                ProductId = x.id,
+                                ProductSKU = x.stockList.FirstOrDefault().Product.SKU,
+                                ProductDescription = x.stockList.FirstOrDefault().Product.Description,
+                                LocationStockLevels = x.stockList.Select(s => new LocationStockLevelDTO()
+                                {
+                                    InventoryLocationId = s.InventoryLocation.Id,
+                                    InventoryLocationName = s.InventoryLocation.Name,
+                                    InventoryLocationAbbreviation = s.InventoryLocation.Abbreviation!,
+                                    Available = s.Available,
+                                    Incoming = s.Incoming,
+                                    Outgoing = s.Outgoing
+                                }).ToList()
+                            });
 
         return results.ToList();
     }

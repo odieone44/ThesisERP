@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Diagnostics.Metrics;
-using System.Linq.Expressions;
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Core.Entities;
@@ -34,8 +30,7 @@ public class ClientsController : BaseApiController
         var clients = await _entityRepo
                             .GetAllAsync
                              (expression: x => x.EntityType == Core.Enums.Entities.EntityTypes.client,
-                                 orderBy: o => o.OrderBy(d => d.DateCreated),
-                                 include: i => i.Include(p => p.RelatedProducts));
+                                 orderBy: o => o.OrderBy(d => d.DateCreated)); //i => i.Include(p => p.RelatedProducts)
 
         var results = _mapper.Map<List<ClientDTO>>(clients);
 
@@ -90,7 +85,7 @@ public class ClientsController : BaseApiController
         if (client == null) { return NotFound(); }
 
         _mapper.Map(clientDTO, client);
-        await _entityRepo.UpdateAsync(client);        
+        await _entityRepo.UpdateAsync(client);
 
         return NoContent();
     }
