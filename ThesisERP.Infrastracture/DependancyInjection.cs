@@ -19,6 +19,8 @@ using ThesisERP.Application.Mappings;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Services;
 using ThesisERP.Core.Exceptions;
+using ThesisERP.Application.Interfaces.Transactions;
+using ThesisERP.Application.Services.Transactions;
 
 namespace ThesisERP.Infrastracture
 {
@@ -49,6 +51,7 @@ namespace ThesisERP.Infrastracture
 
             services.AddScoped(typeof(IRepositoryBase<>), typeof(ThesisEFRepository<>));
             services.AddScoped<IAuthManager, AuthManager>();
+            services.AddScoped<IDocumentService, DocumentService>();
             
             return services;
         }

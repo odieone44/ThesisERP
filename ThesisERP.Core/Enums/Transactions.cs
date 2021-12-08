@@ -15,6 +15,12 @@
             sales_return = 8
         }
 
+        public enum StockChangeTypes
+        {
+            positive = 0,
+            negative = 1
+        }
+
         public enum Status
         {
             draft = 0,

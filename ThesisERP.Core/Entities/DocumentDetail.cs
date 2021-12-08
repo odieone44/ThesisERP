@@ -64,9 +64,7 @@ public class DocumentDetail
         LineTotalGross = LineTotalNet + LineTotalTax - LineTotalDiscount;
 
     }
-
-
-    public DocumentDetail()
+    private DocumentDetail()
     {
 
     }
