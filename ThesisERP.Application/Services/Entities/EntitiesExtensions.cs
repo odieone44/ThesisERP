@@ -8,7 +8,7 @@ using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Application.Services.Entities;
 
-public static class EntitiesServices
+public static class EntitiesExtensions
 {
     public async static Task<Entity?> GetClientById(this IRepositoryBase<Entity> entityRepo, int id)
     {

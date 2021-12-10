@@ -13,28 +13,30 @@ public class TransactionTemplate
     public long NextNumber { get; set; } = 1;
     public DateTime DateCreated { get; set; }
     public DateTime? DateUpdated { get; set; }
-    public Transactions.Types TransactionType { get; set; }
+    public Transactions.TransactionType TransactionType { get; set; }
     public byte[] Timestamp { get; set; }
+    public bool IsDeleted { get; set; } = false;
+    public bool IsPositiveStockTransaction => GetStockChangeType() == Transactions.StockChangeType.positive;
 
-    public Transactions.StockChangeTypes GetStockChangeType()
+    private Transactions.StockChangeType GetStockChangeType()
     {
-        return GetPositiveTransactionTypes().Contains(TransactionType) ? Transactions.StockChangeTypes.positive : Transactions.StockChangeTypes.negative;
+        return GetPositiveTransactionTypes().Contains(TransactionType) ? Transactions.StockChangeType.positive : Transactions.StockChangeType.negative;
     }
 
-    public static IEnumerable<Transactions.Types> GetPositiveTransactionTypes()
+    public static IEnumerable<Transactions.TransactionType> GetPositiveTransactionTypes()
     {
-        yield return Transactions.Types.purchase_order;
-        yield return Transactions.Types.purchase_bill;
-        yield return Transactions.Types.sales_return;
-        yield return Transactions.Types.stock_adjustment_plus;
+        yield return Transactions.TransactionType.purchase_order;
+        yield return Transactions.TransactionType.purchase_bill;
+        yield return Transactions.TransactionType.sales_return;
+        yield return Transactions.TransactionType.stock_adjustment_plus;
     }
 
-    public static IEnumerable<Transactions.Types> GetNegativeTransactionTypes()
+    public static IEnumerable<Transactions.TransactionType> GetNegativeTransactionTypes()
     {
-        yield return Transactions.Types.sales_order;
-        yield return Transactions.Types.sales_invoice;
-        yield return Transactions.Types.purchase_return;
-        yield return Transactions.Types.stock_adjustment_minus;
+        yield return Transactions.TransactionType.sales_order;
+        yield return Transactions.TransactionType.sales_invoice;
+        yield return Transactions.TransactionType.purchase_return;
+        yield return Transactions.TransactionType.stock_adjustment_minus;
     }
 
 }

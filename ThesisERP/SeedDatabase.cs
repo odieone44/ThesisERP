@@ -106,7 +106,7 @@ namespace ThesisERP
                 NextNumber = 1,
                 Prefix = "SI-",
                 Postfix = string.Empty,
-                TransactionType = Transactions.Types.sales_invoice,
+                TransactionType = Transactions.TransactionType.sales_invoice,
                 DateCreated = DateTime.Now,
                 DateUpdated = DateTime.Now
             };

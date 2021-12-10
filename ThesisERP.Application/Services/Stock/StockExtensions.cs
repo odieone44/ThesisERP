@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Core.Entities;
+using ThesisERP.Core.Interfaces;
+using static ThesisERP.Core.Enums.Transactions;
 
 namespace ThesisERP.Application.Services.Stock;
 
-public static class StockServices
+public static class StockExtensions
 {
     public async static Task<List<GetLocationStockDTO>> GetLocationStock(this IRepositoryBase<StockLevel> stockRepo, int? locationId)
     {
@@ -72,4 +74,69 @@ public static class StockServices
 
         return results.ToList();
     }
+
+    //public async static Task UpdateTransactionProductsStockEntries<T>(this IRepositoryBase<StockLevel> stockRepo, T transaction, Core.Enums.Transactions.TransactionAction action) where T : ITransaction
+    //{
+    //    int locationId = transaction.InventoryLocation.Id;
+
+    //    foreach (var detail in transaction.Details)
+    //    {
+    //        var locationStockEntry = detail.Product.StockLevels.FirstOrDefault(x=> x.InventoryLocationId == locationId);
+    //        if (locationStockEntry is null)
+    //        {
+    //            locationStockEntry = new StockLevel()
+    //            {
+    //                InventoryLocationId = locationId,
+    //                ProductId = detail.ProductId
+    //            };
+    //        }
+    //    }
+    //}
+
+    //private void _HandleTransactionStockUpdate(StockLevel stockEntry, TransactionAction action, decimal quantity, bool isPositiveTransaction)
+    //{
+    //    switch (action)
+    //    {
+    //        case TransactionAction.create:
+    //        case TransactionAction.update:
+    //            if (isPositiveTransaction)
+    //            {
+    //                stockEntry.Incoming += quantity;
+    //            } 
+    //            else
+    //            {
+    //                stockEntry.Outgoing += quantity;
+    //            } 
+    //            break;
+    //        case TransactionAction.fulfill:
+    //            if (isPositiveTransaction)
+    //            {
+    //                stockEntry.Incoming -= quantity;
+    //                stockEntry.Available += quantity;
+    //            }
+    //            else
+    //            {
+    //                stockEntry.Outgoing -= quantity;
+    //                stockEntry.Available -= quantity;
+    //            }
+    //            break;
+    //        case TransactionAction.cancel:
+    //            if (isPositiveTransaction)
+    //            {
+    //                stockEntry.Incoming -= quantity;
+    //                stockEntry.Available += quantity;
+    //            }
+    //            else
+    //            {
+    //                stockEntry.Outgoing -= quantity;
+    //                stockEntry.Available -= quantity;
+    //            }
+    //            break;
+
+
+
+
+
+    //    }
+    //}
 }

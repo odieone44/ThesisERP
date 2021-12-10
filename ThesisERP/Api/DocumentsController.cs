@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Xml.Linq;
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.DTOs.Documents;
@@ -23,7 +24,7 @@ public class DocumentsController : BaseApiController
         _documentService = docService;
     }
     
-    //[Authorize]
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> CreateDocument([FromBody] CreateDocumentDTO documentDTO)
     {
@@ -33,7 +34,9 @@ public class DocumentsController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var document = await _documentService.Create(documentDTO, "admin");        
+        var username = HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.Name).FirstOrDefault()?.Value ?? string.Empty;
+        //HttpContext.User.Identity.Name
+        var document = await _documentService.Create(documentDTO, username);        
 
         return Ok(document);
 

@@ -2,7 +2,7 @@
 {
     public static class Transactions
     {
-        public enum Types
+        public enum TransactionType
         {
             purchase_order = 0,
             sales_order = 1,
@@ -15,19 +15,28 @@
             sales_return = 8
         }
 
-        public enum StockChangeTypes
+        public enum StockChangeType
         {
             positive = 0,
             negative = 1
         }
 
-        public enum Status
+        public enum TransactionStatus
         {
             draft = 0,
             pending = 1,
-            approved = 2,
-            completed = 3,
+            fulfilled = 2,
+            closed = 3,
             cancelled = 4
+        }
+
+        public enum TransactionAction
+        {
+            create = 0,
+            update = 1,
+            fulfill = 2,
+            close = 3,
+            cancel = 4
         }
 
     }

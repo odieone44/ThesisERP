@@ -5,7 +5,7 @@ using ThesisERP.Core.Exceptions;
 
 namespace ThesisERP.Core.Entities;
 
-public class Document
+public class Document : ITransaction
 {
     public int Id { get; set; }
 
@@ -20,7 +20,7 @@ public class Document
 
     public string DocumentNumber { get; set; }
 
-    public Transactions.Status Status { get; set; }
+    public Transactions.TransactionStatus Status { get; set; }
 
     public Address BillingAddress { get; set; }
     public Address ShippingAddress { get; set; }
@@ -34,6 +34,11 @@ public class Document
     public DateTime? DateUpdated { get; set; }
 
     public string CreatedBy { get; set; }
+    public Transactions.TransactionType Type => TransactionTemplate.TransactionType;
+    public bool IsFulfilled => Status == Transactions.TransactionStatus.fulfilled;
+    public bool IsClosed => Status == Transactions.TransactionStatus.closed;
+    public bool IsCancelled => Status == Transactions.TransactionStatus.cancelled;
+    public bool IsPositiveStockTransaction => TransactionTemplate.IsPositiveStockTransaction;
 
     private Document() { }
 
@@ -52,7 +57,7 @@ public class Document
         BillingAddress = billingAddress;
         ShippingAddress = shippingAddress;
         DocumentNumber = $"{template.Prefix}{template.NextNumber}{template.Postfix}";
-        Status = Transactions.Status.pending;
+        Status = Transactions.TransactionStatus.pending;
         Details = details;
         DateCreated = DateTime.UtcNow;
         DateUpdated = DateTime.UtcNow;

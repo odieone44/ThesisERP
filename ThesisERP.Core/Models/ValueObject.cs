@@ -5,43 +5,42 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ThesisERP.Core.Models
+namespace ThesisERP.Core.Models;
+
+public abstract class ValueObject
 {
-    public abstract class ValueObject
+    public static bool operator ==(ValueObject left, ValueObject right)
     {
-        public static bool operator == (ValueObject left, ValueObject right)
+        if (left is null ^ right is null)
         {
-            if (left is null ^ right is null)
-            {
-                return false;
-            }
-
-            return left?.Equals(right!) != false;
+            return false;
         }
 
-        public static bool operator != (ValueObject left, ValueObject right)
+        return left?.Equals(right!) != false;
+    }
+
+    public static bool operator !=(ValueObject left, ValueObject right)
+    {
+        return !(left == right);
+    }
+
+    protected abstract IEnumerable<object> GetEqualityComponents();
+
+    public override bool Equals(object? obj)
+    {
+        if (obj == null || obj.GetType() != GetType())
         {
-            return !(left == right);
+            return false;
         }
 
-        protected abstract IEnumerable<object> GetEqualityComponents();
+        var other = (ValueObject)obj;
+        return GetEqualityComponents().SequenceEqual(other.GetEqualityComponents());
+    }
 
-        public override bool Equals(object? obj)
-        {
-            if (obj == null || obj.GetType() != GetType())
-            {
-                return false;
-            }
-
-            var other = (ValueObject)obj;
-            return GetEqualityComponents().SequenceEqual(other.GetEqualityComponents());
-        }
-
-        public override int GetHashCode()
-        {
-            return GetEqualityComponents()
-                .Select(x => x != null ? x.GetHashCode() : 0)
-                .Aggregate((x, y) => x ^ y);
-        }
+    public override int GetHashCode()
+    {
+        return GetEqualityComponents()
+            .Select(x => x != null ? x.GetHashCode() : 0)
+            .Aggregate((x, y) => x ^ y);
     }
 }
