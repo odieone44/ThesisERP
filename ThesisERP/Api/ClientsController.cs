@@ -62,8 +62,8 @@ public class ClientsController : BaseApiController
 
         var client = _mapper.Map<Entity>(clientDTO);
 
-        var result = await _entityRepo.AddAsync(client);
-
+        var result = _entityRepo.Add(client);
+        await _entityRepo.SaveChangesAsync();
         var clientAdded = _mapper.Map<ClientDTO>(result);
 
         return CreatedAtRoute("GetClient", new { id = clientAdded.Id }, clientAdded);
@@ -85,7 +85,10 @@ public class ClientsController : BaseApiController
         if (client == null) { return NotFound(); }
 
         _mapper.Map(clientDTO, client);
-        await _entityRepo.UpdateAsync(client);
+        
+        _entityRepo.Update(client);
+
+        await _entityRepo.SaveChangesAsync();
 
         return NoContent();
     }
@@ -104,7 +107,9 @@ public class ClientsController : BaseApiController
 
         if (client == null) { return NotFound(); }
 
-        await _entityRepo.DeleteAsync(client);
+        _entityRepo.Delete(client);
+        
+        await _entityRepo.SaveChangesAsync();
 
         return NoContent();
 

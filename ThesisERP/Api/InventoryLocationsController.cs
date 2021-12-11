@@ -59,7 +59,9 @@ public class InventoryLocationsController : ControllerBase
 
         var location = _mapper.Map<InventoryLocation>(locationDTO);
 
-        var result = await _locationsRepo.AddAsync(location);
+        var result = _locationsRepo.Add(location);
+
+        await _locationsRepo.SaveChangesAsync();
 
         var locationAdded = _mapper.Map<InventoryLocationDTO>(result);
 
@@ -83,7 +85,9 @@ public class InventoryLocationsController : ControllerBase
 
         _mapper.Map(locationDTO, location);
 
-        await _locationsRepo.UpdateAsync(location);
+        _locationsRepo.Update(location);
+
+        await _locationsRepo.SaveChangesAsync();
 
         return NoContent();
     }
@@ -102,7 +106,9 @@ public class InventoryLocationsController : ControllerBase
 
         if (location == null) { return NotFound(); }
 
-        await _locationsRepo.DeleteAsync(location);
+        _locationsRepo.Delete(location);
+
+        await _locationsRepo.SaveChangesAsync();
 
         return NoContent();
 

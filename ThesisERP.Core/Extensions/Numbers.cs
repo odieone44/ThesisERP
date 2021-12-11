@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ThesisERP.Core.Extensions
+namespace ThesisERP.Core.Extensions;
+
+public static class Numbers
 {
-    public static class Numbers
+    public static decimal RoundTo(this decimal d, int digits)
     {
-        public static decimal RoundTo(this decimal d, int digits)
-        {
-            return decimal.Round(d, digits, MidpointRounding.AwayFromZero);
-        }
+        return decimal.Round(d, digits, MidpointRounding.AwayFromZero);
     }
 }

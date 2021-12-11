@@ -2,24 +2,23 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ThesisERP.Infrastracture.Data.Configurations.Entities
+namespace ThesisERP.Infrastracture.Data.Configurations.Entities;
+
+public class RoleConfiguration : IEntityTypeConfiguration<IdentityRole>
 {
-    public class RoleConfiguration : IEntityTypeConfiguration<IdentityRole>
+    public void Configure(EntityTypeBuilder<IdentityRole> builder)
     {
-        public void Configure(EntityTypeBuilder<IdentityRole> builder)
-        {
-            builder.HasData(
-                new IdentityRole
-                {
-                    Name = "User",
-                    NormalizedName = "USER"
-                },
-                new IdentityRole
-                {
-                    Name = "Administrator",
-                    NormalizedName = "ADMINISTRATOR"
-                }
-            );
-        }
+        builder.HasData(
+            new IdentityRole
+            {
+                Name = "User",
+                NormalizedName = "USER"
+            },
+            new IdentityRole
+            {
+                Name = "Administrator",
+                NormalizedName = "ADMINISTRATOR"
+            }
+        );
     }
 }

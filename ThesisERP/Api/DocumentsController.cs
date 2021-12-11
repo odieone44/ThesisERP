@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using System.Xml.Linq;
-using ThesisERP.Application.DTOs;
+using Microsoft.EntityFrameworkCore;
 using ThesisERP.Application.DTOs.Documents;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Interfaces.Transactions;
+using ThesisERP.Application.Services.Transactions;
 using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api;
@@ -14,16 +13,18 @@ namespace ThesisERP.Api;
 public class DocumentsController : BaseApiController
 {
     private readonly ILogger<DocumentsController> _logger;
-    private readonly IMapper _mapper;    
+    private readonly IMapper _mapper;
     private readonly IDocumentService _documentService;
+    private readonly IRepositoryBase<Document> _docsRepo;
 
-    public DocumentsController(ILogger<DocumentsController> logger, IMapper mapper, IDocumentService docService)
+    public DocumentsController(ILogger<DocumentsController> logger, IMapper mapper, IDocumentService docService, IRepositoryBase<Document> docsRepo)
     {
         _logger = logger;
         _mapper = mapper;
         _documentService = docService;
+        _docsRepo = docsRepo;
     }
-    
+
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> CreateDocument([FromBody] CreateDocumentDTO documentDTO)
@@ -34,11 +35,67 @@ public class DocumentsController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var username = HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.Name).FirstOrDefault()?.Value ?? string.Empty;
-        //HttpContext.User.Identity.Name
-        var document = await _documentService.Create(documentDTO, username);        
+        var username = HttpContext.User.Identity?.Name ?? string.Empty;
 
-        return Ok(document);
+        var document = await _documentService.Create(documentDTO, username);
 
+        var response = _mapper.Map<DocumentDTO>(document);
+        return Ok(response);
     }
+
+    [Authorize]
+    [HttpPost("Fulfill/{id:int}")]
+    public async Task<IActionResult> FulfillDocument(int id)
+    {
+        if (id < 1)
+        {
+            return BadRequest("Document Id has to be provided.");
+        }
+
+        var document = await _documentService.Fulfill(id);
+
+        var response = _mapper.Map<DocumentDTO>(document);
+        return Ok(response);
+    }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetDocuments()
+    {
+        var documents = await _docsRepo
+                                .GetAllAsync
+                                 (orderBy: o => o.OrderByDescending(d => d.DateUpdated),
+                                 include: i => i.Include(p => p.Entity)
+                                                .Include(x => x.InventoryLocation)
+                                                .Include(t => t.TransactionTemplate)
+                                                .Include(q => q.Details)
+                                                    .ThenInclude(d => d.Product)
+                                                .Include(q => q.Details)
+                                                    .ThenInclude(d => d.Tax)
+                                                .Include(q => q.Details)
+                                                    .ThenInclude(d => d.Discount));
+
+        var results = _mapper.Map<List<DocumentDTO>>(documents);
+
+        return Ok(results);
+    }
+
+    [HttpGet("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetDocument(int id)
+    {
+        if (id < 1)
+        {
+            return BadRequest("Document Id has to be provided.");
+        }
+
+        var document = await _docsRepo.GetDocumentByIdIncludeRelations(id);                                
+
+        if (document == null) { return NotFound(); }
+
+        var result = _mapper.Map<DocumentDTO>(document);
+
+        return Ok(result);
+    }
+
 }

@@ -1,9 +1,8 @@
-﻿namespace ThesisERP.Core.Entities
+﻿namespace ThesisERP.Core.Entities;
+
+public class Tax
 {
-    public class Tax
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public decimal Amount { get; set; }
-    }
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public decimal Amount { get; set; }
 }

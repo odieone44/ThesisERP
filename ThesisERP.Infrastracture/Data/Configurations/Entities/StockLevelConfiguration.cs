@@ -7,13 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using ThesisERP.Core.Entities;
 
-namespace ThesisERP.Infrastracture.Data.Configurations.Entities
+namespace ThesisERP.Infrastracture.Data.Configurations.Entities;
+
+internal class StockLevelConfiguration : IEntityTypeConfiguration<StockLevel>
 {
-    internal class StockLevelConfiguration : IEntityTypeConfiguration<StockLevel>
+    public void Configure(EntityTypeBuilder<StockLevel> stockLevelBuilder)
     {
-        public void Configure(EntityTypeBuilder<StockLevel> stockLevelBuilder)
-        {
-            stockLevelBuilder.ToTable("StockLevels").HasKey(t => t.Id);
-        }
+        stockLevelBuilder.ToTable("StockLevels").HasKey(t => t.Id);
     }
 }

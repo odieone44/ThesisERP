@@ -13,13 +13,13 @@ public interface IRepositoryBase<T> where T : class
 
     Task<int> CountAsync(Expression<Func<T, bool>>? expression = null);
 
-    Task<T> AddAsync(T entity);
+    T Add(T entity);
 
-    Task UpdateAsync(T entity);
+    void Update(T entity);
 
-    Task DeleteAsync(T entity);
+    void Delete(T entity);
 
-    Task DeleteRangeAsync(IEnumerable<T> entities);
+    void DeleteRange(IEnumerable<T> entities);
 
     Task SaveChangesAsync();
 }

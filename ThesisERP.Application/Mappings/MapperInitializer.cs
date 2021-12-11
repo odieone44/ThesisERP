@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ThesisERP.Application.DTOs;
+using ThesisERP.Application.DTOs.Documents;
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Enums;
 
@@ -15,12 +16,12 @@ public class MapperInitializer : Profile
                      opt => opt.MapFrom(src => src.Country))
            .ReverseMap();
 
-        _createStockLevelMaps();
         _createAppUserMaps();
+        _createStockLevelMaps();
         _createEntityMaps();
         _createInventoryLocationMaps();
         _createProductMaps();
-
+        _createDocumentMaps();
 
     }
 
@@ -33,7 +34,14 @@ public class MapperInitializer : Profile
 
     private void _createEntityMaps()
     {
+        CreateMap<Entity, EntityBaseInfoDTO>();
+
         CreateMap<Entity, ClientDTO>()
+            .ReverseMap()
+                .ForMember(dest => dest.EntityType,
+                           opt => opt.MapFrom(val => Entities.EntityTypes.client));
+
+        CreateMap<Entity, ClientBaseInfoDTO>()
             .ReverseMap()
                 .ForMember(dest => dest.EntityType,
                            opt => opt.MapFrom(val => Entities.EntityTypes.client));
@@ -59,6 +67,11 @@ public class MapperInitializer : Profile
                 .ForMember(dest => dest.EntityType,
                            opt => opt.MapFrom(val => Entities.EntityTypes.supplier));
 
+        CreateMap<Entity, SupplierBaseInfoDTO>()
+         .ReverseMap()
+             .ForMember(dest => dest.EntityType,
+                        opt => opt.MapFrom(val => Entities.EntityTypes.supplier));
+
         CreateMap<Entity, CreateSupplierDTO>()
            .ReverseMap()
                .ForMember(dest => dest.EntityType,
@@ -82,6 +95,8 @@ public class MapperInitializer : Profile
             .ReverseMap()
                 .ForMember(dest => dest.StockLevels,
                            opt => opt.UseDestinationValue());
+
+        CreateMap<InventoryLocation, InventoryLocationBaseDTO>();
 
         CreateMap<InventoryLocation, CreateInventoryLocationDTO>()
             .ReverseMap()
@@ -127,6 +142,25 @@ public class MapperInitializer : Profile
         //CreateMap<StockLevel, ProductStockLevelDTO>()
         //    .ForMember(dest => dest.ProductSKU, opt => opt.MapFrom(src => src.Product.SKU))
         //    .ForMember(dest => dest.ProductDescription, opt => opt.MapFrom(src => src.Product.Description));
+
+    }
+
+    private void _createDocumentMaps()
+    {
+        CreateMap<DocumentDetail, DocumentDetailDTO>()
+            .ForMember(x => x.ProductSKU, opt => opt.MapFrom(src => src.Product.SKU))
+            .ForMember(x => x.ProductDescription, opt => opt.MapFrom(src => src.Product.Description))
+            .ForMember(x => x.TaxName, opt => opt.MapFrom(src => src.Tax.Name))
+            .ForMember(x => x.DiscountName, opt => opt.MapFrom(src => src.Discount.Name));
+
+
+        CreateMap<Document, DocumentDTO>();
+
+        CreateMap<Document, SalesDocumentDTO>()
+            .ForMember(x=>x.Client, opt => opt.MapFrom(src=>src.Entity));
+
+        CreateMap<Document, PurchaseDocumentDTO>()
+            .ForMember(x => x.Supplier, opt => opt.MapFrom(src => src.Entity));       
 
     }
 }

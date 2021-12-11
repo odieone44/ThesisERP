@@ -22,51 +22,39 @@ using ThesisERP.Core.Exceptions;
 using ThesisERP.Application.Interfaces.Transactions;
 using ThesisERP.Application.Services.Transactions;
 
-namespace ThesisERP.Infrastracture
+namespace ThesisERP.Infrastracture;
+
+public static class DependancyInjection
 {
-    public static class DependancyInjection
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
-        {
-            //string connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
-            string connString = Environment.GetEnvironmentVariable("ThesisERPConnection_2");
+        //string connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
+        string connString = Environment.GetEnvironmentVariable("ThesisERPConnection_2");
 
-            services.AddDbContext<DatabaseContext>(options =>
-                options.UseSqlServer(connectionString: connString)
-            );
+        services.AddDbContext<DatabaseContext>(options =>
+            options.UseSqlServer(connectionString: connString)
+        );     
 
-            services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<DatabaseContext>());
+        //add scoped services => one instance per request.
+        services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<DatabaseContext>());
+        services.AddScoped(typeof(IRepositoryBase<>), typeof(ThesisEFRepository<>));
+        services.AddScoped<IAuthManager, AuthManager>();
+        services.AddScoped<IDocumentService, DocumentService>();
 
-            var jwtConfig = configuration.GetSection("JwtSettings");
+        return services;
+    }
 
-            services.Configure<JwtSettings>(jwtConfig);
-            services.AddMemoryCache();
-            services.ConfigureRateLimiting();
-            services.AddHttpContextAccessor();
-            //services.AddAuthentication();
-            services.ConfigureIdentity();
-            services.ConfigureJWT(configuration);
-            services.ConfigureAutoMapper();
-            services.ConfigureVersioning();
+    public static void ConfigureIdentity(this IServiceCollection services)
+    {
+        var builder = services.AddIdentityCore<AppUser>(u => u.User.RequireUniqueEmail = true);
 
-            services.AddScoped(typeof(IRepositoryBase<>), typeof(ThesisEFRepository<>));
-            services.AddScoped<IAuthManager, AuthManager>();
-            services.AddScoped<IDocumentService, DocumentService>();
-            
-            return services;
-        }
+        builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
+        builder.AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders();
+    }
 
-        public static void ConfigureIdentity(this IServiceCollection services)
-        {
-            var builder = services.AddIdentityCore<AppUser>(u => u.User.RequireUniqueEmail = true);
-
-            builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
-            builder.AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders();
-        }
-
-        public static void ConfigureRateLimiting(this IServiceCollection services)
-        {
-            var rateLimitRules = new List<RateLimitRule>
+    public static void ConfigureRateLimiting(this IServiceCollection services)
+    {
+        var rateLimitRules = new List<RateLimitRule>
             {
                 new RateLimitRule
                 {
@@ -75,93 +63,92 @@ namespace ThesisERP.Infrastracture
                     Period = "1s"
                 }
             };
-            services.Configure<IpRateLimitOptions>(opt =>
-            {
-                opt.GeneralRules = rateLimitRules;
-            });
-            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
-            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
-            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
-            services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
-        }
-
-        public static void ConfigureAutoMapper(this IServiceCollection services)
+        services.Configure<IpRateLimitOptions>(opt =>
         {
-            services.AddAutoMapper(typeof(MapperInitializer));
-            //services.AddAutoMapper(Assembly.GetExecutingAssembly());
-        }
+            opt.GeneralRules = rateLimitRules;
+        });
+        services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+        services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+        services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+        services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+    }
 
-        public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
+    public static void ConfigureAutoMapper(this IServiceCollection services)
+    {
+        services.AddAutoMapper(typeof(MapperInitializer));
+        //services.AddAutoMapper(Assembly.GetExecutingAssembly());
+    }
+
+    public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
+    {
+        var jwtSettings = configuration.GetSection("JwtSettings");
+        var key = Environment.GetEnvironmentVariable("THESIS_JWT_KEY");
+
+        services
+        .AddAuthentication(options =>
         {
-            var jwtSettings = configuration.GetSection("JwtSettings");
-            var key = Environment.GetEnvironmentVariable("THESIS_JWT_KEY");
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidateAudience = false,
+                ValidIssuer = jwtSettings.GetSection("Issuer").Value,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+            };
+        });
+    }
+    public static void ConfigureVersioning(this IServiceCollection services)
+    {
+        services.AddApiVersioning(opt =>
+        {
+            opt.ReportApiVersions = true;
+            opt.AssumeDefaultVersionWhenUnspecified = true;
+            opt.DefaultApiVersion = new ApiVersion(1, 0);
+            opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
+        });
+    }
 
-            services
-            .AddAuthentication(options =>
+    public static void ConfigureExceptionHandler(this IApplicationBuilder app)
+    {
+        app.UseExceptionHandler(error =>
+        {
+            error.Run(async context =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;                
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                context.Response.ContentType = "application/json";
+
+                var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+                if (contextFeature != null)
                 {
-                    ValidateIssuer = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidateAudience = false,
-                    ValidIssuer = jwtSettings.GetSection("Issuer").Value,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
-                };
-            });
-        }
-        public static void ConfigureVersioning(this IServiceCollection services)
-        {
-            services.AddApiVersioning(opt =>
-            {
-                opt.ReportApiVersions = true;
-                opt.AssumeDefaultVersionWhenUnspecified = true;
-                opt.DefaultApiVersion = new ApiVersion(1, 0);
-                opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
-            });
-        }
+                    string responseMessage = string.Empty;
 
-        public static void ConfigureExceptionHandler(this IApplicationBuilder app)
-        {
-            app.UseExceptionHandler(error =>
-            {
-                error.Run(async context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                    context.Response.ContentType = "application/json";
-
-                    var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
-                    if (contextFeature != null)
+                    if (contextFeature.Error is ThesisERPException)
                     {
-                        string responseMessage = string.Empty;
-                                                
-                        if (contextFeature.Error is ThesisERPException)
-                        {
-                            responseMessage = contextFeature.Error.Message;
-                            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                        } 
-                        else
-                        {
-                            Log.Error($"Something went wrong in {contextFeature.Error}");
-                            responseMessage = "Internal Server Error. Please try again.";
-                        }
-                        await context.Response
-                        .WriteAsync(
-                            new AppError
-                            {
-                                StatusCode = context.Response.StatusCode,
-                                Message = responseMessage
-                            }
-                            .ToString()
-                        );
+                        responseMessage = contextFeature.Error.Message;
+                        context.Response.StatusCode = StatusCodes.Status400BadRequest;
                     }
-                });
+                    else
+                    {
+                        Log.Error($"Something went wrong in {contextFeature.Error}");
+                        responseMessage = "Internal Server Error. Please try again.";
+                    }
+                    await context.Response
+                    .WriteAsync(
+                        new AppError
+                        {
+                            StatusCode = context.Response.StatusCode,
+                            Message = responseMessage
+                        }
+                        .ToString()
+                    );
+                }
             });
-        }
+        });
     }
 }

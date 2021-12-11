@@ -12,6 +12,5 @@ public interface ITransaction
     ICollection<DocumentDetail> Details { get; set; }
     bool IsFulfilled { get; }
     bool IsClosed { get; }
-    bool IsCancelled { get; }
-    bool IsPositiveStockTransaction { get; }
+    bool IsCancelled { get; }   
 }

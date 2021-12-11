@@ -3,12 +3,12 @@ using System.Text.Json;
 
 namespace ThesisERP.Application.DTOs;
 
-public class ClientDTO : GetClientDTO
+public class ClientProductsDTO : ClientDTO
 {
     public virtual ICollection<ProductDTO>? RelatedProducts { get; set; } = new List<ProductDTO>();
 }
 
-public class GetClientDTO : CreateClientDTO
+public class ClientDTO : CreateClientDTO
 {
     public int Id { get; set; }
     public DateTime DateCreated { get; set; }
@@ -34,4 +34,15 @@ public class CreateClientDTO
 
 public class UpdateClientDTO : CreateClientDTO
 {
+}
+
+public class ClientBaseInfoDTO
+{
+    public int Id { get; set; }
+    public string? Organization { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string? LastName { get; set; }
+
+    [DataType(DataType.EmailAddress)]
+    public string Email { get; set; } = string.Empty;
 }

@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ThesisERP.Application.Models
+namespace ThesisERP.Application.Models;
+
+public class AuthSuccess : AuthResponse
 {
-    public class AuthSuccess : AuthResponse
-    {
-        public AuthSuccess(string jwtToken, string refreshToken) : base(jwtToken, refreshToken) { }
-    }
+    public AuthSuccess(string jwtToken, string refreshToken) : base(jwtToken, refreshToken) { }
 }

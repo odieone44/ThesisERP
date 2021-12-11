@@ -52,8 +52,11 @@ public class DocumentDetail
     public DocumentDetail(Product product, decimal quantity, decimal price, Tax? tax = null, Discount? discount = null)
     {
         Product = product;
+        ProductId = product.Id;
         Discount = discount;
+        DiscountID = discount?.Id;
         Tax = tax;
+        TaxID = tax?.Id;
         ProductQuantity = quantity;
         UnitPrice = price;
 

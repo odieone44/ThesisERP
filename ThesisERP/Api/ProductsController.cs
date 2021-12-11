@@ -66,7 +66,9 @@ public class ProductsController : BaseApiController
 
         var product = _mapper.Map<Product>(productDTO);
 
-        var result = await _productsRepo.AddAsync(product);
+        var result = _productsRepo.Add(product);
+        
+        await _productsRepo.SaveChangesAsync();
 
         var productAdded = _mapper.Map<ProductDTO>(result);
 
@@ -87,12 +89,12 @@ public class ProductsController : BaseApiController
         }
 
         var product = await _productsRepo.GetByIdAsync(id);
-
         if (product == null) { return NotFound(); }
 
         _mapper.Map(productDTO, product);
+        _productsRepo.Update(product);
 
-        await _productsRepo.UpdateAsync(product);
+        await _productsRepo.SaveChangesAsync();
 
         return NoContent();
     }
@@ -112,7 +114,9 @@ public class ProductsController : BaseApiController
 
         if (product == null) { return NotFound(); }
 
-        await _productsRepo.DeleteAsync(product);
+        _productsRepo.Delete(product);
+
+        await _productsRepo.SaveChangesAsync();
 
         return NoContent();
 

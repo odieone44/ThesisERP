@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ThesisERP.Core.Exceptions
+namespace ThesisERP.Core.Exceptions;
+
+public class ThesisERPException : Exception
 {
-    public class ThesisERPException : Exception
+    public ThesisERPException(string errorMessage) : base(errorMessage)
     {
-        public ThesisERPException(string errorMessage) : base(errorMessage)
-        {
-        }
     }
 }

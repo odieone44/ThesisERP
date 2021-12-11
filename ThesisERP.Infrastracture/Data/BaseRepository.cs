@@ -11,40 +11,33 @@ public abstract class BaseRepository<T> : IRepositoryBase<T> where T : class
 
     public BaseRepository(DbContext dbContext)
     {
-        this._dbContext = dbContext;
+        _dbContext = dbContext;
     }
 
-    public virtual async Task<T> AddAsync(T entity)
+    public virtual T Add(T entity)
     {
-        _dbContext.Set<T>().Add(entity);
-
-        await SaveChangesAsync();
+        _dbContext.Set<T>().Add(entity);        
 
         return entity;
     }
 
-    public virtual async Task UpdateAsync(T entity)
+    public virtual void Update(T entity)
     {
-        _dbContext.Entry(entity).State = EntityState.Modified;
-
-        await SaveChangesAsync();
+        _dbContext.Entry(entity).State = EntityState.Modified;        
     }
 
-    public virtual async Task DeleteAsync(T entity)
+    public virtual void Delete(T entity)
     {
-        _dbContext.Set<T>().Remove(entity);
-
-        await SaveChangesAsync();
+        _dbContext.Set<T>().Remove(entity);        
     }
 
-    public virtual async Task DeleteRangeAsync(IEnumerable<T> entities)
+    public virtual void DeleteRange(IEnumerable<T> entities)
     {
         _dbContext.Set<T>().RemoveRange(entities);
-
-        await SaveChangesAsync();
+        
     }
 
-    public virtual async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? expression = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object?>>? include = null)
+    public async virtual Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? expression = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object?>>? include = null)
     {
         IQueryable<T> query = _dbContext.Set<T>();
 
@@ -66,16 +59,16 @@ public abstract class BaseRepository<T> : IRepositoryBase<T> where T : class
         return await query.ToListAsync();
     }
 
-    public virtual async Task<T?> GetByIdAsync<TId>(TId id) where TId : notnull
+    public async virtual Task<T?> GetByIdAsync<TId>(TId id) where TId : notnull
     {
         return await _dbContext.Set<T>().FindAsync(new object[] { id });
     }
-    public virtual async Task<int> CountAsync(Expression<Func<T, bool>>? expression = null)
+    public async virtual Task<int> CountAsync(Expression<Func<T, bool>>? expression = null)
     {
         return await _dbContext.Set<T>().CountAsync(expression);
     }
 
-    public virtual async Task SaveChangesAsync()
+    public async virtual Task SaveChangesAsync()
     {
         await _dbContext.SaveChangesAsync();
     }

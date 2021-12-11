@@ -1,7 +1,6 @@
-﻿namespace ThesisERP.Core.Interfaces
+﻿namespace ThesisERP.Core.Interfaces;
+
+public interface ITransactionDetail
 {
-    public interface ITransactionDetail
-    {
-        // not implemented yet
-    }
+    // not implemented yet
 }

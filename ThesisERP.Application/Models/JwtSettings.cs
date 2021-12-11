@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ThesisERP.Application.Models
+namespace ThesisERP.Application.Models;
+
+public class JwtSettings
 {
-    public class JwtSettings
-    {
-        public string Issuer { get; set; }
-        public int Lifetime { get; set; }
-        public int RefreshTokenTTL { get; set; }
-    }
+    public string Issuer { get; set; }
+    public int Lifetime { get; set; }
+    public int RefreshTokenTTL { get; set; }
 }

@@ -9,6 +9,7 @@ using ThesisERP.Infrastracture;
 using ThesisERP.Infrastracture.Data;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
+using ThesisERP.Application.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,17 @@ builder.Host.UseSerilog(
                       rollingInterval: RollingInterval.Day,
                       restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information);
     });
+
+var jwtConfig = builder.Configuration.GetSection("JwtSettings");
+
+builder.Services.Configure<JwtSettings>(jwtConfig);
+builder.Services.AddMemoryCache();
+builder.Services.ConfigureRateLimiting();
+builder.Services.AddHttpContextAccessor();
+builder.Services.ConfigureIdentity();
+builder.Services.ConfigureJWT(builder.Configuration);
+builder.Services.ConfigureAutoMapper();
+builder.Services.ConfigureVersioning();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 

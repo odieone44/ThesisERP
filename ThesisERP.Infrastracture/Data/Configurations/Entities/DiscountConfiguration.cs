@@ -2,13 +2,12 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ThesisERP.Core.Entities;
 
-namespace ThesisERP.Infrastracture.Data.Configurations.Entities
+namespace ThesisERP.Infrastracture.Data.Configurations.Entities;
+
+internal class DiscountConfiguration : IEntityTypeConfiguration<Discount>
 {
-    internal class DiscountConfiguration : IEntityTypeConfiguration<Discount>
+    public void Configure(EntityTypeBuilder<Discount> discountBuilder)
     {
-        public void Configure(EntityTypeBuilder<Discount> discountBuilder)
-        {
-            discountBuilder.ToTable("Discounts").HasKey(t => t.Id);
-        }
+        discountBuilder.ToTable("Discounts").HasKey(t => t.Id);
     }
 }

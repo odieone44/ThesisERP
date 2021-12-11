@@ -8,24 +8,23 @@ using System.Text;
 using System.Threading.Tasks;
 using ThesisERP.Core.Entities;
 
-namespace ThesisERP.Infrastracture.Data.Configurations.Entities
+namespace ThesisERP.Infrastracture.Data.Configurations.Entities;
+
+internal class EntityConfiguration : IEntityTypeConfiguration<Entity>
 {
-    internal class EntityConfiguration : IEntityTypeConfiguration<Entity>
+    public void Configure(EntityTypeBuilder<Entity> entityBuilder)
     {
-        public void Configure(EntityTypeBuilder<Entity> entityBuilder)
-        {
 
-            entityBuilder.ToTable("Entities");
-            entityBuilder.HasKey(t => t.Id);
+        entityBuilder.ToTable("Entities");
+        entityBuilder.HasKey(t => t.Id);
 
-            entityBuilder.Property(e => e.Timestamp).IsRowVersion();
+        entityBuilder.Property(e => e.Timestamp).IsRowVersion();
 
-            entityBuilder.HasMany(e => e.RelatedProducts)
-                         .WithMany(x => x.RelatedEntities);
+        entityBuilder.HasMany(e => e.RelatedProducts)
+                     .WithMany(x => x.RelatedEntities);
 
-            entityBuilder.OwnsOne(s => s.ShippingAddress);
-            entityBuilder.OwnsOne(b => b.BillingAddress); 
-           
-        }
+        entityBuilder.OwnsOne(s => s.ShippingAddress);
+        entityBuilder.OwnsOne(b => b.BillingAddress);
+
     }
 }

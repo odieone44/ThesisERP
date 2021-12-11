@@ -1,12 +1,11 @@
 ﻿using Newtonsoft.Json;
 
-namespace ThesisERP.Application.Models
-{
-    public class AppError
-    {
-        public int StatusCode { get; set; }
-        public string Message { get; set; } = string.Empty;
+namespace ThesisERP.Application.Models;
 
-        public override string ToString() => JsonConvert.SerializeObject(this);
-    }
+public class AppError
+{
+    public int StatusCode { get; set; }
+    public string Message { get; set; } = string.Empty;
+
+    public override string ToString() => JsonConvert.SerializeObject(this);
 }

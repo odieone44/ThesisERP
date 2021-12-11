@@ -2,6 +2,7 @@
 using ThesisERP.Core.Enums;
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Exceptions;
+using System.Xml.Linq;
 
 namespace ThesisERP.Core.Entities;
 
@@ -37,31 +38,32 @@ public class Document : ITransaction
     public Transactions.TransactionType Type => TransactionTemplate.TransactionType;
     public bool IsFulfilled => Status == Transactions.TransactionStatus.fulfilled;
     public bool IsClosed => Status == Transactions.TransactionStatus.closed;
-    public bool IsCancelled => Status == Transactions.TransactionStatus.cancelled;
-    public bool IsPositiveStockTransaction => TransactionTemplate.IsPositiveStockTransaction;
+    public bool IsCancelled => Status == Transactions.TransactionStatus.cancelled;   
 
-    private Document() { }
+    private Document() { }   
 
-    public Document(Entity entity,
-                    InventoryLocation location,
-                    TransactionTemplate template,
-                    Address billingAddress,
-                    Address shippingAddress,
-                    List<DocumentDetail> details,
-                    string comments,
-                    string username)
+    public static Document Initialize(Entity entity,
+                                      InventoryLocation location,
+                                      TransactionTemplate template,
+                                      Address billingAddress,
+                                      Address shippingAddress, 
+                                      string username)
     {
-        Entity = entity;
-        InventoryLocation = location;
-        TransactionTemplate = template;
-        BillingAddress = billingAddress;
-        ShippingAddress = shippingAddress;
-        DocumentNumber = $"{template.Prefix}{template.NextNumber}{template.Postfix}";
-        Status = Transactions.TransactionStatus.pending;
-        Details = details;
-        DateCreated = DateTime.UtcNow;
-        DateUpdated = DateTime.UtcNow;
-        CreatedBy = username;
-        Comments = comments;
+        return new()
+        {
+            Entity = entity,
+            EntityId = entity.Id,
+            InventoryLocation = location,
+            InventoryLocationId = location.Id,
+            TransactionTemplate = template,
+            TemplateId = template.Id,
+            BillingAddress = billingAddress,
+            ShippingAddress = shippingAddress,
+            DocumentNumber = $"{template.Prefix}{template.NextNumber}{template.Postfix}",
+            Status = Transactions.TransactionStatus.draft,
+            DateCreated = DateTime.UtcNow,
+            DateUpdated = DateTime.UtcNow,
+            CreatedBy = username
+        };
     }
 }

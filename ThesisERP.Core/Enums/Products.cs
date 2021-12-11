@@ -1,11 +1,10 @@
-﻿namespace ThesisERP.Core.Enums
+﻿namespace ThesisERP.Core.Enums;
+
+public static class Products
 {
-    public static class Products
+    public enum Types
     {
-        public enum Types
-        {
-            product = 0,
-            service = 1
-        }
+        product = 0,
+        service = 1
     }
 }

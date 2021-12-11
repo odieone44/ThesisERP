@@ -63,9 +63,11 @@ public class SuppliersController : BaseApiController
 
         var supplier = _mapper.Map<Entity>(supplierDTO);
 
-        var result = await _entityRepo.AddAsync(supplier);
+        var result = _entityRepo.Add(supplier);
 
         if (result == null) { return Problem(); }
+        
+        await _entityRepo.SaveChangesAsync();
 
         var supplierAdded = _mapper.Map<SupplierDTO>(result);
 
@@ -88,7 +90,9 @@ public class SuppliersController : BaseApiController
         if (supplier == null) { return NotFound(); }
 
         _mapper.Map(supplierDTO, supplier);
-        await _entityRepo.UpdateAsync(supplier);
+        _entityRepo.Update(supplier);
+
+        await _entityRepo.SaveChangesAsync();
 
         return NoContent();
     }
@@ -108,7 +112,9 @@ public class SuppliersController : BaseApiController
 
         if (supplier == null) { return NotFound(); }
 
-        await _entityRepo.DeleteAsync(supplier);
+        _entityRepo.Delete(supplier);
+
+        await _entityRepo.SaveChangesAsync();
 
         return NoContent();
 

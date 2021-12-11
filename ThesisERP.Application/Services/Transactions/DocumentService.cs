@@ -1,19 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ThesisERP.Application.DTOs.Documents;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Interfaces.Transactions;
-using ThesisERP.Application.Services.Entities;
+using ThesisERP.Application.Models.Stock;
 using ThesisERP.Core.Entities;
-using ThesisERP.Core.Exceptions;
 using ThesisERP.Core.Enums;
-using static ThesisERP.Core.Enums.Transactions;
+using ThesisERP.Core.Exceptions;
 using static ThesisERP.Core.Enums.Entities;
+using static ThesisERP.Core.Enums.Transactions;
 
 namespace ThesisERP.Application.Services.Transactions;
 
@@ -25,12 +20,9 @@ public class DocumentService : IDocumentService
     private readonly IRepositoryBase<Entity> _entitiesRepo;
     private readonly IRepositoryBase<InventoryLocation> _locationsRepo;
     private readonly IRepositoryBase<StockLevel> _stockRepo;
-    private readonly IMapper _mapper;
-    
-    private TransactionTemplate _template;
-    private Entity _entity;
-    private InventoryLocation _location;
-    private List<Product> _products;
+    private readonly IMapper _mapper;    
+
+    private Document _document;
 
     public DocumentService(IRepositoryBase<Document> documentsRepo,
                            IRepositoryBase<Product> productsRepo,
@@ -62,78 +54,41 @@ public class DocumentService : IDocumentService
     //TODO - This is a temp implementation for testing.
     public async Task<Document> Create(CreateDocumentDTO documentDTO, string username)
     {
-        await _LoadDocumentCreateRequiredEntities(documentDTO);
+        //todo - add transaction? 
+        await _InitializeNewDocument(documentDTO, username);
+        await _HandleStockUpdateForAction(TransactionAction.create);
 
-        var billAddress = _mapper.Map<Address>(documentDTO.BillingAddress);
-        var shipAddress = _mapper.Map<Address>(documentDTO.ShippingAddress);
+        _document.Status = TransactionStatus.pending;
+        _document.Comments = documentDTO.Comments;        
+        _document.TransactionTemplate.NextNumber++;
 
-        var detailsList = new List<DocumentDetail>();
-        
-        var stockDict = (await _stockRepo
-                               .GetAllAsync(x => _products.Select(x=>x.Id).Contains(x.ProductId) 
-                                            && x.InventoryLocationId == documentDTO.InventoryLocationId))
-                               .ToDictionary(x => x.ProductId, v => v);
+        var docResult = _documentsRepo.Add(_document);
 
-        foreach (var detailDto in documentDTO.Details)
-        {
-            var thisProduct = _products.Where(x => x.Id == detailDto.ProductId).FirstOrDefault();
-            
-            //todo add taxes/discounts
-            var detail = new DocumentDetail(thisProduct, detailDto.ProductQuantity, detailDto.UnitPrice, null, null);
-            detailsList.Add(detail);
+        _templatesRepo.Update(_document.TransactionTemplate);
 
-            if (stockDict.TryGetValue(detailDto.ProductId, out var stockEntry))
-            {
-                if (_template.IsPositiveStockTransaction)
-                {
-                    stockEntry.Incoming += detail.ProductQuantity;
-                }
-                else
-                {
-                    stockEntry.Outgoing += detail.ProductQuantity;
-                }
+        await _documentsRepo.SaveChangesAsync();
 
-                await _stockRepo.UpdateAsync(stockEntry);
-            }
-            else
-            {
-                var newStock = new StockLevel()
-                {
-                    InventoryLocation = _location,
-                    Product = thisProduct,
-                    Available = decimal.Zero,
-                    Incoming = _template.IsPositiveStockTransaction ? detail.ProductQuantity : decimal.Zero,
-                    Outgoing = _template.IsPositiveStockTransaction ? decimal.Zero : detail.ProductQuantity
-                };
-
-                var result = await _stockRepo.AddAsync(newStock);
-
-                stockDict.Add(detailDto.ProductId, result);
-            }
-
-        }
-
-        var doc = new Document(_entity, 
-                               _location, 
-                               _template, 
-                               billAddress, 
-                               shipAddress, 
-                               detailsList, 
-                               documentDTO.Comments, 
-                               username);
-
-        _template.NextNumber++;
-
-        var docResult = await _documentsRepo.AddAsync(doc);
-        
-        await _templatesRepo.UpdateAsync(_template);
-        
         return docResult;
     }
 
-    public Task<Document> Fulfill(int id)
+    public async Task<Document> Fulfill(int id)
     {
-        throw new NotImplementedException();
+        _document = await _documentsRepo.GetDocumentByIdIncludeRelations(id);
+        _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
+
+        if (_document.Status != TransactionStatus.pending)
+        {
+            throw new ThesisERPException($"Document with id: '{id}' cannot be fulfilled because its not marked as 'Pending'.");
+        }
+
+        await _HandleStockUpdateForAction(TransactionAction.fulfill);
+        _document.Status = TransactionStatus.fulfilled;
+
+        _documentsRepo.Update(_document);
+
+        await _documentsRepo.SaveChangesAsync();
+
+        return _document;
     }
 
     public Task<Document> Update(int id, UpdateDocumentDTO documentDTO)
@@ -141,30 +96,78 @@ public class DocumentService : IDocumentService
         throw new NotImplementedException();
     }
 
-    private async Task _LoadDocumentCreateRequiredEntities(CreateDocumentDTO documentDTO)
+    private async Task _InitializeNewDocument(CreateDocumentDTO documentDTO, string username)
     {
-        _template = await _templatesRepo.GetByIdAsync(documentDTO.TemplateId);
-        _ = _template ?? throw new ThesisERPException($"Document Template with id: '{documentDTO.TemplateId}' not found.");
+        var template = await _templatesRepo.GetByIdAsync(documentDTO.TemplateId);
+        _ = template ?? throw new ThesisERPException($"Document Template with id: '{documentDTO.TemplateId}' not found.");
 
-        var entityType = _template.IsPositiveStockTransaction ? EntityTypes.supplier : EntityTypes.client;
-        _entity = (await _entitiesRepo.GetAllAsync(x => x.Id == documentDTO.EntityId && x.EntityType == entityType)).FirstOrDefault();
-        _ = _entity ?? throw new ThesisERPException($"{entityType} with id: '{documentDTO.EntityId}' not found.");
+        var entityType = template.IsPositiveStockTransaction ? EntityTypes.supplier : EntityTypes.client;
+        var entity = (await _entitiesRepo.GetAllAsync(x => x.Id == documentDTO.EntityId && x.EntityType == entityType)).FirstOrDefault();
+        _ = entity ?? throw new ThesisERPException($"{entityType} with id: '{documentDTO.EntityId}' not found.");
 
-        _location = await _locationsRepo.GetByIdAsync(documentDTO.InventoryLocationId);
-        _ = _location ?? throw new ThesisERPException($"Inventory Location with id: '{documentDTO.InventoryLocationId}' not found.");
+        var location = await _locationsRepo.GetByIdAsync(documentDTO.InventoryLocationId);
+        _ = location ?? throw new ThesisERPException($"Inventory Location with id: '{documentDTO.InventoryLocationId}' not found.");
 
         var productIds = documentDTO.Details.Select(x => x.ProductId).Distinct().ToList();
         if (!productIds.Any()) { throw new ThesisERPException("A valid document details list has to be provided."); }
 
-        _products = await _productsRepo.GetAllAsync(expression: x => productIds.Contains(x.Id),
+        var products = await _productsRepo.GetAllAsync(expression: x => productIds.Contains(x.Id),
                                                        include: i => i.Include(p => p.StockLevels));
 
-        var nonexistingProducts = productIds.Except(_products.Select(x => x.Id)).ToList();
+        var nonExistingProducts = productIds.Except(products.Select(x => x.Id)).ToList();
 
-        if (nonexistingProducts.Any())
+        if (nonExistingProducts.Any())
         {
-            throw new ThesisERPException($"Some products were not found: '{string.Join(", ", nonexistingProducts)}'. Document Creation failed.");
+            throw new ThesisERPException($"Some products were not found: '{string.Join(", ", nonExistingProducts.Select(x => $"ProductId: {x}"))}'. Document Creation failed.");
+        }
+
+        var billAddress = _mapper.Map<Address>(documentDTO.BillingAddress);
+        var shipAddress = _mapper.Map<Address>(documentDTO.ShippingAddress);
+
+        _document = Document.Initialize(entity, location, template, billAddress, shipAddress, username);
+
+        var detailsList = new List<DocumentDetail>();
+        foreach (var detailDto in documentDTO.Details)
+        {
+            var thisProduct = products.Where(x => x.Id == detailDto.ProductId).FirstOrDefault();
+
+            //todo add taxes/discounts
+            var detail = new DocumentDetail(thisProduct, detailDto.ProductQuantity, detailDto.UnitPrice, null, null);
+            detailsList.Add(detail);
+        }
+
+        _document.Details = detailsList;
+
+    }
+
+    private async Task _HandleStockUpdateForAction(TransactionAction action)
+    {      
+
+        var stockAction = new TransactionStockAction(action, _document.Status, _document.Type);
+        int locationId = _document.InventoryLocation.Id;
+
+        var stockDict = (await _stockRepo
+                              .GetAllAsync(x => _document.Details.Select(x => x.Product.Id).Contains(x.ProductId)
+                                           && x.InventoryLocationId == locationId))
+                              .ToDictionary(x => x.ProductId, v => v);
+
+        foreach (var detail in _document.Details)
+        {
+            var stockUpdateHelper = new StockLevelUpdateHelper(stockAction, detail.ProductQuantity);           
+
+            if (!stockDict.TryGetValue(detail.ProductId, out var locationStockEntry))
+            {
+                locationStockEntry = new StockLevel()
+                {
+                    InventoryLocation = _document.InventoryLocation,
+                    Product = detail.Product
+                };
+                var result = _stockRepo.Add(locationStockEntry);
+                stockDict.Add(detail.ProductId, result);                
+            }
+            stockUpdateHelper.HandleStockLevelUpdate(locationStockEntry);
+            if (locationStockEntry.Id > 0) { _stockRepo.Update(locationStockEntry); }
         }
     }
-    
+
 }
