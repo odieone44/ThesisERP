@@ -7,6 +7,7 @@ using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Interfaces.Transactions;
 using ThesisERP.Application.Services.Transactions;
 using ThesisERP.Core.Entities;
+using ThesisERP.Core.Enums;
 
 namespace ThesisERP.Api;
 

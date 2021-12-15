@@ -22,6 +22,7 @@ public class MapperInitializer : Profile
         _createInventoryLocationMaps();
         _createProductMaps();
         _createDocumentMaps();
+        _createTemplateMaps();
 
     }
 
@@ -162,5 +163,14 @@ public class MapperInitializer : Profile
         CreateMap<Document, PurchaseDocumentDTO>()
             .ForMember(x => x.Supplier, opt => opt.MapFrom(src => src.Entity));       
 
+    }
+
+    private void _createTemplateMaps()
+    {
+        CreateMap<DocumentTemplate, DocumentTemplateDTO>()
+            .ReverseMap();
+
+        CreateMap<DocumentTemplate, CreateDocumentTemplateDTO>()
+            .ReverseMap().ForMember(d=>d.DateCreated, opt => opt.MapFrom(s => DateTime.UtcNow));
     }
 }

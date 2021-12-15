@@ -4,12 +4,14 @@ namespace ThesisERP.Core.Entities;
 
 public class DocumentTemplate
 {
+    public const int AbbreviationMaxLength = 10;
+
     public int Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public string Abbreviation { get; set; }
-    public string Prefix { get; set; }
-    public string Postfix { get; set; }
+    public string Prefix { get; set; } = string.Empty;
+    public string Postfix { get; set; } = string.Empty;
     public long NextNumber { get; set; } = 1;
     public DateTime DateCreated { get; set; }
     public DateTime? DateUpdated { get; set; }

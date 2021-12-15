@@ -10,5 +10,23 @@ internal class DocumentTemplateConfiguration : IEntityTypeConfiguration<Document
     {
         templateBuilder.ToTable("DocumentTemplates").HasKey(t => t.Id);
         templateBuilder.Property(t => t.Timestamp).IsRowVersion();
+        templateBuilder.Property(t => t.Abbreviation).HasMaxLength(DocumentTemplate.AbbreviationMaxLength);
+
+        templateBuilder.HasIndex(t => t.Abbreviation)
+            .IncludeProperties(
+                p => new {
+                    p.Id,
+                    p.Description,
+                    p.DocumentType,
+                    p.IsDeleted,
+                    p.Name,
+                    p.NextNumber,
+                    p.Prefix,
+                    p.Postfix,
+                    p.DateCreated,
+                    p.DateUpdated,
+                    p.Timestamp
+                })
+            .IsUnique(); ;
     }
 }
