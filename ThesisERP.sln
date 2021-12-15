@@ -3,18 +3,22 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThesisERP.Api", "ThesisERP.Api\ThesisERP.Api.csproj", "{B9F42925-C46F-4697-98F9-2C42D19FC7E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThesisERP.Api", "src\ThesisERP.Api\ThesisERP.Api.csproj", "{B9F42925-C46F-4697-98F9-2C42D19FC7E3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThesisERP.Infrastracture", "ThesisERP.Infrastracture\ThesisERP.Infrastracture.csproj", "{858B3D4E-69E2-47F3-B683-1DF1128B0291}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThesisERP.Infrastracture", "src\ThesisERP.Infrastracture\ThesisERP.Infrastracture.csproj", "{858B3D4E-69E2-47F3-B683-1DF1128B0291}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThesisERP.Core", "ThesisERP.Core\ThesisERP.Core.csproj", "{ABBE5828-77E6-4340-8EF1-B89126A9C1EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThesisERP.Core", "src\ThesisERP.Core\ThesisERP.Core.csproj", "{ABBE5828-77E6-4340-8EF1-B89126A9C1EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThesisERP.Application", "ThesisERP.Application\ThesisERP.Application.csproj", "{8F4381AF-6C50-42BC-BBB2-2F76961F77A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ThesisERP.Application", "src\ThesisERP.Application\ThesisERP.Application.csproj", "{8F4381AF-6C50-42BC-BBB2-2F76961F77A2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{14E2BF5F-90F3-44FE-96A1-E18CAD9A6410}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4C6C7CD5-486C-4744-870D-677DFF0CEDC1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{CFBD8F59-24AC-4E59-A305-9CFCBB75BCE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +45,12 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B9F42925-C46F-4697-98F9-2C42D19FC7E3} = {4C6C7CD5-486C-4744-870D-677DFF0CEDC1}
+		{858B3D4E-69E2-47F3-B683-1DF1128B0291} = {4C6C7CD5-486C-4744-870D-677DFF0CEDC1}
+		{ABBE5828-77E6-4340-8EF1-B89126A9C1EC} = {4C6C7CD5-486C-4744-870D-677DFF0CEDC1}
+		{8F4381AF-6C50-42BC-BBB2-2F76961F77A2} = {4C6C7CD5-486C-4744-870D-677DFF0CEDC1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A96C687-FE27-4DD4-849B-34A0CF8314D7}
