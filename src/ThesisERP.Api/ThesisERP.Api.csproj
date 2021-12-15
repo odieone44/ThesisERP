@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ThesisERP.Application\ThesisERP.Application.csproj" />
     <ProjectReference Include="..\ThesisERP.Core\ThesisERP.Core.csproj" />
     <ProjectReference Include="..\ThesisERP.Infrastracture\ThesisERP.Infrastracture.csproj" />
   </ItemGroup>

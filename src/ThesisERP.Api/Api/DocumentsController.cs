@@ -7,7 +7,6 @@ using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Interfaces.Transactions;
 using ThesisERP.Application.Services.Transactions;
 using ThesisERP.Core.Entities;
-using ThesisERP.Core.Enums;
 
 namespace ThesisERP.Api;
 
@@ -60,7 +59,7 @@ public class DocumentsController : BaseApiController
     }
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type= typeof(List<DocumentDTO>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DocumentDTO>))]
     public async Task<IActionResult> GetDocuments()
     {
         var documents = await _docsRepo
@@ -90,7 +89,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var document = await _docsRepo.GetDocumentByIdIncludeRelations(id);                                
+        var document = await _docsRepo.GetDocumentByIdIncludeRelations(id);
 
         if (document == null) { return NotFound(); }
 
