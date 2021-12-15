@@ -1,26 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using Serilog;
-using System.Text;
-using ThesisERP.Core.Entities;
-using ThesisERP.Application.Models;
-using Microsoft.Extensions.DependencyInjection;
-using ThesisERP.Infrastracture.Data;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
-using AspNetCoreRateLimit;
-using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.AspNetCore.Mvc;
-using ThesisERP.Application.Mappings;
+using Microsoft.Extensions.DependencyInjection;
 using ThesisERP.Application.Interfaces;
-using ThesisERP.Application.Services;
-using ThesisERP.Core.Exceptions;
 using ThesisERP.Application.Interfaces.Transactions;
+using ThesisERP.Application.Services;
 using ThesisERP.Application.Services.Transactions;
+using ThesisERP.Core.Entities;
+using ThesisERP.Infrastracture.Data;
 
 namespace ThesisERP.Infrastracture;
 
@@ -33,7 +19,7 @@ public static class DependancyInjection
 
         services.AddDbContext<DatabaseContext>(options =>
             options.UseSqlServer(connectionString: connString)
-        );      
+        );
 
         services.ConfigureIdentity();
 

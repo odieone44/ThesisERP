@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ThesisERP.Core.Entities;
-using ThesisERP.Core.Enums;
 
 namespace ThesisERP.Infrastracture.Data.Configurations.Entities;
 
@@ -24,12 +23,11 @@ internal class ProductConfiguration : IEntityTypeConfiguration<Product>
         productBuilder
             .HasIndex(p => p.SKU)
             .IncludeProperties(
-                p => new
-                {
+                p => new {
                     p.Id,
-                    p.Description, 
-                    p.Type, 
-                    p.DefaultPurchasePrice, 
+                    p.Description,
+                    p.Type,
+                    p.DefaultPurchasePrice,
                     p.DefaultSaleSPrice,
                     p.LongDescription,
                     p.DateCreated,
