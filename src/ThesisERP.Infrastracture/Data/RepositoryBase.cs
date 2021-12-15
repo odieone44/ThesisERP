@@ -5,11 +5,11 @@ using ThesisERP.Application.Interfaces;
 
 namespace ThesisERP.Infrastracture.Data;
 
-public abstract class BaseRepository<T> : IRepositoryBase<T> where T : class
+public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
 {
     private readonly DbContext _dbContext;
 
-    public BaseRepository(DbContext dbContext)
+    public RepositoryBase(DbContext dbContext)
     {
         _dbContext = dbContext;
     }

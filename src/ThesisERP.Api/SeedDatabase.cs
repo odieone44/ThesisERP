@@ -54,16 +54,16 @@ public static class SeedDatabase
 
     public static void Initialize(IServiceProvider serviceProvider)
     {
-        using (var dbContext = new DatabaseContext(serviceProvider.GetRequiredService<DbContextOptions<DatabaseContext>>()))
+        using var dbContext = new DatabaseContext(serviceProvider.GetRequiredService<DbContextOptions<DatabaseContext>>());
+
+        if (dbContext.Entities.Any() || 
+            dbContext.Documents.Any() || 
+            dbContext.Products.Any())
         {
-
-            if (dbContext.Entities.Any())
-            {
-                return;   // DB has been seeded
-            }
-
-            PopulateTestData(dbContext);
+            return;   // DB has been seeded
         }
+
+        PopulateTestData(dbContext);
     }
 
     public static void PopulateTestData(DatabaseContext dbContext)

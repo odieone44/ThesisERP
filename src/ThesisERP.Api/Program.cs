@@ -2,9 +2,10 @@ using AspNetCoreRateLimit;
 using Serilog;
 using System.Text.Json.Serialization;
 using ThesisERP;
+using ThesisERP.Application;
 using ThesisERP.Application.Models;
 using ThesisERP.Infrastracture;
-using ThesisERP.Infrastracture.Data;
+using ThesisERP.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,16 +24,20 @@ builder.Host.UseSerilog(
 
 var jwtConfig = builder.Configuration.GetSection("JwtSettings");
 
+
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure();
+
 builder.Services.Configure<JwtSettings>(jwtConfig);
+builder.Services.ConfigureJWT(builder.Configuration);
+
 builder.Services.AddMemoryCache();
 builder.Services.ConfigureRateLimiting();
 builder.Services.AddHttpContextAccessor();
-builder.Services.ConfigureIdentity();
-builder.Services.ConfigureJWT(builder.Configuration);
-builder.Services.ConfigureAutoMapper();
+
+
 builder.Services.ConfigureVersioning();
 
-builder.Services.AddInfrastructure(builder.Configuration);
 
 
 builder.Services.AddCors(o =>
@@ -98,10 +103,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
 
     try
-    {
-        var context = services.GetRequiredService<DatabaseContext>();
-
-        //context.Database.EnsureCreated();
+    {               
         SeedDatabase.Initialize(services);
     }
     catch (Exception ex)
