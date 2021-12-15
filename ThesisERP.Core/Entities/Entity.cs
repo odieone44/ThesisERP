@@ -6,7 +6,7 @@ namespace ThesisERP.Core.Entities;
 public class Entity
 {
     public int Id { get; set; }
-    public Enums.Entities.EntityTypes EntityType { get; set; }
+    public EntityType EntityType { get; set; }
     public string? Organization { get; set; }
     public string FirstName { get; set; } = string.Empty;
     public string? LastName { get; set; }
@@ -23,7 +23,7 @@ public class Entity
 
     public Entity() { }
 
-    public Entity(Enums.Entities.EntityTypes type, string firstName, string lastName, string email, string? organization = null)
+    public Entity(EntityType type, string firstName, string lastName, string email, string? organization = null)
     {
         EntityType = type;
         FirstName = firstName;

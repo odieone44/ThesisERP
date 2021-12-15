@@ -16,7 +16,7 @@ public class Address : ValueObject
     public string City { get; set; } = string.Empty;
     public string Region { get; set; } = string.Empty;
     public string PostalCode { get; set; } = string.Empty;
-    public Addresses.CountryCodes Country { get; set; } = Addresses.CountryCodes.NONE;
+    public CountryCode Country { get; set; } = CountryCode.NONE;
 
     public Address() { }
 
@@ -26,7 +26,7 @@ public class Address : ValueObject
                    string city,
                    string region,
                    string postalCode,
-                   Addresses.CountryCodes country)
+                   CountryCode country)
     {
         Name = name;
         Line1 = line1;

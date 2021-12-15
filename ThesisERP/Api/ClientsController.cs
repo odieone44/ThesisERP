@@ -6,6 +6,7 @@ using System.Data;
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Core.Entities;
+using ThesisERP.Core.Enums;
 
 namespace ThesisERP.Api;
 
@@ -29,7 +30,7 @@ public class ClientsController : BaseApiController
     {
         var clients = await _entityRepo
                             .GetAllAsync
-                             (expression: x => x.EntityType == Core.Enums.Entities.EntityTypes.client,
+                             (expression: x => x.EntityType == EntityType.client,
                                  orderBy: o => o.OrderBy(d => d.DateCreated)); //i => i.Include(p => p.RelatedProducts)
 
         var results = _mapper.Map<List<ClientDTO>>(clients);
@@ -119,7 +120,7 @@ public class ClientsController : BaseApiController
     {
         var getClient = await _entityRepo
                               .GetAllAsync
-                               (expression: x => x.EntityType == Core.Enums.Entities.EntityTypes.client && x.Id == id,
+                               (expression: x => x.EntityType == EntityType.client && x.Id == id,
                                    include: b => b.Include(p => p.RelatedProducts));
 
         return getClient.FirstOrDefault();

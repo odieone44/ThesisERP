@@ -14,7 +14,7 @@ public class DatabaseContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<AppUser> AppUsers => Set<AppUser>();
     public DbSet<Entity> Entities => Set<Entity>();
     public DbSet<Document> Documents => Set<Document>();
-    public DbSet<TransactionTemplate> TransactionTemplates => Set<TransactionTemplate>();
+    public DbSet<DocumentTemplate> DocumentTemplates => Set<DocumentTemplate>();
     public DbSet<InventoryLocation> InventoryLocations => Set<InventoryLocation>();
     public DbSet<StockLevel> StockLevels => Set<StockLevel>();
     public DbSet<Tax> Taxes => Set<Tax>();

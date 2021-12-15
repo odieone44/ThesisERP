@@ -1,15 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Core.Entities;
-using ThesisERP.Core.Interfaces;
-using static ThesisERP.Core.Enums.Transactions;
 
 namespace ThesisERP.Application.Services.Stock;
 

@@ -59,7 +59,7 @@ public class DocumentsController : BaseApiController
     }
 
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type= typeof(List<DocumentDTO>))]
     public async Task<IActionResult> GetDocuments()
     {
         var documents = await _docsRepo
@@ -67,12 +67,12 @@ public class DocumentsController : BaseApiController
                                  (orderBy: o => o.OrderByDescending(d => d.DateUpdated),
                                  include: i => i.Include(p => p.Entity)
                                                 .Include(x => x.InventoryLocation)
-                                                .Include(t => t.TransactionTemplate)
-                                                .Include(q => q.Details)
+                                                .Include(t => t.DocumentTemplate)
+                                                .Include(q => q.Rows)
                                                     .ThenInclude(d => d.Product)
-                                                .Include(q => q.Details)
+                                                .Include(q => q.Rows)
                                                     .ThenInclude(d => d.Tax)
-                                                .Include(q => q.Details)
+                                                .Include(q => q.Rows)
                                                     .ThenInclude(d => d.Discount));
 
         var results = _mapper.Map<List<DocumentDTO>>(documents);
@@ -81,7 +81,7 @@ public class DocumentsController : BaseApiController
     }
 
     [HttpGet("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentDTO))]
     public async Task<IActionResult> GetDocument(int id)
     {
         if (id < 1)

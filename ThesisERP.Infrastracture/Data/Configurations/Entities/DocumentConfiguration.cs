@@ -15,7 +15,7 @@ internal class DocumentConfiguration : IEntityTypeConfiguration<Document>
                        .WithMany()
                        .HasForeignKey(d => d.EntityId);
 
-        documentBuilder.HasOne(t => t.TransactionTemplate)
+        documentBuilder.HasOne(t => t.DocumentTemplate)
                        .WithMany()
                        .HasForeignKey(t => t.TemplateId);
 
@@ -26,14 +26,14 @@ internal class DocumentConfiguration : IEntityTypeConfiguration<Document>
         documentBuilder.Property(d => d.Timestamp).IsRowVersion();
 
         documentBuilder.OwnsMany(
-            d => d.Details, detail =>
+            d => d.Rows, docRow =>
             {
-                detail.ToTable("DocumentDetails").HasKey(det => det.Id);
-                detail.WithOwner(x => x.ParentDocument).HasForeignKey(k => k.ParentDocumentId);
-                detail.HasOne(p => p.Product).WithMany().HasForeignKey(p => p.ProductId);
-                detail.HasOne(t => t.Tax).WithMany().HasForeignKey(t => t.TaxID);
-                detail.HasOne(d => d.Discount).WithMany().HasForeignKey(d => d.DiscountID);
-                detail.Property(d => d.Timestamp).IsRowVersion();
+                docRow.ToTable("DocumentRows").HasKey(r => r.Id);
+                docRow.WithOwner(x => x.ParentDocument).HasForeignKey(k => k.ParentDocumentId);
+                docRow.HasOne(p => p.Product).WithMany().HasForeignKey(p => p.ProductId);
+                docRow.HasOne(t => t.Tax).WithMany().HasForeignKey(t => t.TaxID);
+                docRow.HasOne(d => d.Discount).WithMany().HasForeignKey(d => d.DiscountID);
+                docRow.Property(d => d.Timestamp).IsRowVersion();
             });
 
         documentBuilder.OwnsOne(s => s.ShippingAddress);

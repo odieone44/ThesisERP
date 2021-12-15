@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Core.Entities;
+using ThesisERP.Core.Enums;
 
 namespace ThesisERP.Application.Services.Entities;
 
@@ -14,7 +15,7 @@ public static class EntitiesExtensions
     {
         var getClient = await entityRepo
                               .GetAllAsync
-                               (expression: x => x.EntityType == Core.Enums.Entities.EntityTypes.client && x.Id == id);
+                               (expression: x => x.EntityType == EntityType.client && x.Id == id);
 
         return getClient.FirstOrDefault();
     }
@@ -23,7 +24,7 @@ public static class EntitiesExtensions
     {
         var getClient = await entityRepo
                               .GetAllAsync
-                               (expression: x => x.EntityType == Core.Enums.Entities.EntityTypes.client && x.Id == id);
+                               (expression: x => x.EntityType == EntityType.client && x.Id == id);
 
         return getClient.FirstOrDefault();
     }

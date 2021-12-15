@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ThesisERP.Infrastracture.Data.Migrations
 {
-    public partial class freshMigration : Migration
+    public partial class ReInitializeMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -62,6 +62,29 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Discounts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DocumentTemplates",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Abbreviation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Prefix = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Postfix = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NextNumber = table.Column<long>(type: "bigint", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DocumentType = table.Column<int>(type: "int", nullable: false),
+                    Timestamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DocumentTemplates", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -126,9 +149,9 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    SKU = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LongDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SKU = table.Column<string>(type: "nvarchar(40)", maxLength: 40, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    LongDescription = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
                     DefaultPurchasePrice = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: true),
                     DefaultSaleSPrice = table.Column<decimal>(type: "decimal(18,6)", precision: 18, scale: 6, nullable: true),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -152,28 +175,6 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Taxes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TransactionTemplates",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Abbreviation = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Prefix = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Postfix = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NextNumber = table.Column<long>(type: "bigint", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DateUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TransactionType = table.Column<int>(type: "int", nullable: false),
-                    Timestamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TransactionTemplates", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -310,6 +311,60 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Documents",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EntityId = table.Column<int>(type: "int", nullable: false),
+                    InventoryLocationId = table.Column<int>(type: "int", nullable: false),
+                    TemplateId = table.Column<int>(type: "int", nullable: false),
+                    DocumentNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    BillingAddress_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BillingAddress_Line1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BillingAddress_Line2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BillingAddress_City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BillingAddress_Region = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BillingAddress_PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BillingAddress_Country = table.Column<int>(type: "int", nullable: false),
+                    ShippingAddress_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShippingAddress_Line1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShippingAddress_Line2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShippingAddress_City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShippingAddress_Region = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShippingAddress_PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShippingAddress_Country = table.Column<int>(type: "int", nullable: false),
+                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Timestamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Documents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Documents_DocumentTemplates_TemplateId",
+                        column: x => x.TemplateId,
+                        principalTable: "DocumentTemplates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Documents_Entities_EntityId",
+                        column: x => x.EntityId,
+                        principalTable: "Entities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Documents_InventoryLocations_InventoryLocationId",
+                        column: x => x.InventoryLocationId,
+                        principalTable: "InventoryLocations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EntityProduct",
                 columns: table => new
                 {
@@ -363,60 +418,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Documents",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EntityId = table.Column<int>(type: "int", nullable: false),
-                    InventoryLocationId = table.Column<int>(type: "int", nullable: false),
-                    TemplateId = table.Column<int>(type: "int", nullable: false),
-                    DocumentNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    BillingAddress_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BillingAddress_Line1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BillingAddress_Line2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BillingAddress_City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BillingAddress_Region = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BillingAddress_PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BillingAddress_Country = table.Column<int>(type: "int", nullable: false),
-                    ShippingAddress_Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ShippingAddress_Line1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ShippingAddress_Line2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ShippingAddress_City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ShippingAddress_Region = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ShippingAddress_PostalCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ShippingAddress_Country = table.Column<int>(type: "int", nullable: false),
-                    Timestamp = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DateUpdated = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Documents", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Documents_Entities_EntityId",
-                        column: x => x.EntityId,
-                        principalTable: "Entities",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Documents_InventoryLocations_InventoryLocationId",
-                        column: x => x.InventoryLocationId,
-                        principalTable: "InventoryLocations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Documents_TransactionTemplates_TemplateId",
-                        column: x => x.TemplateId,
-                        principalTable: "TransactionTemplates",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DocumentDetails",
+                name: "DocumentRows",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -435,26 +437,26 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DocumentDetails", x => x.Id);
+                    table.PrimaryKey("PK_DocumentRows", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DocumentDetails_Discounts_DiscountID",
+                        name: "FK_DocumentRows_Discounts_DiscountID",
                         column: x => x.DiscountID,
                         principalTable: "Discounts",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_DocumentDetails_Documents_ParentDocumentId",
+                        name: "FK_DocumentRows_Documents_ParentDocumentId",
                         column: x => x.ParentDocumentId,
                         principalTable: "Documents",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DocumentDetails_Products_ProductId",
+                        name: "FK_DocumentRows_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DocumentDetails_Taxes_TaxID",
+                        name: "FK_DocumentRows_Taxes_TaxID",
                         column: x => x.TaxID,
                         principalTable: "Taxes",
                         principalColumn: "Id");
@@ -463,12 +465,12 @@ namespace ThesisERP.Infrastracture.Data.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "109f7dbc-c7c5-4871-8283-078b5ef27020", "56d9e7c8-feb7-4bd1-8e06-b3d2ab4cbbf6", "User", "USER" });
+                values: new object[] { "807bcd1c-786b-4439-8d69-66d7eccdcfe5", "dcf2ea77-5f4e-49de-a84f-8d2412a09748", "User", "USER" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "274bbb30-07c5-42fb-9477-0b019373e67f", "8b0ce168-0f9f-4113-a55d-4745af0953b4", "Administrator", "ADMINISTRATOR" });
+                values: new object[] { "9b9516ea-53ba-4cfa-a52d-20a0745b9fcc", "df1b8b85-1580-44c5-b083-8a724dd46292", "Administrator", "ADMINISTRATOR" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -510,23 +512,23 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DocumentDetails_DiscountID",
-                table: "DocumentDetails",
+                name: "IX_DocumentRows_DiscountID",
+                table: "DocumentRows",
                 column: "DiscountID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DocumentDetails_ParentDocumentId",
-                table: "DocumentDetails",
+                name: "IX_DocumentRows_ParentDocumentId",
+                table: "DocumentRows",
                 column: "ParentDocumentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DocumentDetails_ProductId",
-                table: "DocumentDetails",
+                name: "IX_DocumentRows_ProductId",
+                table: "DocumentRows",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DocumentDetails_TaxID",
-                table: "DocumentDetails",
+                name: "IX_DocumentRows_TaxID",
+                table: "DocumentRows",
                 column: "TaxID");
 
             migrationBuilder.CreateIndex(
@@ -548,6 +550,13 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                 name: "IX_EntityProduct_RelatedProductsId",
                 table: "EntityProduct",
                 column: "RelatedProductsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_SKU",
+                table: "Products",
+                column: "SKU",
+                unique: true)
+                .Annotation("SqlServer:Include", new[] { "Id", "Description", "Type", "DefaultPurchasePrice", "DefaultSaleSPrice", "LongDescription", "DateCreated", "DateUpdated" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_UserId",
@@ -583,7 +592,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "DocumentDetails");
+                name: "DocumentRows");
 
             migrationBuilder.DropTable(
                 name: "EntityProduct");
@@ -613,13 +622,13 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                 name: "Products");
 
             migrationBuilder.DropTable(
+                name: "DocumentTemplates");
+
+            migrationBuilder.DropTable(
                 name: "Entities");
 
             migrationBuilder.DropTable(
                 name: "InventoryLocations");
-
-            migrationBuilder.DropTable(
-                name: "TransactionTemplates");
         }
     }
 }

@@ -4,7 +4,7 @@ namespace ThesisERP.Core.Entities;
 
 #pragma warning disable CS8618
 
-public class DocumentDetail
+public class DocumentRow
 {
 
     public int Id { get; set; }
@@ -49,7 +49,7 @@ public class DocumentDetail
     }
 
 
-    public DocumentDetail(Product product, decimal quantity, decimal price, Tax? tax = null, Discount? discount = null)
+    public DocumentRow(Product product, decimal quantity, decimal price, Tax? tax = null, Discount? discount = null)
     {
         Product = product;
         ProductId = product.Id;
@@ -67,7 +67,7 @@ public class DocumentDetail
         LineTotalGross = LineTotalNet + LineTotalTax - LineTotalDiscount;
 
     }
-    private DocumentDetail()
+    private DocumentRow()
     {
 
     }

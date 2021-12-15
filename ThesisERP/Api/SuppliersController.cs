@@ -6,6 +6,7 @@ using System.Data;
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Core.Entities;
+using ThesisERP.Core.Enums;
 
 namespace ThesisERP.Api;
 
@@ -29,7 +30,7 @@ public class SuppliersController : BaseApiController
     {
         var suppliers = await _entityRepo
                             .GetAllAsync
-                             (expression: x => x.EntityType == Core.Enums.Entities.EntityTypes.supplier,
+                             (expression: x => x.EntityType == EntityType.supplier,
                                  orderBy: o => o.OrderBy(d => d.DateCreated),
                                  include: i => i.Include(p => p.RelatedProducts));
 
@@ -124,7 +125,7 @@ public class SuppliersController : BaseApiController
     {
         var getSupplier = await _entityRepo
                               .GetAllAsync
-                               (expression: x => x.EntityType == Core.Enums.Entities.EntityTypes.supplier && x.Id == id,
+                               (expression: x => x.EntityType == EntityType.supplier && x.Id == id,
                                    include: b => b.Include(p => p.RelatedProducts));
 
         return getSupplier.FirstOrDefault();

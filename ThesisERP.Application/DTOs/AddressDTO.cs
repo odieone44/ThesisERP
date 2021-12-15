@@ -29,5 +29,5 @@ public class AddressDTO
     public string PostalCode { get; set; } = string.Empty;
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public Addresses.CountryCodes CountryCode { get; set; } = Addresses.CountryCodes.NONE;
+    public CountryCode CountryCode { get; set; } = CountryCode.NONE;
 }

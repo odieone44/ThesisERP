@@ -28,8 +28,8 @@ public static class DependancyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        //string connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
-        string connString = Environment.GetEnvironmentVariable("ThesisERPConnection_2");
+        string connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
+        //string connString = Environment.GetEnvironmentVariable("ThesisERPConnection_2");
 
         services.AddDbContext<DatabaseContext>(options =>
             options.UseSqlServer(connectionString: connString)

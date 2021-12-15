@@ -5,7 +5,7 @@ namespace ThesisERP.Core.Entities;
 public class Product
 {
     public int Id { get; set; }
-    public Products.Types Type { get; set; }
+    public ProductType Type { get; set; }
     public string SKU { get; set; }
     public string Description { get; set; }
     public string? LongDescription { get; set; }

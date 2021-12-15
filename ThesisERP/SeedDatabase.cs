@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Enums;
 using ThesisERP.Infrastracture.Data;
@@ -8,13 +7,13 @@ namespace ThesisERP;
 
 public static class SeedDatabase
 {
-    public static readonly Entity TestClient = new(type: Entities.EntityTypes.client,
+    public static readonly Entity TestClient = new(type: EntityType.client,
                                                    firstName: "John",
                                                    lastName: "Doe",
                                                    email: "example@test.com",
                                                    organization: "ThesisERP");
 
-    public static readonly Entity TestSupplier = new(type: Entities.EntityTypes.supplier,
+    public static readonly Entity TestSupplier = new(type: EntityType.supplier,
                                                      firstName: "James",
                                                      lastName: "Harden",
                                                      email: "example2@test.com",
@@ -26,7 +25,7 @@ public static class SeedDatabase
                                                                city: "Athens",
                                                                region: "Attiki",
                                                                postalCode: "10505",
-                                                               country: Addresses.CountryCodes.GR);
+                                                               country: CountryCode.GR);
 
     public static readonly Address ClientBillingAddress = new(name: "Test Billing",
                                                                line1: "Aristidou 8",
@@ -34,7 +33,7 @@ public static class SeedDatabase
                                                                city: "Athens",
                                                                region: "Attiki",
                                                                postalCode: "10505",
-                                                               country: Addresses.CountryCodes.GR);
+                                                               country: CountryCode.GR);
 
     public static readonly Address SupplierShippingAddress = new(name: "Test Recipient",
                                                                   line1: "Aristidou 8",
@@ -42,7 +41,7 @@ public static class SeedDatabase
                                                                   city: "Athens",
                                                                   region: "Attiki",
                                                                   postalCode: "10505",
-                                                                  country: Addresses.CountryCodes.GR);
+                                                                  country: CountryCode.GR);
 
     public static readonly Address SupplierBillingAddress = new(name: "Test Billing",
                                                                  line1: "Aristidou 8",
@@ -50,7 +49,7 @@ public static class SeedDatabase
                                                                  city: "Athens",
                                                                  region: "Attiki",
                                                                  postalCode: "10505",
-                                                                 country: Addresses.CountryCodes.GR);
+                                                                 country: CountryCode.GR);
 
 
     public static void Initialize(IServiceProvider serviceProvider)
@@ -98,7 +97,7 @@ public static class SeedDatabase
         dbContext.InventoryLocations.Add(location);
         dbContext.SaveChanges();
 
-        var template = new TransactionTemplate()
+        var template = new DocumentTemplate()
         {
             Name = "Sales Invoice",
             Abbreviation = "SI",
@@ -106,12 +105,12 @@ public static class SeedDatabase
             NextNumber = 1,
             Prefix = "SI-",
             Postfix = string.Empty,
-            TransactionType = Transactions.TransactionType.sales_invoice,
+            DocumentType = DocumentType.sales_invoice,
             DateCreated = DateTime.Now,
             DateUpdated = DateTime.Now
         };
 
-        dbContext.TransactionTemplates.Add(template);
+        dbContext.DocumentTemplates.Add(template);
         dbContext.SaveChanges();
 
         var product = new Product()
@@ -119,7 +118,7 @@ public static class SeedDatabase
             SKU = "TST0001",
             Description = "Test Product",
             LongDescription = "This is a test product.",
-            Type = Products.Types.product,
+            Type = ProductType.product,
             DefaultPurchasePrice = 10.0m,
             DefaultSaleSPrice = 20.0m,
             DateCreated = DateTime.UtcNow,

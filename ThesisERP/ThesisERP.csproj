@@ -35,4 +35,8 @@
     <None Include="wwwroot\swagger\logo.css" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="logs\" />
+  </ItemGroup>
+
 </Project>

@@ -66,15 +66,15 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "e788421d-5a8a-44ea-91cf-2a45985aaa01",
-                            ConcurrencyStamp = "97b5d860-4df6-459f-9df4-92c092dc97b4",
+                            Id = "807bcd1c-786b-4439-8d69-66d7eccdcfe5",
+                            ConcurrencyStamp = "dcf2ea77-5f4e-49de-a84f-8d2412a09748",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = "36646064-b28e-466c-80e8-a8ab6a919712",
-                            ConcurrencyStamp = "6bf21fb9-9f61-40d0-9cc2-461c3f51a9a0",
+                            Id = "9b9516ea-53ba-4cfa-a52d-20a0745b9fcc",
+                            ConcurrencyStamp = "df1b8b85-1580-44c5-b083-8a724dd46292",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -333,6 +333,60 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.ToTable("Documents", (string)null);
                 });
 
+            modelBuilder.Entity("ThesisERP.Core.Entities.DocumentTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Abbreviation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DocumentType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("NextNumber")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Postfix")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Prefix")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Timestamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DocumentTemplates", (string)null);
+                });
+
             modelBuilder.Entity("ThesisERP.Core.Entities.Entity", b =>
                 {
                     b.Property<int>("Id")
@@ -507,60 +561,6 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.ToTable("Taxes", (string)null);
                 });
 
-            modelBuilder.Entity("ThesisERP.Core.Entities.TransactionTemplate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Abbreviation")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DateUpdated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("NextNumber")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Postfix")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Prefix")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("Timestamp")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
-
-                    b.Property<int>("TransactionType")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TransactionTemplates", (string)null);
-                });
-
             modelBuilder.Entity("EntityProduct", b =>
                 {
                     b.HasOne("ThesisERP.Core.Entities.Entity", null)
@@ -694,7 +694,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ThesisERP.Core.Entities.TransactionTemplate", "TransactionTemplate")
+                    b.HasOne("ThesisERP.Core.Entities.DocumentTemplate", "DocumentTemplate")
                         .WithMany()
                         .HasForeignKey("TemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -780,7 +780,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                                 .HasForeignKey("DocumentId");
                         });
 
-                    b.OwnsMany("ThesisERP.Core.Entities.DocumentDetail", "Details", b1 =>
+                    b.OwnsMany("ThesisERP.Core.Entities.DocumentRow", "Rows", b1 =>
                         {
                             b1.Property<int>("Id")
                                 .ValueGeneratedOnAdd()
@@ -840,7 +840,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
 
                             b1.HasIndex("TaxID");
 
-                            b1.ToTable("DocumentDetails", (string)null);
+                            b1.ToTable("DocumentRows", (string)null);
 
                             b1.HasOne("ThesisERP.Core.Entities.Discount", "Discount")
                                 .WithMany()
@@ -871,16 +871,16 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                     b.Navigation("BillingAddress")
                         .IsRequired();
 
-                    b.Navigation("Details");
+                    b.Navigation("DocumentTemplate");
 
                     b.Navigation("Entity");
 
                     b.Navigation("InventoryLocation");
 
+                    b.Navigation("Rows");
+
                     b.Navigation("ShippingAddress")
                         .IsRequired();
-
-                    b.Navigation("TransactionTemplate");
                 });
 
             modelBuilder.Entity("ThesisERP.Core.Entities.Entity", b =>

@@ -23,7 +23,7 @@ public class CreateDocumentDTO
     public string Comments { get; set; } = string.Empty;
 
     [Required]
-    public ICollection<CreateDocumentDetailDTO> Details { get; set; } = new List<CreateDocumentDetailDTO>();
+    public ICollection<CreateDocumentRowDTO> Rows { get; set; } = new List<CreateDocumentRowDTO>();
 }
 
 public class UpdateDocumentDTO
@@ -33,9 +33,9 @@ public class UpdateDocumentDTO
 
 public class BaseDocumentDTO
 {
-    public Transactions.TransactionType Type { get; set; }
+    public DocumentType Type { get; set; }
     public string DocumentNumber { get; set; }
-    public Transactions.TransactionStatus Status { get; set; }
+    public TransactionStatus Status { get; set; }
 
     [Required]
     public InventoryLocationBaseDTO InventoryLocation { get; set; }
@@ -50,7 +50,7 @@ public class BaseDocumentDTO
     public AddressDTO ShippingAddress { get; set; }    
 
     [Required]
-    public ICollection<DocumentDetailDTO> Details { get; set; } = new List<DocumentDetailDTO>();
+    public ICollection<DocumentRowDTO> Rows { get; set; } = new List<DocumentRowDTO>();
 }
 
 public class DocumentDTO : BaseDocumentDTO

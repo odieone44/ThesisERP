@@ -8,7 +8,7 @@ using ThesisERP.Core.Extensions;
 
 namespace ThesisERP.Application.DTOs.Documents;
 
-public class CreateDocumentDetailDTO
+public class CreateDocumentRowDTO
 {    
     public int ProductId { get; set; }        
     public decimal ProductQuantity { get; set; }    
@@ -17,7 +17,7 @@ public class CreateDocumentDetailDTO
     public int? TaxID { get; set; }
 }
 
-public class DocumentDetailDTO 
+public class DocumentRowDTO 
 {
     public int ProductId { get; set; }
     public string ProductSKU { get; set; }

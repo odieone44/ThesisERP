@@ -20,7 +20,7 @@ public class ProductDTO : CreateProductDTO
 
 public class CreateProductDTO
 {    
-    public Products.Types Type { get; set; }
+    public ProductType Type { get; set; }
    
     [Required]
     [StringLength(40, ErrorMessage = "Length must be between {2} and {1} characters.", MinimumLength = 1)]    

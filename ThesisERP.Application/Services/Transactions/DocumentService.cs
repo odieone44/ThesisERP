@@ -7,8 +7,8 @@ using ThesisERP.Application.Models.Stock;
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Enums;
 using ThesisERP.Core.Exceptions;
-using static ThesisERP.Core.Enums.Entities;
-using static ThesisERP.Core.Enums.Transactions;
+using ThesisERP.Core.Enums;
+
 
 namespace ThesisERP.Application.Services.Transactions;
 
@@ -16,7 +16,7 @@ public class DocumentService : IDocumentService
 {
     private readonly IRepositoryBase<Document> _documentsRepo;
     private readonly IRepositoryBase<Product> _productsRepo;
-    private readonly IRepositoryBase<TransactionTemplate> _templatesRepo;
+    private readonly IRepositoryBase<DocumentTemplate> _templatesRepo;
     private readonly IRepositoryBase<Entity> _entitiesRepo;
     private readonly IRepositoryBase<InventoryLocation> _locationsRepo;
     private readonly IRepositoryBase<StockLevel> _stockRepo;
@@ -26,7 +26,7 @@ public class DocumentService : IDocumentService
 
     public DocumentService(IRepositoryBase<Document> documentsRepo,
                            IRepositoryBase<Product> productsRepo,
-                           IRepositoryBase<TransactionTemplate> templatesRepo,
+                           IRepositoryBase<DocumentTemplate> templatesRepo,
                            IRepositoryBase<Entity> entitiesRepo,
                            IRepositoryBase<InventoryLocation> locationsRepo,
                            IRepositoryBase<StockLevel> stockRepo,
@@ -60,11 +60,11 @@ public class DocumentService : IDocumentService
 
         _document.Status = TransactionStatus.pending;
         _document.Comments = documentDTO.Comments;        
-        _document.TransactionTemplate.NextNumber++;
+        _document.DocumentTemplate.NextNumber++;
 
         var docResult = _documentsRepo.Add(_document);
 
-        _templatesRepo.Update(_document.TransactionTemplate);
+        _templatesRepo.Update(_document.DocumentTemplate);
 
         await _documentsRepo.SaveChangesAsync();
 
@@ -101,15 +101,15 @@ public class DocumentService : IDocumentService
         var template = await _templatesRepo.GetByIdAsync(documentDTO.TemplateId);
         _ = template ?? throw new ThesisERPException($"Document Template with id: '{documentDTO.TemplateId}' not found.");
 
-        var entityType = template.IsPositiveStockTransaction ? EntityTypes.supplier : EntityTypes.client;
+        var entityType = template.IsPositiveStockTransaction ? EntityType.supplier : EntityType.client;
         var entity = (await _entitiesRepo.GetAllAsync(x => x.Id == documentDTO.EntityId && x.EntityType == entityType)).FirstOrDefault();
         _ = entity ?? throw new ThesisERPException($"{entityType} with id: '{documentDTO.EntityId}' not found.");
 
         var location = await _locationsRepo.GetByIdAsync(documentDTO.InventoryLocationId);
         _ = location ?? throw new ThesisERPException($"Inventory Location with id: '{documentDTO.InventoryLocationId}' not found.");
 
-        var productIds = documentDTO.Details.Select(x => x.ProductId).Distinct().ToList();
-        if (!productIds.Any()) { throw new ThesisERPException("A valid document details list has to be provided."); }
+        var productIds = documentDTO.Rows.Select(x => x.ProductId).Distinct().ToList();
+        if (!productIds.Any()) { throw new ThesisERPException("A valid document rows list has to be provided."); }
 
         var products = await _productsRepo.GetAllAsync(expression: x => productIds.Contains(x.Id),
                                                        include: i => i.Include(p => p.StockLevels));
@@ -126,17 +126,17 @@ public class DocumentService : IDocumentService
 
         _document = Document.Initialize(entity, location, template, billAddress, shipAddress, username);
 
-        var detailsList = new List<DocumentDetail>();
-        foreach (var detailDto in documentDTO.Details)
+        var rowsList = new List<DocumentRow>();
+        foreach (var rowDTO in documentDTO.Rows)
         {
-            var thisProduct = products.Where(x => x.Id == detailDto.ProductId).FirstOrDefault();
+            var thisProduct = products.Where(x => x.Id == rowDTO.ProductId).FirstOrDefault();
 
             //todo add taxes/discounts
-            var detail = new DocumentDetail(thisProduct, detailDto.ProductQuantity, detailDto.UnitPrice, null, null);
-            detailsList.Add(detail);
+            var detail = new DocumentRow(thisProduct, rowDTO.ProductQuantity, rowDTO.UnitPrice, null, null);
+            rowsList.Add(detail);
         }
 
-        _document.Details = detailsList;
+        _document.Rows = rowsList;
 
     }
 
@@ -147,23 +147,23 @@ public class DocumentService : IDocumentService
         int locationId = _document.InventoryLocation.Id;
 
         var stockDict = (await _stockRepo
-                              .GetAllAsync(x => _document.Details.Select(x => x.Product.Id).Contains(x.ProductId)
+                              .GetAllAsync(x => _document.Rows.Select(x => x.Product.Id).Contains(x.ProductId)
                                            && x.InventoryLocationId == locationId))
                               .ToDictionary(x => x.ProductId, v => v);
 
-        foreach (var detail in _document.Details)
+        foreach (var row in _document.Rows)
         {
-            var stockUpdateHelper = new StockLevelUpdateHelper(stockAction, detail.ProductQuantity);           
+            var stockUpdateHelper = new StockLevelUpdateHelper(stockAction, row.ProductQuantity);           
 
-            if (!stockDict.TryGetValue(detail.ProductId, out var locationStockEntry))
+            if (!stockDict.TryGetValue(row.ProductId, out var locationStockEntry))
             {
                 locationStockEntry = new StockLevel()
                 {
                     InventoryLocation = _document.InventoryLocation,
-                    Product = detail.Product
+                    Product = row.Product
                 };
                 var result = _stockRepo.Add(locationStockEntry);
-                stockDict.Add(detail.ProductId, result);                
+                stockDict.Add(row.ProductId, result);                
             }
             stockUpdateHelper.HandleStockLevelUpdate(locationStockEntry);
             if (locationStockEntry.Id > 0) { _stockRepo.Update(locationStockEntry); }
