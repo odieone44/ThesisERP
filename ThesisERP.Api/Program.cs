@@ -1,15 +1,10 @@
 using AspNetCoreRateLimit;
-using Swashbuckle.AspNetCore;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using Serilog;
-using System;
+using System.Text.Json.Serialization;
 using ThesisERP;
+using ThesisERP.Application.Models;
 using ThesisERP.Infrastracture;
 using ThesisERP.Infrastracture.Data;
-using System.Text.Json.Serialization;
-using Newtonsoft.Json;
-using ThesisERP.Application.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,14 +71,14 @@ app.UseSwagger(c =>
     c.RouteTemplate = "api/{documentname}/swagger.json";
 });
 app.UseSwaggerUI(c =>
-{           
+{
     c.InjectStylesheet("../swagger/logo.css");
     c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
     c.RoutePrefix = "api";
     var swaggerJsonBasePath = string.IsNullOrEmpty(c.RoutePrefix) ? "." : "..";
 
     c.SwaggerEndpoint($"{swaggerJsonBasePath}/api/v1/swagger.json", "ThesisERP API v1");
-    
+
 });
 
 app.ConfigureExceptionHandler();
