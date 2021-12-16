@@ -10,6 +10,9 @@ using ThesisERP.Core.Enums;
 
 namespace ThesisERP.Api;
 
+/// <summary>
+/// Manage your organization's clients.
+/// </summary>
 public class ClientsController : BaseApiController
 {
 
@@ -50,8 +53,7 @@ public class ClientsController : BaseApiController
         var result = _mapper.Map<ClientDTO>(client);
         return Ok(result);
     }
-
-    [Authorize]
+    
     [HttpPost]
     public async Task<IActionResult> CreateClient([FromBody] CreateClientDTO clientDTO)
     {
@@ -70,8 +72,7 @@ public class ClientsController : BaseApiController
         return CreatedAtRoute("GetClient", new { id = clientAdded.Id }, clientAdded);
 
     }
-
-    [Authorize]
+    
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateClient(int id, [FromBody] UpdateClientDTO clientDTO)
     {
@@ -93,8 +94,7 @@ public class ClientsController : BaseApiController
 
         return NoContent();
     }
-
-    [Authorize()]
+    
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteClient(int id)
     {

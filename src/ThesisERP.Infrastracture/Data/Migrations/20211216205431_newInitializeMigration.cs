@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ThesisERP.Infrastracture.Data.Migrations
 {
-    public partial class ReInitializeMigration : Migration
+    public partial class newInitializeMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -72,7 +72,7 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Abbreviation = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Abbreviation = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Prefix = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Postfix = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NextNumber = table.Column<long>(type: "bigint", nullable: false),
@@ -462,16 +462,6 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "807bcd1c-786b-4439-8d69-66d7eccdcfe5", "dcf2ea77-5f4e-49de-a84f-8d2412a09748", "User", "USER" });
-
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "9b9516ea-53ba-4cfa-a52d-20a0745b9fcc", "df1b8b85-1580-44c5-b083-8a724dd46292", "Administrator", "ADMINISTRATOR" });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -545,6 +535,13 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                 name: "IX_Documents_TemplateId",
                 table: "Documents",
                 column: "TemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DocumentTemplates_Abbreviation",
+                table: "DocumentTemplates",
+                column: "Abbreviation",
+                unique: true)
+                .Annotation("SqlServer:Include", new[] { "Id", "Description", "DocumentType", "IsDeleted", "Name", "NextNumber", "Prefix", "Postfix", "DateCreated", "DateUpdated", "Timestamp" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_EntityProduct_RelatedProductsId",

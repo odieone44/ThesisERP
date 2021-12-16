@@ -8,9 +8,10 @@ using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api;
 
-[Route("api/[controller]")]
-[ApiController]
-public class InventoryLocationsController : ControllerBase
+/// <summary>
+/// Manage your organization's Inventory Locations.
+/// </summary>
+public class InventoryLocationsController : BaseApiController
 {
     private readonly ILogger<InventoryLocationsController> _logger;
     private readonly IMapper _mapper;
@@ -46,8 +47,7 @@ public class InventoryLocationsController : ControllerBase
         var result = _mapper.Map<InventoryLocationDTO>(location);
         return Ok(result);
     }
-
-    [Authorize]
+        
     [HttpPost]
     public async Task<IActionResult> CreateInventoryLocation([FromBody] CreateInventoryLocationDTO locationDTO)
     {
@@ -68,8 +68,7 @@ public class InventoryLocationsController : ControllerBase
         return CreatedAtRoute("GetInventoryLocation", new { id = locationAdded.Id }, locationAdded);
 
     }
-
-    [Authorize]
+        
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateInventoryLocation(int id, [FromBody] UpdateInventoryLocationDTO locationDTO)
     {
@@ -91,8 +90,7 @@ public class InventoryLocationsController : ControllerBase
 
         return NoContent();
     }
-
-    [Authorize()]
+        
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteInventoryLocation(int id)
     {

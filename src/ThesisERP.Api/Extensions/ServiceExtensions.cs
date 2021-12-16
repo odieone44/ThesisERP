@@ -38,7 +38,7 @@ public static class ServiceExtensions
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
         var key = Environment.GetEnvironmentVariable("THESIS_JWT_KEY");
-
+        //var jwtSettings = configuration.Get<JwtSettings>();
         services
         .AddAuthentication(options =>
         {

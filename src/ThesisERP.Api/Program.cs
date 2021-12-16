@@ -6,6 +6,8 @@ using ThesisERP.Application;
 using ThesisERP.Application.Models;
 using ThesisERP.Infrastracture;
 using ThesisERP.Api.Extensions;
+using Microsoft.Extensions.Options;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,7 +61,23 @@ builder.Services.AddControllers()
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen( opt =>
+{
+    opt.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Version = "v1",
+        Title = "ThesisERP Api",
+        Description = "An ASP.NET Core 6.0 Web API for ThesisERP, " +
+                      "a simple ERP application created for my BSc Computer Science Thesis @ University Of Pireaus." +
+                      "<br />  <br />" +
+                      "After logging in, you can authenticate your requests by including an 'Authorization:Bearer [YourToken]' header."
+
+    });
+
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    opt.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename), includeControllerXmlComments:true);
+
+});
 
 var app = builder.Build();
 
@@ -101,10 +119,10 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
+    
     try
     {               
-        SeedDatabase.Initialize(services);
+        await SeedDatabase.Initialize(services);
     }
     catch (Exception ex)
     {

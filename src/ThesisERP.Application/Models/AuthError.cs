@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ThesisERP.Application.Models;
 
-public class AuthError : AuthResponse
+public class AuthError : AuthResult
 {
     public AuthError() : base() { }
 }

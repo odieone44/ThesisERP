@@ -9,6 +9,9 @@ using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api;
 
+/// <summary>
+/// Manage your organization's Products and Services. 
+/// </summary>
 public class ProductsController : BaseApiController
 {
     private readonly ILogger<ProductsController> _logger;
@@ -52,8 +55,7 @@ public class ProductsController : BaseApiController
         var result = _mapper.Map<ProductDTO>(product);
         return Ok(result);
     }
-
-    [Authorize]
+        
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ProductDTO))]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductDTO productDTO)
@@ -75,8 +77,7 @@ public class ProductsController : BaseApiController
         return CreatedAtRoute("GetProduct", new { id = productAdded.Id }, productAdded);
 
     }
-
-    [Authorize]
+        
     [HttpPut("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -98,8 +99,7 @@ public class ProductsController : BaseApiController
 
         return NoContent();
     }
-
-    [Authorize()]
+        
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

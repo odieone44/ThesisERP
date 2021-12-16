@@ -2,13 +2,12 @@
 
 public enum DocumentType
 {    
-    purchase_bill = 2,
-    sales_invoice = 3,
-    internal_transfer = 4,
-    stock_adjustment_plus = 5,
-    stock_adjustment_minus = 6,
-    purchase_return = 7,
-    sales_return = 8
+    purchase_bill = 1,
+    sales_invoice = 2,    
+    stock_adjustment_plus = 3,
+    stock_adjustment_minus = 4,
+    purchase_return = 5,
+    sales_return = 6
 }
 
 public enum OrderType

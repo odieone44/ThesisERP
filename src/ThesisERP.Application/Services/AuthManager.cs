@@ -29,7 +29,7 @@ public class AuthManager : IAuthManager
 
     #region Actions
 
-    public async Task<AuthResponse> ValidateUser(LoginUserDTO userDTO, string ipAddress)
+    public async Task<AuthResult> ValidateUser(LoginUserDTO userDTO, string ipAddress)
     {
         _user = await _userManager.FindByNameAsync(userDTO.Email);
 
@@ -49,7 +49,7 @@ public class AuthManager : IAuthManager
 
         return new AuthSuccess(jwtToken, refreshToken.Token);
     }
-    public async Task<AuthResponse> RefreshUser(string token, string ipAddress)
+    public async Task<AuthResult> RefreshUser(string token, string ipAddress)
     {
         try
         {

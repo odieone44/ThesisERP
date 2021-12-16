@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ThesisERP.Application.DTOs;
@@ -8,6 +9,10 @@ using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api;
 
+/// <summary>
+/// Login or create an account. 
+/// </summary>
+[AllowAnonymous]
 public class AccountController : BaseApiController
 {
     private readonly UserManager<AppUser> _userManager;
@@ -26,9 +31,14 @@ public class AccountController : BaseApiController
         _authManager = authManager;
     }
 
+    /// <summary>
+    /// Register a new user account.
+    /// </summary>
+    /// <param name="userDTO"></param>
+    /// <returns></returns>
     [HttpPost]
     [Route("register")]
-    public async Task<IActionResult> Register([FromBody] UserDTO userDTO)
+    public async Task<IActionResult> Register([FromBody] RegisterUserDTO userDTO)
     {
         _logger.LogInformation($"Registration attempt for {userDTO.Email} ");
         if (!ModelState.IsValid)
@@ -50,12 +60,20 @@ public class AccountController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        await _userManager.AddToRolesAsync(user, userDTO.Roles);
+        await _userManager.AddToRolesAsync(user, new[] { "User" });
         return Accepted();
     }
 
+    /// <summary>
+    /// Log into your account to authenticate further requests.
+    /// </summary>    
+    /// <response code="200">Returns a JWT used to authenticate requests, and a cookie containing a Refresh Token used to refresh the JWT after expiration.</response>
+    /// <response code="401">If account information is not correct or account does not exist.</response>
+    /// <response code="400">If the request body is not valid.</response>
+    /// <param name="userDTO"></param>
     [HttpPost]
     [Route("login")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthSuccessResponse))]
     public async Task<IActionResult> Login([FromBody] LoginUserDTO userDTO)
     {
         _logger.LogInformation($"Logging attempt for {userDTO.Email} ");
@@ -69,6 +87,10 @@ public class AccountController : BaseApiController
         return _handleAuthorizationAttempt(response);
     }
 
+    /// <summary>
+    /// Get a new JWT by using your Refresh Token. 
+    /// </summary>
+    /// <returns></returns>
     [HttpPost("refresh-user")]
     public async Task<IActionResult> RefreshToken()
     {
@@ -76,7 +98,7 @@ public class AccountController : BaseApiController
 
         if (refreshToken == null) return BadRequest();
 
-        AuthResponse response = await _authManager.RefreshUser(refreshToken, _ipAddress());
+        AuthResult response = await _authManager.RefreshUser(refreshToken, _ipAddress());
 
         return _handleAuthorizationAttempt(response);
     }
@@ -103,15 +125,15 @@ public class AccountController : BaseApiController
             return HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() ?? "0.0.0.0";
     }
 
-    private IActionResult _handleAuthorizationAttempt(AuthResponse response)
+    private IActionResult _handleAuthorizationAttempt(AuthResult result)
     {
-        if (response is AuthError)
+        if (result is AuthSuccess success)
         {
-            return Unauthorized();
+            _setTokenCookie(success.RefreshToken);
+
+            return Ok(new AuthSuccessResponse(success));
         }
 
-        _setTokenCookie(response.RefreshToken);
-
-        return Ok(new { Token = response.JwtToken });
+        return Unauthorized();
     }
 }

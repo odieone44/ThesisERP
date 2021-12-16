@@ -10,6 +10,9 @@ using ThesisERP.Core.Enums;
 
 namespace ThesisERP.Api;
 
+/// <summary>
+/// Manage your organization's suppliers.
+/// </summary>
 public class SuppliersController : BaseApiController
 {
 
@@ -52,7 +55,7 @@ public class SuppliersController : BaseApiController
         return Ok(result);
     }
 
-    [Authorize]
+    
     [HttpPost]
     public async Task<IActionResult> CreateSupplier([FromBody] CreateSupplierDTO supplierDTO)
     {
@@ -76,7 +79,7 @@ public class SuppliersController : BaseApiController
 
     }
 
-    [Authorize]
+    
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateSupplier(int id, [FromBody] UpdateSupplierDTO supplierDTO)
     {

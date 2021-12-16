@@ -172,5 +172,11 @@ public class MapperInitializer : Profile
 
         CreateMap<DocumentTemplate, CreateDocumentTemplateDTO>()
             .ReverseMap().ForMember(d=>d.DateCreated, opt => opt.MapFrom(s => DateTime.UtcNow));
+
+        CreateMap<UpdateDocumentTemplateDTO, DocumentTemplate>()
+            .ForMember(d => d.DateUpdated, opt => opt.MapFrom(s => DateTime.UtcNow));
+            
+            
+
     }
 }

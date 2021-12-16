@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ThesisERP.Application.DTOs.Documents;
 using ThesisERP.Application.Interfaces;
@@ -7,6 +6,9 @@ using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api.Api;
 
+/// <summary>
+/// Manage the Templates used to issue documents.
+/// </summary>
 public class TemplatesController : BaseApiController
 {
     private readonly ILogger<TemplatesController> _logger;
@@ -19,6 +21,8 @@ public class TemplatesController : BaseApiController
         _mapper = mapper;
         _templatesRepo = templatesRepo;
     }
+
+
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTemplates()
@@ -30,6 +34,7 @@ public class TemplatesController : BaseApiController
 
         return Ok(results);
     }
+
 
     [HttpGet("{id:int}", Name = "GetTemplate")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentTemplateDTO))]
@@ -50,7 +55,7 @@ public class TemplatesController : BaseApiController
         return Ok(result);
     }
 
-    [Authorize]
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(DocumentTemplateDTO))]
     public async Task<IActionResult> CreateTemplate([FromBody] CreateDocumentTemplateDTO templateDTO)
@@ -73,49 +78,51 @@ public class TemplatesController : BaseApiController
 
     }
 
-    //[Authorize]
-    //[HttpPut("{id:int}")]
-    //[ProducesResponseType(StatusCodes.Status204NoContent)]
-    //[ProducesResponseType(StatusCodes.Status404NotFound)]
-    //public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductDTO productDTO)
-    //{
-    //    if (!ModelState.IsValid || id < 1)
-    //    {
-    //        _logger.LogError($"Invalid PUT Request in {nameof(UpdateProduct)}");
-    //        return BadRequest(ModelState);
-    //    }
 
-    //    var product = await _productsRepo.GetByIdAsync(id);
-    //    if (product == null) { return NotFound(); }
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateTemplate(int id, [FromBody] UpdateDocumentTemplateDTO templateDTO)
+    {
+        if (!ModelState.IsValid || id < 1)
+        {
+            _logger.LogError($"Invalid PUT Request in {nameof(UpdateTemplate)}");
+            return BadRequest(ModelState);
+        }
 
-    //    _mapper.Map(productDTO, product);
-    //    _productsRepo.Update(product);
+        var template = await _templatesRepo.GetByIdAsync(id);
+        if (template == null) { return NotFound(); }
 
-    //    await _productsRepo.SaveChangesAsync();
+        _mapper.Map(templateDTO, template);
+        _templatesRepo.Update(template);
 
-    //    return NoContent();
-    //}
+        await _templatesRepo.SaveChangesAsync();
 
-    //[Authorize()]
-    //[HttpDelete("{id:int}")]
-    //[ProducesResponseType(StatusCodes.Status204NoContent)]
-    //[ProducesResponseType(StatusCodes.Status404NotFound)]
-    //public async Task<IActionResult> DeleteProduct(int id)
-    //{
-    //    if (id < 1)
-    //    {
-    //        return BadRequest("Id has to be provided for Delete action");
-    //    }
+        return NoContent();
+    }
 
-    //    var product = await _productsRepo.GetByIdAsync(id);
 
-    //    if (product == null) { return NotFound(); }
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> SoftDeleteTemplate(int id)
+    {
+        if (id < 1)
+        {
+            return BadRequest("Id has to be provided for Delete action");
+        }
 
-    //    _productsRepo.Delete(product);
+        var template = await _templatesRepo.GetByIdAsync(id);
 
-    //    await _productsRepo.SaveChangesAsync();
+        if (template == null) { return NotFound(); }
 
-    //    return NoContent();
+        template.IsDeleted = true;
 
-    //}
+        _templatesRepo.Update(template);
+
+        await _templatesRepo.SaveChangesAsync();
+
+        return NoContent();
+
+    }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Enums;
 using ThesisERP.Infrastracture.Data;
@@ -51,29 +51,51 @@ public static class SeedDatabase
                                                                  postalCode: "10505",
                                                                  country: CountryCode.GR);
 
-
-    public static void Initialize(IServiceProvider serviceProvider)
+    public async static Task Initialize(IServiceProvider serviceProvider)
     {
-        using var dbContext = new DatabaseContext(serviceProvider.GetRequiredService<DbContextOptions<DatabaseContext>>());
+        var dbContext = serviceProvider.GetRequiredService<DatabaseContext>();
 
-        if (dbContext.Entities.Any() || 
-            dbContext.Documents.Any() || 
-            dbContext.Products.Any())
+        await PopulateTestDataAsync(dbContext);
+
+        var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
+        var rolesManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+        await SeedDefaultUserAsync(userManager, rolesManager);
+    }
+
+    public async static Task SeedDefaultUserAsync(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+    {
+        var administratorRole = new IdentityRole("Administrator");
+
+        if (roleManager.Roles.All(r => r.Name != administratorRole.Name))
+        {
+            await roleManager.CreateAsync(administratorRole);
+        }
+
+        var userRole = new IdentityRole("User");
+
+        if (roleManager.Roles.All(r => r.Name != userRole.Name))
+        {
+            await roleManager.CreateAsync(userRole);
+        }
+
+        var administrator = new AppUser { UserName = "administrator@localhost", Email = "administrator@localhost", FirstName = "admin", LastName = "test" };
+
+        if (userManager.Users.All(u => u.UserName != administrator.UserName))
+        {
+            await userManager.CreateAsync(administrator, "Te#stD@ta!1");
+            await userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
+        }
+    }
+    public async static Task PopulateTestDataAsync(DatabaseContext dbContext)
+    {
+
+        if (dbContext.Entities.Any() ||
+           dbContext.Documents.Any() ||
+           dbContext.Products.Any())
         {
             return;   // DB has been seeded
         }
-
-        PopulateTestData(dbContext);
-    }
-
-    public static void PopulateTestData(DatabaseContext dbContext)
-    {
-        foreach (var item in dbContext.Entities)
-        {
-            dbContext.Remove(item);
-        }
-
-        dbContext.SaveChanges();
 
         TestClient.ShippingAddress = ClientShippingAddress;
         TestClient.BillingAddress = ClientBillingAddress;
@@ -85,7 +107,7 @@ public static class SeedDatabase
 
         dbContext.Entities.Add(TestSupplier);
 
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync();
 
         var location = new InventoryLocation()
         {
@@ -95,7 +117,7 @@ public static class SeedDatabase
         };
 
         dbContext.InventoryLocations.Add(location);
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync();
 
         var template = new DocumentTemplate()
         {
@@ -111,7 +133,7 @@ public static class SeedDatabase
         };
 
         dbContext.DocumentTemplates.Add(template);
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync();
 
         var product = new Product()
         {
@@ -126,7 +148,7 @@ public static class SeedDatabase
         };
 
         dbContext.Products.Add(product);
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync();
 
         var stockEntry = new StockLevel()
         {
@@ -138,7 +160,7 @@ public static class SeedDatabase
         };
 
         dbContext.StockLevels.Add(stockEntry);
-        dbContext.SaveChanges();
+        await dbContext.SaveChangesAsync();
 
     }
 

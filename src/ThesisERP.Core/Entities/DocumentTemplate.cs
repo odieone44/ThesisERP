@@ -4,7 +4,7 @@ namespace ThesisERP.Core.Entities;
 
 public class DocumentTemplate
 {
-    public const int AbbreviationMaxLength = 10;
+    public const int AbbreviationMaxLength = 20;
 
     public int Id { get; set; }
     public string Name { get; set; }

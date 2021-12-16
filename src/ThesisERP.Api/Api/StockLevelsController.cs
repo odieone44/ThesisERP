@@ -7,6 +7,9 @@ using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api;
 
+/// <summary>
+/// Get stock information for products or locations.
+/// </summary>
 public class StockLevelsController : BaseApiController
 {
     private readonly ILogger<StockLevelsController> _logger;

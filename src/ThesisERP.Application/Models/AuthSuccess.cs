@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ThesisERP.Application.Models;
 
-public class AuthSuccess : AuthResponse
+public class AuthSuccess : AuthResult
 {
     public AuthSuccess(string jwtToken, string refreshToken) : base(jwtToken, refreshToken) { }
 }

@@ -62,22 +62,6 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "807bcd1c-786b-4439-8d69-66d7eccdcfe5",
-                            ConcurrencyStamp = "dcf2ea77-5f4e-49de-a84f-8d2412a09748",
-                            Name = "User",
-                            NormalizedName = "USER"
-                        },
-                        new
-                        {
-                            Id = "9b9516ea-53ba-4cfa-a52d-20a0745b9fcc",
-                            ConcurrencyStamp = "df1b8b85-1580-44c5-b083-8a724dd46292",
-                            Name = "Administrator",
-                            NormalizedName = "ADMINISTRATOR"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -343,7 +327,8 @@ namespace ThesisERP.Infrastracture.Data.Migrations
 
                     b.Property<string>("Abbreviation")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
@@ -383,6 +368,11 @@ namespace ThesisERP.Infrastracture.Data.Migrations
                         .HasColumnType("rowversion");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Abbreviation")
+                        .IsUnique();
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Abbreviation"), new[] { "Id", "Description", "DocumentType", "IsDeleted", "Name", "NextNumber", "Prefix", "Postfix", "DateCreated", "DateUpdated", "Timestamp" });
 
                     b.ToTable("DocumentTemplates", (string)null);
                 });

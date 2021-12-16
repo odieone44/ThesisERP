@@ -10,6 +10,9 @@ using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api;
 
+/// <summary>
+/// Issue and manage Invoices, Bills and other business documents.
+/// </summary>
 public class DocumentsController : BaseApiController
 {
     private readonly ILogger<DocumentsController> _logger;
@@ -24,8 +27,7 @@ public class DocumentsController : BaseApiController
         _documentService = docService;
         _docsRepo = docsRepo;
     }
-
-    [Authorize]
+    
     [HttpPost]
     public async Task<IActionResult> CreateDocument([FromBody] CreateDocumentDTO documentDTO)
     {
@@ -43,7 +45,23 @@ public class DocumentsController : BaseApiController
         return Ok(response);
     }
 
-    [Authorize]
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateDocument(int id, [FromBody] UpdateDocumentDTO documentDTO)
+    {
+        if (!ModelState.IsValid)
+        {
+            _logger.LogError($"Invalid POST Request in {nameof(CreateDocument)}");
+            return BadRequest(ModelState);
+        }
+
+        var username = HttpContext.User.Identity?.Name ?? string.Empty;
+
+        var document = await _documentService.Update(id, documentDTO);
+
+        var response = _mapper.Map<DocumentDTO>(document);
+        return Ok(response);
+    }
+
     [HttpPost("Fulfill/{id:int}")]
     public async Task<IActionResult> FulfillDocument(int id)
     {
@@ -53,6 +71,34 @@ public class DocumentsController : BaseApiController
         }
 
         var document = await _documentService.Fulfill(id);
+
+        var response = _mapper.Map<DocumentDTO>(document);
+        return Ok(response);
+    }
+
+    [HttpPost("Close/{id:int}")]
+    public async Task<IActionResult> CloseDocument(int id)
+    {
+        if (id < 1)
+        {
+            return BadRequest("Document Id has to be provided.");
+        }
+
+        var document = await _documentService.Close(id);
+
+        var response = _mapper.Map<DocumentDTO>(document);
+        return Ok(response);
+    }
+
+    [HttpPost("Cancel/{id:int}")]
+    public async Task<IActionResult> CancelDocument(int id)
+    {
+        if (id < 1)
+        {
+            return BadRequest("Document Id has to be provided.");
+        }
+
+        var document = await _documentService.Cancel(id);
 
         var response = _mapper.Map<DocumentDTO>(document);
         return Ok(response);

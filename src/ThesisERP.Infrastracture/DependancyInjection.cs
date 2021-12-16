@@ -34,10 +34,12 @@ public static class DependancyInjection
 
     private static void ConfigureIdentity(this IServiceCollection services)
     {
-        var builder = services.AddIdentityCore<AppUser>(u => u.User.RequireUniqueEmail = true);
+        var builder = services.AddIdentityCore<AppUser>(u => u.User.RequireUniqueEmail = true)
+                               .AddRoles<IdentityRole>()
+                               .AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders();
 
-        builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
-        builder.AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders();
+        //builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
+        //builder.AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders();
     }
 
 }

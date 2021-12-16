@@ -5,6 +5,6 @@ namespace ThesisERP.Application.Interfaces;
 
 public interface IAuthManager
 {
-    Task<AuthResponse> ValidateUser(LoginUserDTO userDTO, string ipAddress);
-    Task<AuthResponse> RefreshUser(string token, string ipAddress);
+    Task<AuthResult> ValidateUser(LoginUserDTO userDTO, string ipAddress);
+    Task<AuthResult> RefreshUser(string token, string ipAddress);
 }
