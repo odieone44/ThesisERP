@@ -27,6 +27,10 @@ public class ClientsController : BaseApiController
         _entityRepo = entityRepo;
     }
 
+    /// <summary>
+    /// Retrieve all clients in your account.
+    /// </summary>
+    /// <response code="200">Returns a list of clients.</response>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetClients() //[FromQuery] RequestParams requestParams
@@ -41,9 +45,14 @@ public class ClientsController : BaseApiController
         return Ok(results);
     }
 
+    /// <summary>
+    /// Retrieve a client by id.
+    /// </summary>
+    /// <param name="id">The id to search for.</param>
+    /// <response code="200">Returns the requested client.</response>
+    /// <response code="404">If client does not exist.</response>
     [HttpGet("{id:int}", Name = "GetClient")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(ClientDTO))]    
     public async Task<IActionResult> GetClient(int id)
     {
         var client = await _getClientById(id);
@@ -53,8 +62,15 @@ public class ClientsController : BaseApiController
         var result = _mapper.Map<ClientDTO>(client);
         return Ok(result);
     }
-    
+
+    /// <summary>
+    /// Create a new client.
+    /// </summary>
+    /// <param name="clientDTO"></param>
+    /// <response code="201">The created client entity and the route to access it.</response>
+    /// <response code="400">If the request body is invalid.</response>
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ClientDTO))]
     public async Task<IActionResult> CreateClient([FromBody] CreateClientDTO clientDTO)
     {
         if (!ModelState.IsValid)
@@ -72,8 +88,17 @@ public class ClientsController : BaseApiController
         return CreatedAtRoute("GetClient", new { id = clientAdded.Id }, clientAdded);
 
     }
-    
+
+    /// <summary>
+    /// Update an existing client.
+    /// </summary>
+    /// <param name="clientDTO">A ClientDTO with the new values.</param>
+    /// <param name="id">The id of the client to update</param>
+    /// <response code="204">On success</response>
+    /// <response code="400">If the request body is invalid.</response>
+    /// <response code="404">If the client is not found.</response>    
     [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> UpdateClient(int id, [FromBody] UpdateClientDTO clientDTO)
     {
         if (!ModelState.IsValid || id < 1)
@@ -94,8 +119,16 @@ public class ClientsController : BaseApiController
 
         return NoContent();
     }
-    
+
+    /// <summary>
+    /// Delete a client.
+    /// </summary>
+    /// <param name="id">The id of the client to delete</param>
+    /// <response code="204">On success</response>
+    /// <response code="400">If the request is invalid.</response>
+    /// <response code="404">If the client is not found.</response>
     [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteClient(int id)
     {
         if (id < 1)

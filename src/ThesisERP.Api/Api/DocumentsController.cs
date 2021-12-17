@@ -50,7 +50,7 @@ public class DocumentsController : BaseApiController
     {
         if (!ModelState.IsValid)
         {
-            _logger.LogError($"Invalid POST Request in {nameof(CreateDocument)}");
+            _logger.LogError($"Invalid POST Request in {nameof(UpdateDocument)}");
             return BadRequest(ModelState);
         }
 

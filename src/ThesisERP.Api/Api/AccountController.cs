@@ -90,8 +90,11 @@ public class AccountController : BaseApiController
     /// <summary>
     /// Get a new JWT by using your Refresh Token. 
     /// </summary>
-    /// <returns></returns>
+    /// <response code="200">Returns a JWT used to authenticate requests, and a cookie containing a Refresh Token used to refresh the JWT after expiration.</response>
+    /// <response code="401">If token is invalid.</response>
+    /// <response code="400">If no token is provided.</response>
     [HttpPost("refresh-user")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthSuccessResponse))]
     public async Task<IActionResult> RefreshToken()
     {
         string? refreshToken = Request.Cookies["refreshToken"];

@@ -15,7 +15,6 @@ namespace ThesisERP.Api;
 /// </summary>
 public class SuppliersController : BaseApiController
 {
-
     private readonly ILogger<SuppliersController> _logger;
     private readonly IMapper _mapper;
     private readonly IRepositoryBase<Entity> _entityRepo;
@@ -27,6 +26,10 @@ public class SuppliersController : BaseApiController
         _entityRepo = entityRepo;
     }
 
+    /// <summary>
+    /// Retrieve all suppliers in your account.
+    /// </summary>
+    /// <response code="200">Returns a list of suppliers.</response>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSuppliers()
@@ -42,9 +45,14 @@ public class SuppliersController : BaseApiController
         return Ok(results);
     }
 
+    /// <summary>
+    /// Retrieve a supplier by id.
+    /// </summary>
+    /// <param name="id">The id to search for.</param>
+    /// <response code="200">Returns the requested supplier.</response>
+    /// <response code="404">If supplier does not exist.</response>
     [HttpGet("{id:int}", Name = "GetSupplier")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SupplierDTO))]    
     public async Task<IActionResult> GetSupplier(int id)
     {
         var supplier = await _getSupplierById(id);
@@ -55,8 +63,14 @@ public class SuppliersController : BaseApiController
         return Ok(result);
     }
 
-    
+    /// <summary>
+    /// Create a new supplier.
+    /// </summary>
+    /// <param name="supplierDTO"></param>
+    /// <response code="201">The created supplier entity and the route to access it.</response>
+    /// <response code="400">If the request body is invalid.</response>
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(SupplierDTO))]
     public async Task<IActionResult> CreateSupplier([FromBody] CreateSupplierDTO supplierDTO)
     {
         if (!ModelState.IsValid)
@@ -79,8 +93,16 @@ public class SuppliersController : BaseApiController
 
     }
 
-    
+    /// <summary>
+    /// Update an existing supplier.
+    /// </summary>
+    /// <param name="supplierDTO">A SupplierDTO with the new values.</param>
+    /// <param name="id">The id of the supplier to update</param>
+    /// <response code="204">On success</response>
+    /// <response code="400">If the request body is invalid.</response>
+    /// <response code="404">If the supplier is not found.</response>    
     [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> UpdateSupplier(int id, [FromBody] UpdateSupplierDTO supplierDTO)
     {
         if (!ModelState.IsValid || id < 1)
@@ -102,8 +124,15 @@ public class SuppliersController : BaseApiController
     }
 
 
-    [Authorize()]
+    /// <summary>
+    /// Delete a supplier.
+    /// </summary>
+    /// <param name="id">The id of the supplier to delete</param>
+    /// <response code="204">On success</response>
+    /// <response code="400">If the request is invalid.</response>
+    /// <response code="404">If the supplier is not found.</response>
     [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteSupplier(int id)
     {
         if (id < 1)
