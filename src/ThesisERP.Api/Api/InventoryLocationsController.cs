@@ -24,6 +24,10 @@ public class InventoryLocationsController : BaseApiController
         _locationsRepo = locationsRepo;
     }
 
+    /// <summary>
+    /// Retrieve all Inventory Locations in your account.
+    /// </summary>
+    /// <response code="200">Returns a list of locations.</response>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLocations() //[FromQuery] RequestParams requestParams
@@ -35,9 +39,14 @@ public class InventoryLocationsController : BaseApiController
         return Ok(results);
     }
 
+    /// <summary>
+    /// Retrieve a location by id.
+    /// </summary>
+    /// <param name="id">The id to search for.</param>
+    /// <response code="200">Returns the requested location.</response>
+    /// <response code="404">If location does not exist.</response>
     [HttpGet("{id:int}", Name = "GetInventoryLocation")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK)]    
     public async Task<IActionResult> GetInventoryLocation(int id)
     {
         var location = await _locationsRepo.GetByIdAsync(id);
@@ -47,8 +56,15 @@ public class InventoryLocationsController : BaseApiController
         var result = _mapper.Map<InventoryLocationDTO>(location);
         return Ok(result);
     }
-        
+
+    /// <summary>
+    /// Create a new Inventory Location.
+    /// </summary>
+    /// <param name="locationDTO"></param>
+    /// <response code="201">The created location and the route to access it.</response>
+    /// <response code="400">If the request body is invalid.</response>
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(InventoryLocationDTO))]
     public async Task<IActionResult> CreateInventoryLocation([FromBody] CreateInventoryLocationDTO locationDTO)
     {
         if (!ModelState.IsValid)
@@ -68,8 +84,17 @@ public class InventoryLocationsController : BaseApiController
         return CreatedAtRoute("GetInventoryLocation", new { id = locationAdded.Id }, locationAdded);
 
     }
-        
+
+    /// <summary>
+    /// Update an existing location.
+    /// </summary>
+    /// <param name="locationDTO">A LocationDTO with the new values.</param>
+    /// <param name="id">The id of the location to update</param>
+    /// <response code="204">On success</response>
+    /// <response code="400">If the request body is invalid.</response>
+    /// <response code="404">If the location is not found.</response>    
     [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> UpdateInventoryLocation(int id, [FromBody] UpdateInventoryLocationDTO locationDTO)
     {
         if (!ModelState.IsValid || id < 1)
@@ -90,8 +115,20 @@ public class InventoryLocationsController : BaseApiController
 
         return NoContent();
     }
-        
+
+    /// <summary>
+    /// Soft Delete a location.
+    /// </summary>
+    /// <remarks>
+    /// As a location is related with other entities, you can mark it as deleted without removing it from the database. <br />
+    /// This allows the location deletion to be reverted, and documents that used it to still be accessible for book-keeping purposes.
+    /// </remarks>
+    /// <param name="id">The id of the location to delete</param>
+    /// <response code="204">On success</response>
+    /// <response code="400">If the request is invalid.</response>
+    /// <response code="404">If the location is not found.</response>
     [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteInventoryLocation(int id)
     {
         if (id < 1)
@@ -104,8 +141,39 @@ public class InventoryLocationsController : BaseApiController
 
         if (location == null) { return NotFound(); }
 
-        _locationsRepo.Delete(location);
+        location.IsDeleted = true;
+        _locationsRepo.Update(location);
 
+        //_locationsRepo.Delete(location);
+        await _locationsRepo.SaveChangesAsync();
+
+        return NoContent();
+
+    }
+
+    /// <summary>
+    /// Restore a deleted location.
+    /// </summary>   
+    /// <param name="id">The id of the location to restore</param>
+    /// <response code="204">On success</response>
+    /// <response code="400">If the request is invalid.</response>
+    /// <response code="404">If the location is not found.</response>
+    [HttpPut("{id:int}/Restore")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> RestoreInventoryLocation(int id)
+    {
+        if (id < 1)
+        {            
+            return BadRequest("Id has to be provided for Restore action");
+        }
+
+        var location = await _locationsRepo.GetByIdAsync(id);
+
+        if (location == null) { return NotFound(); }
+
+        location.IsDeleted = false;
+        _locationsRepo.Update(location);
+        
         await _locationsRepo.SaveChangesAsync();
 
         return NoContent();

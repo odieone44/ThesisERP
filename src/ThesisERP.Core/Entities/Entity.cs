@@ -13,7 +13,7 @@ public class Entity
     public string Email { get; set; } = string.Empty;
     public DateTime DateCreated { get; set; }
     public DateTime? DateUpdated { get; set; }
-
+    public bool IsDeleted { get; set; }
     public virtual ICollection<Product>? RelatedProducts { get; set; }
 
     public byte[] Timestamp { get; set; }

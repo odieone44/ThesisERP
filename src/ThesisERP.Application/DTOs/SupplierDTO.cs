@@ -17,7 +17,8 @@ public class SupplierDTO : CreateSupplierDTO
 {
     public int Id { get; set; }
     public DateTime DateCreated { get; set; }
-    public DateTime? DateUpdated { get; set; }    
+    public DateTime? DateUpdated { get; set; }
+    public bool IsDeleted { get; set; }
 }
 
 public class CreateSupplierDTO

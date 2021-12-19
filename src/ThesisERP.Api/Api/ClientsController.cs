@@ -32,7 +32,7 @@ public class ClientsController : BaseApiController
     /// </summary>
     /// <response code="200">Returns a list of clients.</response>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(List<ClientDTO>))]
     public async Task<IActionResult> GetClients() //[FromQuery] RequestParams requestParams
     {
         var clients = await _entityRepo
@@ -121,7 +121,7 @@ public class ClientsController : BaseApiController
     }
 
     /// <summary>
-    /// Delete a client.
+    /// Soft Delete a client.
     /// </summary>
     /// <param name="id">The id of the client to delete</param>
     /// <response code="204">On success</response>
@@ -132,8 +132,7 @@ public class ClientsController : BaseApiController
     public async Task<IActionResult> DeleteClient(int id)
     {
         if (id < 1)
-        {
-            //_logger.LogError($"Invalid Delete Request in {nameof(DeleteClient)}");
+        {            
             return BadRequest("Id has to be provided for Delete action");
         }
 
@@ -141,8 +140,37 @@ public class ClientsController : BaseApiController
 
         if (client == null) { return NotFound(); }
 
-        _entityRepo.Delete(client);
-        
+        client.IsDeleted = true;
+        //_entityRepo.Delete(client);
+        _entityRepo.Update(client);
+        await _entityRepo.SaveChangesAsync();
+
+        return NoContent();
+
+    }
+
+    /// <summary>
+    /// Restore a deleted client.
+    /// </summary>
+    /// <param name="id">The id of the client to restore</param>
+    /// <response code="204">On success</response>
+    /// <response code="400">If the request is invalid.</response>
+    /// <response code="404">If the client is not found.</response>
+    [HttpPut("{id:int}/Restore")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> RestoreClient(int id)
+    {
+        if (id < 1)
+        {
+            return BadRequest("Id has to be provided for Restore action");
+        }
+
+        var client = await _getClientById(id);
+
+        if (client == null) { return NotFound(); }
+
+        client.IsDeleted = false;        
+        _entityRepo.Update(client);
         await _entityRepo.SaveChangesAsync();
 
         return NoContent();

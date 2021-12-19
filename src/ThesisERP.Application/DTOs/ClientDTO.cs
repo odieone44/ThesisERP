@@ -13,6 +13,7 @@ public class ClientDTO : CreateClientDTO
     public int Id { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime? DateUpdated { get; set; }
+    public bool IsDeleted { get; set; }
 }
 
 public class CreateClientDTO

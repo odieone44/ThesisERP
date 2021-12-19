@@ -10,6 +10,7 @@ public class ProductDTO : CreateProductDTO
     public int Id { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
+    public bool IsDeleted { get; set; }
         
     public virtual ICollection<ClientDTO> RelatedClients { get; set; } = new List<ClientDTO>();    
     public virtual ICollection<SupplierDTO> RelatedSuppliers { get; set; } = new List<SupplierDTO>();

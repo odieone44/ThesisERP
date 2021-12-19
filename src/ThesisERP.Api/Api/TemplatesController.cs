@@ -22,9 +22,12 @@ public class TemplatesController : BaseApiController
         _templatesRepo = templatesRepo;
     }
 
-
+    /// <summary>
+    /// Retrieve all document templates in your account.
+    /// </summary>
+    /// <response code="200">Returns a list of document templates.</response>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(List<DocumentTemplateDTO>))]
     public async Task<IActionResult> GetTemplates()
     {
         var templates = await _templatesRepo
@@ -35,10 +38,14 @@ public class TemplatesController : BaseApiController
         return Ok(results);
     }
 
-
+    /// <summary>
+    /// Retrieve a document template by id.
+    /// </summary>
+    /// <param name="id">The id to search for.</param>
+    /// <response code="200">Returns the requested template.</response>
+    /// <response code="404">If template does not exist.</response>
     [HttpGet("{id:int}", Name = "GetTemplate")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentTemplateDTO))]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentTemplateDTO))]    
     public async Task<IActionResult> GetTemplate(int id)
     {
 
@@ -55,7 +62,12 @@ public class TemplatesController : BaseApiController
         return Ok(result);
     }
 
-
+    /// <summary>
+    /// Create a new document template.
+    /// </summary>
+    /// <param name="templateDTO"></param>
+    /// <response code="201">The created template and the route to access it.</response>
+    /// <response code="400">If the request body is invalid.</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(DocumentTemplateDTO))]
     public async Task<IActionResult> CreateTemplate([FromBody] CreateDocumentTemplateDTO templateDTO)
@@ -78,10 +90,19 @@ public class TemplatesController : BaseApiController
 
     }
 
-
+    /// <summary>
+    /// Update an existing template.
+    /// </summary>
+    /// <remarks>
+    /// Template type cannot be updated.
+    /// </remarks>
+    /// <param name="templateDTO">A Template DTO with the new values.</param>
+    /// <param name="id">The id of the template to update</param>
+    /// <response code="204">On success</response>
+    /// <response code="400">If the request body is invalid.</response>
+    /// <response code="404">If the template is not found.</response>    
     [HttpPut("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]    
     public async Task<IActionResult> UpdateTemplate(int id, [FromBody] UpdateDocumentTemplateDTO templateDTO)
     {
         if (!ModelState.IsValid || id < 1)
@@ -101,11 +122,16 @@ public class TemplatesController : BaseApiController
         return NoContent();
     }
 
-
+    /// <summary>
+    /// Soft Delete a template.
+    /// </summary>
+    /// <param name="id">The id of the template to delete</param>
+    /// <response code="204">On success</response>
+    /// <response code="400">If the request is invalid.</response>
+    /// <response code="404">If the template is not found.</response>
     [HttpDelete("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> SoftDeleteTemplate(int id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]    
+    public async Task<IActionResult> DeleteTemplate(int id)
     {
         if (id < 1)
         {
@@ -117,6 +143,36 @@ public class TemplatesController : BaseApiController
         if (template == null) { return NotFound(); }
 
         template.IsDeleted = true;
+
+        _templatesRepo.Update(template);
+
+        await _templatesRepo.SaveChangesAsync();
+
+        return NoContent();
+
+    }
+
+    /// <summary>
+    /// Restore a deleted template.
+    /// </summary>
+    /// <param name="id">The id of the template to restore</param>
+    /// <response code="204">On success</response>
+    /// <response code="400">If the request is invalid.</response>
+    /// <response code="404">If the template is not found.</response>
+    [HttpPut("{id:int}/Restore")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> RestoreTemplate(int id)
+    {
+        if (id < 1)
+        {
+            return BadRequest("Id has to be provided for Restore action");
+        }
+
+        var template = await _templatesRepo.GetByIdAsync(id);
+
+        if (template == null) { return NotFound(); }
+
+        template.IsDeleted = false;
 
         _templatesRepo.Update(template);
 

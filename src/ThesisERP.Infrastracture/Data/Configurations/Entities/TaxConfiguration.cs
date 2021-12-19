@@ -8,6 +8,6 @@ internal class TaxConfiguration : IEntityTypeConfiguration<Tax>
 {
     public void Configure(EntityTypeBuilder<Tax> taxBuilder)
     {
-        taxBuilder.ToTable("Taxes").HasKey(t => t.Id);
+        taxBuilder.ToTable("Taxes").HasKey(t => t.Id);        
     }
 }

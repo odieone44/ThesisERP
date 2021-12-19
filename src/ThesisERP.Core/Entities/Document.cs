@@ -8,28 +8,20 @@ public class Document
 
     public int EntityId { get; set; }
     public Entity Entity { get; set; }
-
     public int InventoryLocationId { get; set; }
     public InventoryLocation InventoryLocation { get; set; }
-
     public int TemplateId { get; set; }
     public DocumentTemplate DocumentTemplate { get; set; }
-
     public string DocumentNumber { get; set; }
-
     public TransactionStatus Status { get; set; }
-
     public Address BillingAddress { get; set; }
     public Address ShippingAddress { get; set; }
-
     public string Comments { get; set; } = string.Empty;
-
     public ICollection<DocumentRow> Rows { get; set; } = new List<DocumentRow>();
-
     public byte[] Timestamp { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime? DateUpdated { get; set; }
-
+    public bool IsDeleted { get; set; } = false;
     public string CreatedBy { get; set; }
     public DocumentType Type => DocumentTemplate.DocumentType;
     public bool IsFulfilled => Status == TransactionStatus.fulfilled;

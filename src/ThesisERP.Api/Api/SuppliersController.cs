@@ -125,7 +125,7 @@ public class SuppliersController : BaseApiController
 
 
     /// <summary>
-    /// Delete a supplier.
+    /// Soft Delete a supplier.
     /// </summary>
     /// <param name="id">The id of the supplier to delete</param>
     /// <response code="204">On success</response>
@@ -145,8 +145,38 @@ public class SuppliersController : BaseApiController
 
         if (supplier == null) { return NotFound(); }
 
-        _entityRepo.Delete(supplier);
+        supplier.IsDeleted = true;
+        //_entityRepo.Delete(supplier);
+        _entityRepo.Update(supplier);
+        await _entityRepo.SaveChangesAsync();
 
+        return NoContent();
+
+    }
+
+    /// <summary>
+    /// Restore a deleted supplier.
+    /// </summary>
+    /// <param name="id">The id of the supplier to restore</param>
+    /// <response code="204">On success</response>
+    /// <response code="400">If the request is invalid.</response>
+    /// <response code="404">If the supplier is not found.</response>
+    [HttpPut("{id:int}/Restore")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> RestoreSupplier(int id)
+    {
+        if (id < 1)
+        {
+            //_logger.LogError($"Invalid Delete Request in {nameof(DeleteSupplier)}");
+            return BadRequest("Id has to be provided for Restore action");
+        }
+
+        var supplier = await _getSupplierById(id);
+
+        if (supplier == null) { return NotFound(); }
+
+        supplier.IsDeleted = false;        
+        _entityRepo.Update(supplier);
         await _entityRepo.SaveChangesAsync();
 
         return NoContent();

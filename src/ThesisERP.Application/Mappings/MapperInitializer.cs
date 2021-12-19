@@ -23,7 +23,8 @@ public class MapperInitializer : Profile
         _createProductMaps();
         _createDocumentMaps();
         _createTemplateMaps();
-
+        _createTaxMaps();
+        _createDiscountMaps();
     }
 
     private void _createAppUserMaps()
@@ -178,5 +179,15 @@ public class MapperInitializer : Profile
             
             
 
+    }
+
+    private void _createTaxMaps()
+    {
+        CreateMap<Tax, TaxDTO>().ReverseMap();
+    }
+
+    private void _createDiscountMaps()
+    {
+        CreateMap<Discount, DiscountDTO>().ReverseMap();
     }
 }

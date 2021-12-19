@@ -13,6 +13,7 @@ public class Product
     public decimal? DefaultSaleSPrice { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
+    public bool IsDeleted { get; set; }
     public byte[] Timestamp { get; set; }
     public virtual ICollection<Entity> RelatedEntities { get; set; } = new List<Entity>();
     public virtual ICollection<StockLevel> StockLevels { get; set; } = new List<StockLevel>();

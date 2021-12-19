@@ -27,8 +27,18 @@ public class CreateDocumentDTO
 }
 
 public class UpdateDocumentDTO
-{
+{    
+    public int? EntityId { get; set; }
+        
+    public int? InventoryLocationId { get; set; }
+    
+    public AddressDTO BillingAddress { get; set; }
+    public AddressDTO ShippingAddress { get; set; }
 
+    [StringLength(1000)]
+    public string Comments { get; set; } = string.Empty;
+        
+    public ICollection<CreateDocumentRowDTO>? Rows { get; set; } = new List<CreateDocumentRowDTO>();
 }
 
 public class BaseDocumentDTO

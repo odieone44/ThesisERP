@@ -23,7 +23,12 @@ public class StockLevelsController : BaseApiController
         _stockRepo = stockRepo;
     }
 
-    [HttpGet("GetLocationStock")]
+    /// <summary>
+    /// Retrieve stock levels per location.
+    /// </summary>
+    /// <param name="locationId">Optional. If provided, only stock levels of the required location will be returned</param>
+    /// <response code="200">Returns a list of locations with stock information per product.</response>
+    [HttpGet("Locations")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GetLocationStockDTO>))]
     public async Task<IActionResult> GetLocationStock([FromQuery] int? locationId = null)
     {
@@ -32,7 +37,12 @@ public class StockLevelsController : BaseApiController
         return Ok(stock);
     }
 
-    [HttpGet("GetProductStock")]
+    /// <summary>
+    /// Retrieve stock levels per product.
+    /// </summary>
+    /// <param name="productId">Optional. If provided, only stock levels of the required product will be returned</param>
+    /// <response code="200">Returns a list of products with stock information per location.</response>
+    [HttpGet("Products")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GetProductStockDTO>))]
     public async Task<IActionResult> GetProductStock([FromQuery] int? productId = null)
     {

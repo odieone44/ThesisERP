@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using ThesisERP.Application.DTOs.Documents;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Interfaces.Transactions;
@@ -7,8 +8,6 @@ using ThesisERP.Application.Models.Stock;
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Enums;
 using ThesisERP.Core.Exceptions;
-using ThesisERP.Core.Enums;
-
 
 namespace ThesisERP.Application.Services.Transactions;
 
@@ -20,7 +19,9 @@ public class DocumentService : IDocumentService
     private readonly IRepositoryBase<Entity> _entitiesRepo;
     private readonly IRepositoryBase<InventoryLocation> _locationsRepo;
     private readonly IRepositoryBase<StockLevel> _stockRepo;
-    private readonly IMapper _mapper;    
+    private readonly IRepositoryBase<Tax> _taxRepo;
+    private readonly IRepositoryBase<Discount> _discountRepo;
+    private readonly IMapper _mapper;
 
     private Document _document;
 
@@ -30,6 +31,8 @@ public class DocumentService : IDocumentService
                            IRepositoryBase<Entity> entitiesRepo,
                            IRepositoryBase<InventoryLocation> locationsRepo,
                            IRepositoryBase<StockLevel> stockRepo,
+                           IRepositoryBase<Tax> taxRepo,
+                           IRepositoryBase<Discount> discountRepo,
                            IMapper mapper)
     {
         _documentsRepo = documentsRepo;
@@ -38,6 +41,8 @@ public class DocumentService : IDocumentService
         _entitiesRepo = entitiesRepo;
         _locationsRepo = locationsRepo;
         _stockRepo = stockRepo;
+        _taxRepo = taxRepo;
+        _discountRepo = discountRepo;
         _mapper = mapper;
     }
 
@@ -59,7 +64,7 @@ public class DocumentService : IDocumentService
         await _HandleStockUpdateForAction(TransactionAction.create);
 
         _document.Status = TransactionStatus.pending;
-        _document.Comments = documentDTO.Comments;        
+        _document.Comments = documentDTO.Comments;
         _document.DocumentTemplate.NextNumber++;
 
         var docResult = _documentsRepo.Add(_document);
@@ -121,6 +126,34 @@ public class DocumentService : IDocumentService
             throw new ThesisERPException($"Some products were not found: '{string.Join(", ", nonExistingProducts.Select(x => $"ProductId: {x}"))}'. Document Creation failed.");
         }
 
+        var taxIds = documentDTO.Rows.Where(y => y.TaxID != null).Select(x => (int)x.TaxID).Distinct().ToList();
+        var taxes = new List<Tax>();
+
+        if (taxIds.Any())
+        {
+            taxes = await _taxRepo.GetAllAsync(expression: x => taxIds.Contains(x.Id));
+            var nonExistingTaxes = taxIds.Except(taxes.Select(x => x.Id)).ToList();
+
+            if (nonExistingTaxes.Any())
+            {
+                throw new ThesisERPException($"Some taxes were not found: '{string.Join(", ", nonExistingProducts.Select(x => $"TaxId: {x}"))}'. Document Creation failed.");
+            }
+        }
+
+        var discountIds = documentDTO.Rows.Where(y => y.DiscountID != null).Select(x => (int)x.DiscountID).Distinct().ToList();
+        var discounts = new List<Discount>();
+
+        if (discountIds.Any())
+        {
+            discounts = await _discountRepo.GetAllAsync(expression: x => discountIds.Contains(x.Id));
+            var nonExistingDiscounts = discountIds.Except(discounts.Select(x => x.Id)).ToList();
+
+            if (nonExistingDiscounts.Any())
+            {
+                throw new ThesisERPException($"Some discounts were not found: '{string.Join(", ", nonExistingProducts.Select(x => $"DiscountID: {x}"))}'. Document Creation failed.");
+            }
+        }
+
         var billAddress = _mapper.Map<Address>(documentDTO.BillingAddress);
         var shipAddress = _mapper.Map<Address>(documentDTO.ShippingAddress);
 
@@ -129,10 +162,12 @@ public class DocumentService : IDocumentService
         var rowsList = new List<DocumentRow>();
         foreach (var rowDTO in documentDTO.Rows)
         {
-            var thisProduct = products.Where(x => x.Id == rowDTO.ProductId).FirstOrDefault();
+            var thisProduct = products.FirstOrDefault(x => x.Id == rowDTO.ProductId);
+            
+            var thisTax = rowDTO.TaxID != null ? taxes.FirstOrDefault(x => x.Id == rowDTO.TaxID) : null;
+            var thisDiscount = rowDTO.DiscountID != null ? discounts.FirstOrDefault(x => x.Id == rowDTO.DiscountID) : null;
 
-            //todo add taxes/discounts
-            var detail = new DocumentRow(thisProduct, rowDTO.ProductQuantity, rowDTO.UnitPrice, null, null);
+            var detail = new DocumentRow(thisProduct, rowDTO.ProductQuantity, rowDTO.UnitPrice, thisTax, thisDiscount);
             rowsList.Add(detail);
         }
 
@@ -141,7 +176,7 @@ public class DocumentService : IDocumentService
     }
 
     private async Task _HandleStockUpdateForAction(TransactionAction action)
-    {      
+    {
 
         var stockAction = new TransactionStockAction(action, _document.Status, _document.Type);
         int locationId = _document.InventoryLocation.Id;
@@ -153,7 +188,7 @@ public class DocumentService : IDocumentService
 
         foreach (var row in _document.Rows)
         {
-            var stockUpdateHelper = new StockLevelUpdateHelper(stockAction, row.ProductQuantity);           
+            var stockUpdateHelper = new StockLevelUpdateHelper(stockAction, row.ProductQuantity);
 
             if (!stockDict.TryGetValue(row.ProductId, out var locationStockEntry))
             {
@@ -163,7 +198,7 @@ public class DocumentService : IDocumentService
                     Product = row.Product
                 };
                 var result = _stockRepo.Add(locationStockEntry);
-                stockDict.Add(row.ProductId, result);                
+                stockDict.Add(row.ProductId, result);
             }
             stockUpdateHelper.HandleStockLevelUpdate(locationStockEntry);
             if (locationStockEntry.Id > 0) { _stockRepo.Update(locationStockEntry); }

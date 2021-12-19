@@ -5,7 +5,8 @@ namespace ThesisERP.Application.DTOs;
 
 public class InventoryLocationDTO : CreateInventoryLocationDTO
 {
-    public int Id { get; set; }   
+    public int Id { get; set; }
+    public bool IsDeleted { get; set; }
 }
 
 public class CreateInventoryLocationDTO
