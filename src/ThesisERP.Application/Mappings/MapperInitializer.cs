@@ -184,10 +184,14 @@ public class MapperInitializer : Profile
     private void _createTaxMaps()
     {
         CreateMap<Tax, TaxDTO>().ReverseMap();
+        CreateMap<Tax, CreateTaxDTO>().ReverseMap();
+        CreateMap<Tax, UpdateTaxDTO>().ReverseMap();
     }
 
     private void _createDiscountMaps()
     {
         CreateMap<Discount, DiscountDTO>().ReverseMap();
+        CreateMap<Discount, CreateDiscountDTO>().ReverseMap();
+        CreateMap<Discount, UpdateDiscountDTO>().ReverseMap();
     }
 }

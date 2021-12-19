@@ -43,6 +43,7 @@ public class UpdateDocumentDTO
 
 public class BaseDocumentDTO
 {
+    public int Id { get; set; }
     public DocumentType Type { get; set; }
     public string DocumentNumber { get; set; }
     public TransactionStatus Status { get; set; }
@@ -63,9 +64,28 @@ public class BaseDocumentDTO
     public ICollection<DocumentRowDTO> Rows { get; set; } = new List<DocumentRowDTO>();
 }
 
-public class DocumentDTO : BaseDocumentDTO
-{
+public class DocumentDTO 
+{    
+    public int Id { get; set; }
+    public DocumentType Type { get; set; }
+    public string DocumentNumber { get; set; }
+    public TransactionStatus Status { get; set; }
     public EntityBaseInfoDTO Entity { get; set; }
+
+    [Required]
+    public InventoryLocationBaseDTO InventoryLocation { get; set; }
+
+    [StringLength(1000)]
+    public string Comments { get; set; } = string.Empty;
+
+    [Required]
+    public int TemplateId { get; set; }
+
+    public AddressDTO BillingAddress { get; set; }
+    public AddressDTO ShippingAddress { get; set; }
+
+    [Required]
+    public ICollection<DocumentRowDTO> Rows { get; set; } = new List<DocumentRowDTO>();
 }
 
 public class SalesDocumentDTO : BaseDocumentDTO
