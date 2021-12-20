@@ -22,8 +22,6 @@ public enum TransactionType
     order = 1
 }
 
-
-
 public enum StockChangeType
 {
     positive = 0,
