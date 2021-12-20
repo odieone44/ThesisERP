@@ -66,8 +66,8 @@ builder.Services.AddSwaggerGen( opt =>
         Description = "An ASP.NET Core 6.0 Web API for **ThesisERP**, " +
                       "a simple ERP application created for my BSc Computer Science Thesis @ University Of Pireaus." +
                       "<br />  <br />" +
-                      "After logging in, you can authenticate your requests by including an <code>Authorization: Bearer *YourToken*</code> header. <br />" +
-                      "To test the API from this page, you can authorize by clicking the button on the right and entering your JWT in the required field. "
+                      "After logging in, you can authenticate your requests by including an <code>Authorization: Bearer *YourToken*</code> header. <br /><br />" +
+                      "To test the API from this page, login using the 'api/Account/login' endpoint and then authorize by clicking the button on the right and entering your JWT in the required field. "
 
     });
 
