@@ -46,16 +46,6 @@ public class DocumentService : IDocumentService
         _mapper = mapper;
     }
 
-    public Task<Document> Cancel(int id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<Document> Close(int id)
-    {
-        throw new NotImplementedException();
-    }
-
     //TODO - This is a temp implementation for testing.
     public async Task<Document> Create(CreateDocumentDTO documentDTO, string username)
     {
@@ -76,40 +66,20 @@ public class DocumentService : IDocumentService
         return docResult;
     }
 
-    public async Task<Document> Fulfill(int id)
-    {
-        _document = await _documentsRepo.GetDocumentByIdIncludeRelations(id);
-        _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
-
-        if (_document.Status != TransactionStatus.pending)
-        {
-            throw new ThesisERPException($"Document with id: '{id}' cannot be fulfilled because its not marked as 'Pending'.");
-        }
-
-        await _HandleStockUpdateForAction(TransactionAction.fulfill);
-        _document.Status = TransactionStatus.fulfilled;
-
-        _documentsRepo.Update(_document);
-
-        await _documentsRepo.SaveChangesAsync();
-
-        return _document;
-    }
-
     public async Task<Document> Update(int id, UpdateDocumentDTO documentDTO)
     {
         _document = await _documentsRepo.GetDocumentByIdIncludeRelations(id);
         _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
-       
+
         switch (_document.Status)
         {
             case TransactionStatus.pending:
                 //TODO - this is a temp way to handle stock. More elegant implementation pending.
                 await _HandleStockUpdateForAction(TransactionAction.cancel);
-                await _UpdatePendingDocumentWithNewValues(documentDTO);                
+                await _UpdatePendingDocumentWithNewValues(documentDTO);
                 await _HandleStockUpdateForAction(TransactionAction.create);
                 break;
-            case TransactionStatus.fulfilled:               
+            case TransactionStatus.fulfilled:
                 break;
             default:
                 throw new ThesisERPException($"Document with id: '{id}' cannot be updated because its status is '{_document.Status}'.");
@@ -124,6 +94,61 @@ public class DocumentService : IDocumentService
         _document.DateUpdated = DateTime.UtcNow;
 
         _documentsRepo.Update(_document);
+        await _documentsRepo.SaveChangesAsync();
+
+        return _document;
+    }
+
+    public async Task<Document> Fulfill(int id)
+    {
+        _document = await _documentsRepo.GetDocumentByIdIncludeRelations(id);
+        _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
+
+        if (_document.Status != TransactionStatus.pending)
+        {
+            throw new ThesisERPException($"Document with id: '{id}' cannot be fulfilled because its status is not '{TransactionStatus.pending}'.");
+        }
+
+        await _HandleStockUpdateForAction(TransactionAction.fulfill);
+        _document.Status = TransactionStatus.fulfilled;
+
+        _documentsRepo.Update(_document);
+
+        await _documentsRepo.SaveChangesAsync();
+
+        return _document;
+    }
+
+    public async Task<Document> Close(int id)
+    {
+        _document = await _documentsRepo.GetDocumentByIdIncludeRelations(id);
+        _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
+
+        if (_document.Status != TransactionStatus.fulfilled)
+        {
+            throw new ThesisERPException($"Document with id: '{id}' cannot be closed because its status is not '{TransactionStatus.fulfilled}'.");
+        }
+
+        _document.Status = TransactionStatus.closed;
+        _document.DateUpdated = DateTime.UtcNow;
+
+        _documentsRepo.Update(_document);
+
+        await _documentsRepo.SaveChangesAsync();
+
+        return _document;
+    }
+    public async Task<Document> Cancel(int id)
+    {
+        _document = await _documentsRepo.GetDocumentByIdIncludeRelations(id);
+        _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
+
+        await _HandleStockUpdateForAction(TransactionAction.cancel);
+        _document.Status = TransactionStatus.cancelled;
+        _document.DateUpdated = DateTime.UtcNow;
+
+        _documentsRepo.Update(_document);
+
         await _documentsRepo.SaveChangesAsync();
 
         return _document;
