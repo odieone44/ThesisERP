@@ -121,6 +121,7 @@ public class DocumentService : IDocumentService
         _document.BillingAddress = billAddress;
         _document.ShippingAddress = shipAddress;
         _document.Comments = documentDTO.Comments;
+        _document.DateUpdated = DateTime.UtcNow;
 
         _documentsRepo.Update(_document);
         await _documentsRepo.SaveChangesAsync();
