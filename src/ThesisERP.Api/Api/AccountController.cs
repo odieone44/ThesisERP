@@ -107,16 +107,20 @@ public class AccountController : BaseApiController
             return BadRequest();
         }
 
-        _logger.LogInformation($"Password change attempt for {userDTO.Email} ");
+        var userName = HttpContext.User.Identity?.Name ?? string.Empty;
 
-        var user = await _userManager.FindByNameAsync(userDTO.Email);
+        if (string.IsNullOrEmpty(userName)) { return Unauthorized(); }
+
+        _logger.LogInformation($"Password change attempt for {userName} ");
+
+        var user = await _userManager.FindByNameAsync(userName);
 
         if (user == null)
         {
             return Unauthorized();
         }
 
-        var response = await _userManager.ChangePasswordAsync(user, userDTO.Password, userDTO.NewPassword);
+        var response = await _userManager.ChangePasswordAsync(user, userDTO.OldPassword, userDTO.NewPassword);
 
         return response.Succeeded ? NoContent() : Unauthorized();
     }

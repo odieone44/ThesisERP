@@ -18,8 +18,12 @@ public class LoginUserDTO
     public string Password { get; set; } = string.Empty;
 }
 
-public class ChangeUserPasswordDTO : LoginUserDTO
+public class ChangeUserPasswordDTO
 {
+    [Required]
+    [StringLength(512, ErrorMessage = "Your Password is limited to {2} to {1} character", MinimumLength = 6)]
+    public string OldPassword { get; set; } = string.Empty;
+
     [Required]
     [StringLength(512, ErrorMessage = "Your Password is limited to {2} to {1} character", MinimumLength = 6)]
     public string NewPassword { get; set; } = string.Empty;
