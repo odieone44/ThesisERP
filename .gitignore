@@ -370,3 +370,4 @@ FodyWeavers.xsd
 /src/ThesisERP.Api/Properties/serviceDependencies.local.json
 /src/ThesisERP.Api/Properties/serviceDependencies.json
 /src/ThesisERP.Api/appsettings.Development.json
+/src/ThesisERP.Infrastracture/Data/Migrations
