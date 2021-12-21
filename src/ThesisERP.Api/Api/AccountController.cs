@@ -107,7 +107,7 @@ public class AccountController : BaseApiController
             return BadRequest();
         }
 
-        var userName = HttpContext.User.Identity?.Name ?? string.Empty;
+        var userName = HttpContext.User.Identity?.Name;
 
         if (string.IsNullOrEmpty(userName)) { return Unauthorized(); }
 
