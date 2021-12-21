@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Interfaces.Transactions;
@@ -12,11 +13,9 @@ namespace ThesisERP.Infrastracture;
 
 public static class DependancyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        string connString = Environment.GetEnvironmentVariable("ThesisERPConnectionString");
-        //string connString = Environment.GetEnvironmentVariable("ThesisERPConnection_2");
-
+        string connString = configuration.GetConnectionString("ThesisERPConnectionString");
         services.AddDbContext<DatabaseContext>(options =>
             options.UseSqlServer(connectionString: connString)
         );

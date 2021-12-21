@@ -364,3 +364,9 @@ FodyWeavers.xsd
 
 
 /.editorconfig
+/src/ThesisERP.Api/.config
+/src/ThesisERP.Api/Properties/ServiceDependencies/ThesisERPApi20211221150039 - Web Deploy
+/src/ThesisERP.Api/Properties/serviceDependencies.ThesisERPApi20211221150039 - Web Deploy.json
+/src/ThesisERP.Api/Properties/serviceDependencies.local.json
+/src/ThesisERP.Api/Properties/serviceDependencies.json
+/src/ThesisERP.Api/appsettings.Development.json

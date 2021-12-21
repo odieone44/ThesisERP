@@ -2,7 +2,7 @@
 
 namespace ThesisERP.Application.DTOs;
 
-public class TaxDTO : UpdateTaxDTO
+public class TaxDTO : CreateTaxDTO
 {
     public int Id { get; set; }
     public bool IsDeleted { get; set; }

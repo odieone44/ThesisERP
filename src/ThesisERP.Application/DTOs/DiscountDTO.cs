@@ -2,7 +2,7 @@
 
 namespace ThesisERP.Application.DTOs;
 
-public class DiscountDTO : UpdateDiscountDTO
+public class DiscountDTO : CreateDiscountDTO
 {
     public int Id { get; set; }
     public bool IsDeleted { get; set; }

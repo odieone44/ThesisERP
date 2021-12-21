@@ -28,7 +28,7 @@ builder.Host.UseSerilog(
 var jwtConfig = builder.Configuration.GetSection("JwtSettings");
 
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.Configure<JwtSettings>(jwtConfig);
 builder.Services.ConfigureJWT(builder.Configuration);
