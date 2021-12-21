@@ -138,7 +138,7 @@ using (var scope = app.Services.CreateScope())
     
     try
     {               
-        await SeedDatabase.Initialize(services);
+        await SeedDatabase.Initialize(services, app.Configuration);
     }
     catch (Exception ex)
     {

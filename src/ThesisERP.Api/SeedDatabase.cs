@@ -14,56 +14,76 @@ public static class SeedDatabase
                                                    organization: "ThesisERP");
 
     public static readonly Entity TestSupplier = new(type: EntityType.supplier,
-                                                     firstName: "James",
-                                                     lastName: "Harden",
+                                                     firstName: "Jane",
+                                                     lastName: "Doe",
                                                      email: "example2@test.com",
                                                      organization: "ThesisERP");
 
-    public static readonly Address ClientShippingAddress = new(name: "Test Recipient",
-                                                               line1: "Aristidou 8",
-                                                               line2: "4th Floor",
-                                                               city: "Athens",
-                                                               region: "Attiki",
-                                                               postalCode: "10505",
-                                                               country: CountryCode.GR);
+    public static readonly Address TestAddress = new(name: "Test Address Name",
+                                                    line1: "Test Line 1",
+                                                    line2: "Test Line 2",
+                                                    city: "Athens",
+                                                    region: "Attiki",
+                                                    postalCode: "10505",
+                                                    country: CountryCode.GR);
 
-    public static readonly Address ClientBillingAddress = new(name: "Test Billing",
-                                                               line1: "Aristidou 8",
-                                                               line2: "4th Floor",
-                                                               city: "Athens",
-                                                               region: "Attiki",
-                                                               postalCode: "10505",
-                                                               country: CountryCode.GR);
+    public static readonly InventoryLocation TestInventoryLocation = new()
+    {
+        Name = "Test Location",
+        Abbreviation = "TEST"
+    };
 
-    public static readonly Address SupplierShippingAddress = new(name: "Test Recipient",
-                                                                  line1: "Aristidou 8",
-                                                                  line2: "4th Floor",
-                                                                  city: "Athens",
-                                                                  region: "Attiki",
-                                                                  postalCode: "10505",
-                                                                  country: CountryCode.GR);
+    public static readonly DocumentTemplate TestSalesInvoice = new()
+    {
+        Name = "Sales Invoice",
+        Abbreviation = "SI",
+        Description = "Handles sales of goods to clients",
+        NextNumber = 1,
+        Prefix = "SI-",
+        Postfix = string.Empty,
+        DocumentType = DocumentType.sales_invoice,
+        DateCreated = DateTime.UtcNow,
+        DateUpdated = DateTime.UtcNow
+    };
 
-    public static readonly Address SupplierBillingAddress = new(name: "Test Billing",
-                                                                 line1: "Aristidou 8",
-                                                                 line2: "4th Floor",
-                                                                 city: "Athens",
-                                                                 region: "Attiki",
-                                                                 postalCode: "10505",
-                                                                 country: CountryCode.GR);
+    public static readonly DocumentTemplate TestPurchaseBill = new()
+    {
+        Name = "Purchase Bill",
+        Abbreviation = "PB",
+        Description = "Handles purchase of goods from suppliers",
+        NextNumber = 1,
+        Prefix = "PB-",
+        Postfix = string.Empty,
+        DocumentType = DocumentType.purchase_bill,
+        DateCreated = DateTime.UtcNow,
+        DateUpdated = DateTime.UtcNow
+    };
 
-    public async static Task Initialize(IServiceProvider serviceProvider)
+    public static readonly Product TestProduct = new()
+    {
+        SKU = "TST0001",
+        Description = "Test Product",
+        LongDescription = "This is a test product.",
+        Type = ProductType.product,
+        DefaultPurchasePrice = 10.0m,
+        DefaultSaleSPrice = 20.0m,
+        DateCreated = DateTime.UtcNow,
+        DateUpdated = DateTime.UtcNow
+    };
+
+    public async static Task Initialize(IServiceProvider serviceProvider, IConfiguration configuration)
     {
         var dbContext = serviceProvider.GetRequiredService<DatabaseContext>();
 
-        await PopulateTestDataAsync(dbContext);
+        await PopulateTestDataAsync(dbContext);        
 
         var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
         var rolesManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        await SeedDefaultUserAsync(userManager, rolesManager);
+        await SeedDefaultUserAsync(userManager, rolesManager, configuration);
     }
 
-    public async static Task SeedDefaultUserAsync(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+    public async static Task SeedDefaultUserAsync(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
     {
         var administratorRole = new IdentityRole("Administrator");
 
@@ -79,11 +99,15 @@ public static class SeedDatabase
             await roleManager.CreateAsync(userRole);
         }
 
-        var administrator = new AppUser { UserName = "administrator@localhost", Email = "administrator@localhost", FirstName = "admin", LastName = "test" };
+        var adminSettings = configuration.GetSection("DefaultAdminUser");
+        var adminUsername = adminSettings.GetSection("username").Value;
+        var adminPassword = adminSettings.GetSection("password").Value;
+
+        var administrator = new AppUser { UserName = adminUsername, Email = adminUsername, FirstName = "admin", LastName = "test" };
 
         if (userManager.Users.All(u => u.UserName != administrator.UserName))
         {
-            await userManager.CreateAsync(administrator, "Te#stD@ta!1");
+            await userManager.CreateAsync(administrator, adminPassword);
             await userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
         }
     }
@@ -97,63 +121,31 @@ public static class SeedDatabase
             return;   // DB has been seeded
         }
 
-        TestClient.ShippingAddress = ClientShippingAddress;
-        TestClient.BillingAddress = ClientBillingAddress;
-
+        TestClient.ShippingAddress = TestAddress.Copy();
+        TestClient.BillingAddress = TestAddress.Copy();
         dbContext.Entities.Add(TestClient);
 
-        TestSupplier.ShippingAddress = SupplierShippingAddress;
-        TestSupplier.BillingAddress = SupplierBillingAddress;
-
+        TestSupplier.ShippingAddress = TestAddress.Copy();
+        TestSupplier.BillingAddress = TestAddress.Copy();
         dbContext.Entities.Add(TestSupplier);
-
+        
         await dbContext.SaveChangesAsync();
 
-        var location = new InventoryLocation()
-        {
-            Name = "Test Location",
-            Abbreviation = "TEST",
-            Address = ClientBillingAddress.Copy()
-        };
-
-        dbContext.InventoryLocations.Add(location);
+        TestInventoryLocation.Address = TestAddress.Copy();
+        dbContext.InventoryLocations.Add(TestInventoryLocation);
         await dbContext.SaveChangesAsync();
+                
+        dbContext.DocumentTemplates.Add(TestSalesInvoice);
+        dbContext.DocumentTemplates.Add(TestPurchaseBill);
+        await dbContext.SaveChangesAsync();             
 
-        var template = new DocumentTemplate()
-        {
-            Name = "Sales Invoice",
-            Abbreviation = "SI",
-            Description = "Handles sales of goods to clients",
-            NextNumber = 1,
-            Prefix = "SI-",
-            Postfix = string.Empty,
-            DocumentType = DocumentType.sales_invoice,
-            DateCreated = DateTime.Now,
-            DateUpdated = DateTime.Now
-        };
-
-        dbContext.DocumentTemplates.Add(template);
-        await dbContext.SaveChangesAsync();
-
-        var product = new Product()
-        {
-            SKU = "TST0001",
-            Description = "Test Product",
-            LongDescription = "This is a test product.",
-            Type = ProductType.product,
-            DefaultPurchasePrice = 10.0m,
-            DefaultSaleSPrice = 20.0m,
-            DateCreated = DateTime.UtcNow,
-            DateUpdated = DateTime.UtcNow
-        };
-
-        dbContext.Products.Add(product);
+        dbContext.Products.Add(TestProduct);
         await dbContext.SaveChangesAsync();
 
         var stockEntry = new StockLevel()
         {
-            InventoryLocation = location,
-            Product = product,
+            InventoryLocation = TestInventoryLocation,
+            Product = TestProduct,
             Available = 0.0m,
             Incoming = 0.0m,
             Outgoing = 0.0m
