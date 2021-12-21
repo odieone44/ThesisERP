@@ -92,6 +92,36 @@ public class AccountController : BaseApiController
     }
 
     /// <summary>
+    /// Change your account's password.
+    /// </summary>    
+    /// <response code="204">On Success.</response>    
+    /// <response code="401">If account information is not correct or account does not exist.</response>    
+    /// <param name="userDTO"></param>    
+    [HttpPost]
+    [Route("change-password")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangeUserPasswordDTO userDTO)
+    {        
+        if (!ModelState.IsValid)
+        {
+            return BadRequest();
+        }
+
+        _logger.LogInformation($"Password change attempt for {userDTO.Email} ");
+
+        var user = await _userManager.FindByNameAsync(userDTO.Email);
+
+        if (user == null)
+        {
+            return Unauthorized();
+        }
+
+        var response = await _userManager.ChangePasswordAsync(user, userDTO.Password, userDTO.NewPassword);
+
+        return response.Succeeded ? NoContent() : Unauthorized();
+    }
+
+    /// <summary>
     /// Get a new JWT by using your Refresh Token. 
     /// </summary>
     /// <remarks>
