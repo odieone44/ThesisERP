@@ -12,3 +12,14 @@ public class ThesisERPException : Exception
     {
     }
 }
+
+public class ThesisERPUniqueConstraintException : ThesisERPException
+{
+    public string UniqueConstraintName { get; set; }
+    public string UniqueConstraintValue { get; set; }
+    public ThesisERPUniqueConstraintException(string constraintName, string constraintValue) : base($"Error. '{constraintName}' must be unique. An entry with {constraintName}: '{constraintValue}' already exists. Action failed.")
+    {
+        UniqueConstraintName = constraintName;
+        UniqueConstraintValue = constraintValue;
+    }
+}

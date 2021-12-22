@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Xml.Linq;
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Core.Entities;
+using ThesisERP.Core.Exceptions;
 
 namespace ThesisERP.Api;
 
@@ -81,17 +83,28 @@ public class ProductsController : BaseApiController
             _logger.LogError($"Invalid POST Request in {nameof(CreateProduct)}");
             return BadRequest(ModelState);
         }
-
+        
         var product = _mapper.Map<Product>(productDTO);
 
         var result = _productsRepo.Add(product);
-        
-        await _productsRepo.SaveChangesAsync();
 
-        var productAdded = _mapper.Map<ProductDTO>(result);
+        try
+        {
+            await _productsRepo.SaveChangesAsync();
 
-        return CreatedAtRoute("GetProduct", new { id = productAdded.Id }, productAdded);
+            var productAdded = _mapper.Map<ProductDTO>(result);
 
+            return CreatedAtRoute("GetProduct", new { id = productAdded.Id }, productAdded);
+        }
+        catch (DbUpdateException ex)
+        {
+            if (ex.InnerException != null && ex.InnerException is SqlException sqe && sqe.Number == 2601)
+            {
+                throw new ThesisERPUniqueConstraintException("SKU", productDTO.SKU);
+            }
+
+            throw;
+        }
     }
 
     /// <summary>
@@ -118,9 +131,19 @@ public class ProductsController : BaseApiController
         _mapper.Map(productDTO, product);
         _productsRepo.Update(product);
 
-        await _productsRepo.SaveChangesAsync();
-
-        return NoContent();
+        try
+        {
+            await _productsRepo.SaveChangesAsync();
+            return NoContent();
+        }        
+        catch (DbUpdateException ex)
+        {
+            if (ex.InnerException != null && ex.InnerException is SqlException sqe && sqe.Number == 2601)
+            {
+                throw new ThesisERPUniqueConstraintException("SKU", productDTO.SKU);
+            }
+            throw;
+        }
     }
 
 

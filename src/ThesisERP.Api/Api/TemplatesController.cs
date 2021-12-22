@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using ThesisERP.Application.DTOs;
 using ThesisERP.Application.DTOs.Documents;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Core.Entities;
+using ThesisERP.Core.Exceptions;
 
 namespace ThesisERP.Api.Api;
 
@@ -82,11 +86,23 @@ public class TemplatesController : BaseApiController
 
         var result = _templatesRepo.Add(template);
 
-        await _templatesRepo.SaveChangesAsync();
+        try
+        {
+            await _templatesRepo.SaveChangesAsync();
 
-        var templateAdded = _mapper.Map<DocumentTemplateDTO>(result);
+            var templateAdded = _mapper.Map<DocumentTemplateDTO>(result);
 
-        return CreatedAtRoute("GetTemplate", new { id = templateAdded.Id }, templateAdded);
+            return CreatedAtRoute("GetTemplate", new { id = templateAdded.Id }, templateAdded);
+        }
+        catch (DbUpdateException ex)
+        {
+            if (ex.InnerException != null && ex.InnerException is SqlException sqe && sqe.Number == 2601)
+            {
+                throw new ThesisERPUniqueConstraintException("Abbreviation", templateDTO.Abbreviation);
+            }
+
+            throw;
+        }
 
     }
 
@@ -117,9 +133,20 @@ public class TemplatesController : BaseApiController
         _mapper.Map(templateDTO, template);
         _templatesRepo.Update(template);
 
-        await _templatesRepo.SaveChangesAsync();
+        try
+        {
+            await _templatesRepo.SaveChangesAsync();
+            return NoContent();
+        }
+        catch (DbUpdateException ex)
+        {
+            if (ex.InnerException != null && ex.InnerException is SqlException sqe && sqe.Number == 2601)
+            {
+                throw new ThesisERPUniqueConstraintException("Abbreviation", templateDTO.Abbreviation);
+            }
 
-        return NoContent();
+            throw;
+        }
     }
 
     /// <summary>
