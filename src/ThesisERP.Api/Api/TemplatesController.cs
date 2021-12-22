@@ -86,24 +86,11 @@ public class TemplatesController : BaseApiController
 
         var result = _templatesRepo.Add(template);
 
-        try
-        {
-            await _templatesRepo.SaveChangesAsync();
+        await _templatesRepo.SaveChangesAsync();
 
-            var templateAdded = _mapper.Map<DocumentTemplateDTO>(result);
+        var templateAdded = _mapper.Map<DocumentTemplateDTO>(result);
 
-            return CreatedAtRoute("GetTemplate", new { id = templateAdded.Id }, templateAdded);
-        }
-        catch (DbUpdateException ex)
-        {
-            if (ex.InnerException != null && ex.InnerException is SqlException sqe && sqe.Number == 2601)
-            {
-                throw new ThesisERPUniqueConstraintException("Abbreviation", templateDTO.Abbreviation);
-            }
-
-            throw;
-        }
-
+        return CreatedAtRoute("GetTemplate", new { id = templateAdded.Id }, templateAdded);
     }
 
     /// <summary>
@@ -133,20 +120,8 @@ public class TemplatesController : BaseApiController
         _mapper.Map(templateDTO, template);
         _templatesRepo.Update(template);
 
-        try
-        {
-            await _templatesRepo.SaveChangesAsync();
-            return NoContent();
-        }
-        catch (DbUpdateException ex)
-        {
-            if (ex.InnerException != null && ex.InnerException is SqlException sqe && sqe.Number == 2601)
-            {
-                throw new ThesisERPUniqueConstraintException("Abbreviation", templateDTO.Abbreviation);
-            }
-
-            throw;
-        }
+        await _templatesRepo.SaveChangesAsync();
+        return NoContent();
     }
 
     /// <summary>

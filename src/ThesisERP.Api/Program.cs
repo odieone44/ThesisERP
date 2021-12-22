@@ -115,10 +115,9 @@ app.UseSwaggerUI(c =>
     c.DocumentTitle = "Thesis ERP";    
     c.InjectStylesheet("../swagger/logo.css");
     c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
-    c.RoutePrefix = "api";
-    //var swaggerJsonBasePath = string.IsNullOrEmpty(c.RoutePrefix) ? "." : "..";
+    c.RoutePrefix = "api";   
 
-    c.SwaggerEndpoint($"../api/v1/swagger.json", "ThesisERP API v1");
+    c.SwaggerEndpoint($"v1/swagger.json", "ThesisERP API v1");
 });
 
 app.ConfigureExceptionHandler();

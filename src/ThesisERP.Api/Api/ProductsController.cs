@@ -74,6 +74,7 @@ public class ProductsController : BaseApiController
     /// <param name="productDTO"></param>
     /// <response code="201">The created product and the route to access it.</response>
     /// <response code="400">If the request body is invalid.</response>
+    /// <response code="409">If the SKU already exists.</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(ProductDTO))]
     public async Task<IActionResult> CreateProduct([FromBody] CreateProductDTO productDTO)
@@ -83,28 +84,16 @@ public class ProductsController : BaseApiController
             _logger.LogError($"Invalid POST Request in {nameof(CreateProduct)}");
             return BadRequest(ModelState);
         }
-        
+
         var product = _mapper.Map<Product>(productDTO);
 
         var result = _productsRepo.Add(product);
 
-        try
-        {
-            await _productsRepo.SaveChangesAsync();
+        await _productsRepo.SaveChangesAsync();
 
-            var productAdded = _mapper.Map<ProductDTO>(result);
+        var productAdded = _mapper.Map<ProductDTO>(result);
 
-            return CreatedAtRoute("GetProduct", new { id = productAdded.Id }, productAdded);
-        }
-        catch (DbUpdateException ex)
-        {
-            if (ex.InnerException != null && ex.InnerException is SqlException sqe && sqe.Number == 2601)
-            {
-                throw new ThesisERPUniqueConstraintException("SKU", productDTO.SKU);
-            }
-
-            throw;
-        }
+        return CreatedAtRoute("GetProduct", new { id = productAdded.Id }, productAdded);
     }
 
     /// <summary>
@@ -131,19 +120,9 @@ public class ProductsController : BaseApiController
         _mapper.Map(productDTO, product);
         _productsRepo.Update(product);
 
-        try
-        {
-            await _productsRepo.SaveChangesAsync();
-            return NoContent();
-        }        
-        catch (DbUpdateException ex)
-        {
-            if (ex.InnerException != null && ex.InnerException is SqlException sqe && sqe.Number == 2601)
-            {
-                throw new ThesisERPUniqueConstraintException("SKU", productDTO.SKU);
-            }
-            throw;
-        }
+        await _productsRepo.SaveChangesAsync();
+        return NoContent();
+
     }
 
 

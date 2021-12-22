@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Serilog;
 using ThesisERP.Core.Exceptions;
 
 namespace ThesisERP.Application.Models;
@@ -14,21 +15,31 @@ public class AppError
         return JsonConvert.SerializeObject(this);
     }
 
-    public static AppError GetAppErrorFromAppException(ThesisERPException exception)
+    public static AppError GetAppErrorFromAppException(Exception exception)
     {
-        var appError = new AppError();
+        var appError = new AppError()
+        {
+            StatusCode = StatusCodes.Status500InternalServerError,
+            Message = "Internal Server Error. Please try again."
+        };
+
+        if (exception is not ThesisERPException) 
+        {            
+            return appError; 
+        }
 
         switch (exception)
         {
-            case ThesisERPUniqueConstraintException ux:
-                appError.StatusCode = StatusCodes.Status409Conflict;
-                appError.Message = ux.Message;
+            case ThesisERPUniqueConstraintException:
+                appError.StatusCode = StatusCodes.Status409Conflict;                
                 break;
-            case ThesisERPException ex:
-                appError.StatusCode = StatusCodes.Status400BadRequest;
-                appError.Message = ex.Message;
+
+            case ThesisERPException:
+                appError.StatusCode = StatusCodes.Status400BadRequest;                
                 break;            
         }
+        appError.Message = exception.Message;
+
         return appError;
     }
 }

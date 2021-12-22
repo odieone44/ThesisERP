@@ -48,14 +48,14 @@ public class DocumentTemplate
     }
 
     public static IEnumerable<DocumentType> GetPositiveStockChangeDocumentTypes()
-    {        
+    {
         yield return DocumentType.purchase_bill;
         yield return DocumentType.sales_return;
         yield return DocumentType.stock_adjustment_plus;
     }
 
     public static IEnumerable<DocumentType> GetNegativeStockChangeDocumentTypes()
-    {     
+    {
         yield return DocumentType.sales_invoice;
         yield return DocumentType.purchase_return;
         yield return DocumentType.stock_adjustment_minus;

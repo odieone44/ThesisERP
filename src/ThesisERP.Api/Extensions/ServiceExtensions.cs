@@ -81,22 +81,8 @@ public static class ServiceExtensions
                 var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                 if (contextFeature != null)
                 {                    
-                    AppError error;
-
-                    if (contextFeature.Error is ThesisERPException ex)
-                    {
-                        error = AppError.GetAppErrorFromAppException(ex);
-                    }
-                    else
-                    {
-                        Log.Error($"Something went wrong in {contextFeature.Error}");
-                        error = new AppError
-                        {
-                            StatusCode = context.Response.StatusCode,
-                            Message = "Internal Server Error. Please try again."
-                        };
-                    }
-
+                    var error = AppError.GetAppErrorFromAppException(contextFeature.Error);
+                    
                     context.Response.StatusCode = error.StatusCode;
                     await context.Response.WriteAsync(error.ToString());
                 }

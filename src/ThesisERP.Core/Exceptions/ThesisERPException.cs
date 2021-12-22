@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ThesisERP.Core.Exceptions;
 
 public class ThesisERPException : Exception
-{
+{    
     public ThesisERPException(string errorMessage) : base(errorMessage)
     {
     }
@@ -15,11 +15,7 @@ public class ThesisERPException : Exception
 
 public class ThesisERPUniqueConstraintException : ThesisERPException
 {
-    public string UniqueConstraintName { get; set; }
-    public string UniqueConstraintValue { get; set; }
-    public ThesisERPUniqueConstraintException(string constraintName, string constraintValue) : base($"Error. '{constraintName}' must be unique. An entry with {constraintName}: '{constraintValue}' already exists. Action failed.")
+    public ThesisERPUniqueConstraintException() : base($"Action resulted in duplicate value for a property that should be unique. Check related api schema for information and try again.")
     {
-        UniqueConstraintName = constraintName;
-        UniqueConstraintValue = constraintValue;
     }
 }

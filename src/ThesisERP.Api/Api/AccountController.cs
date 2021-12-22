@@ -79,8 +79,9 @@ public class AccountController : BaseApiController
     [Route("login")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthSuccessResponse))]
     public async Task<IActionResult> Login([FromBody] LoginUserDTO userDTO)
-    {
+    {        
         _logger.LogInformation($"Logging attempt for {userDTO.Email} ");
+        
         if (!ModelState.IsValid)
         {
             return BadRequest();
