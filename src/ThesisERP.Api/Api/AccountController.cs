@@ -165,9 +165,13 @@ public class AccountController : BaseApiController
     {
         // get source ip address for the current request
         if (Request.Headers.ContainsKey("X-Forwarded-For"))
-            return Request.Headers["X-Forwarded-For"];
+        { 
+            return Request.Headers["X-Forwarded-For"]; 
+        }
         else
+        {
             return HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString() ?? "0.0.0.0";
+        }
     }
 
     private IActionResult _handleAuthorizationAttempt(AuthResult result)
