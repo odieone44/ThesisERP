@@ -15,7 +15,7 @@ To run the application locally, you need to have the .NET 6 SDK installed.
 
 1. After cloning/downloading this repo, edit the appsettings.json file with your SQL connection string, and change any other configuration values to your liking.  
 
-2. Open a Package Manager Console on the ThesisERP.Infrastracture project and run the following commands to create/update the database:
+2. Open a Package Manager Console on the ThesisERP.Infrastracture project and run the following commands to create/update the database:  
   i. `Add-Migration InitialMigration -OutputDir Data/Migrations`  
   ii. `Update-Database`
 
