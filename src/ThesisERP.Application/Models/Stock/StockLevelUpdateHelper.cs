@@ -11,81 +11,43 @@ public class StockLevelUpdateHelper
     private readonly decimal _amount;
     private readonly TransactionStockAction _stockAction;
 
-    private bool _increaseIncoming = false;
-    private bool _decreaseIncoming = false;
-    private bool _increaseOutgoing = false;
-    private bool _decreaseOutgoing = false;
-    private bool _increaseAvailable = false;
-    private bool _decreaseAvailable = false;
-
     public StockLevelUpdateHelper(TransactionStockAction transStockAction, decimal updateAmount)
     {
         _amount = updateAmount;
-        _stockAction = transStockAction;
-        _InitializeStockPropertiesToBeUpdated();
+        _stockAction = transStockAction;        
     }
 
     public void HandleStockLevelUpdate(StockLevel stockEntry)
     {
-        if (_increaseIncoming)
+        if (GetActionsThatIncreaseIncomingStock().Contains(_stockAction))
         {
             stockEntry.Incoming += _amount;
         }
-        else if (_decreaseIncoming)
+        else if (GetActionsThatDecreaseIncomingStock().Contains(_stockAction))
         {
             stockEntry.Incoming -= _amount;
         }
 
-        if (_increaseOutgoing)
+        if (GetActionsThatIncreaseOutgoingStock().Contains(_stockAction))
         {
             stockEntry.Outgoing += _amount;
         }
-        else if (_decreaseOutgoing)
+        else if (GetActionsThatDecreaseOutgoingStock().Contains(_stockAction))
         {
             stockEntry.Outgoing -= _amount;
         }
 
-        if (_increaseAvailable)
+        if (GetActionsThatIncreaseAvailableStock().Contains(_stockAction))
         {
             stockEntry.Available += _amount;
         }
-        else if (_decreaseAvailable)
+        else if (GetActionsThatDecreaseAvailableStock().Contains(_stockAction))
         {
             stockEntry.Available -= _amount;
             if (stockEntry.Available < 0)
             {
                 throw new ThesisERPException($"Cannot complete transaction as it will result in negative stock for product '{stockEntry.Product.SKU}' in location '{stockEntry.InventoryLocation.Name}'");
             }
-        }
-    }
-
-    private void _InitializeStockPropertiesToBeUpdated()
-    {
-        if (GetActionsThatIncreaseIncomingStock().Contains(_stockAction))
-        {
-            _increaseIncoming = true;
-        }
-        else if (GetActionsThatDecreaseIncomingStock().Contains(_stockAction))
-        {
-            _decreaseIncoming = true;
-        }
-
-        if (GetActionsThatIncreaseOutgoingStock().Contains(_stockAction))
-        {
-            _increaseOutgoing = true;
-        }
-        else if (GetActionsThatDecreaseOutgoingStock().Contains(_stockAction))
-        {
-            _decreaseOutgoing = true;
-        }
-
-        if (GetActionsThatIncreaseAvailableStock().Contains(_stockAction))
-        {
-            _increaseAvailable = true;
-        }
-        else if (GetActionsThatDecreaseAvailableStock().Contains(_stockAction))
-        {
-            _decreaseAvailable = true;
         }
     }
 
