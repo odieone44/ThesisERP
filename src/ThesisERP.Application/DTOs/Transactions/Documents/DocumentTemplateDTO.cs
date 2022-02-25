@@ -2,8 +2,7 @@
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Enums;
 
-namespace ThesisERP.Application.DTOs.Documents;
-
+namespace ThesisERP.Application.DTOs.Transactions.Documents;
 public class DocumentTemplateDTO : CreateDocumentTemplateDTO
 {
     public int Id { get; set; }

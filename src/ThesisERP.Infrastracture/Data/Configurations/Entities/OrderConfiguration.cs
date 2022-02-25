@@ -21,8 +21,8 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
                     .HasForeignKey(d => d.EntityId);
 
         orderBuilder.HasOne(t => t.OrderTemplate)
-                       .WithMany()
-                       .HasForeignKey(t => t.TemplateId);
+                    .WithMany()
+                    .HasForeignKey(t => t.TemplateId);
 
         //orderBuilder.HasOne(t => t.InventoryLocation)
         //               .WithMany()

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ThesisERP.Application.DTOs;
-using ThesisERP.Application.DTOs.Documents;
+using ThesisERP.Application.DTOs.Transactions.Documents;
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Enums;
 
@@ -156,7 +156,7 @@ public class MapperInitializer : Profile
             .ForMember(x => x.DiscountName, opt => opt.MapFrom(src => src.Discount.Name));
 
 
-        CreateMap<Document, DocumentDTO>();
+        CreateMap<Document, GenericDocumentDTO>();
 
         CreateMap<Document, SalesDocumentDTO>()
             .ForMember(x=>x.Client, opt => opt.MapFrom(src=>src.Entity));

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using ThesisERP.Application.DTOs.Documents;
+using ThesisERP.Application.DTOs.Transactions.Documents;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Interfaces.Transactions;
 using ThesisERP.Application.Models.Stock;
@@ -198,11 +198,12 @@ public class DocumentService : IDocumentService
         var billAddress = _mapper.Map<Address>(documentDTO.BillingAddress);
         var shipAddress = _mapper.Map<Address>(documentDTO.ShippingAddress);
 
-        _document = Document.Initialize(requestValues.Entity, 
-                                        requestValues.InventoryLocation, 
-                                        requestValues.DocumentTemplate, 
-                                        billAddress, 
-                                        shipAddress, 
+        _document = Document.Initialize(requestValues.Entity,
+                                        requestValues.InventoryLocation,
+                                        requestValues.DocumentTemplate,
+                                        billAddress,
+                                        shipAddress,
+                                        null,
                                         username);
 
         var rowsList = new List<DocumentRow>();

@@ -8,6 +8,8 @@ public class Document : TransactionBase
     public InventoryLocation InventoryLocation { get; set; }
     public int TemplateId { get; set; }
     public DocumentTemplate DocumentTemplate { get; set; }
+    public int? ParentOrderId { get; set; }
+    public Order? ParentOrder { get; set; }
     public string DocumentNumber { get; set; }
     public ICollection<DocumentRow> Rows { get; set; } = new List<DocumentRow>();
     public byte[] Timestamp { get; set; }
@@ -20,6 +22,7 @@ public class Document : TransactionBase
                                       DocumentTemplate template,
                                       Address billingAddress,
                                       Address shippingAddress,
+                                      Order? parentOrder,
                                       string username)
     {
         return new()
@@ -30,6 +33,8 @@ public class Document : TransactionBase
             InventoryLocationId = location.Id,
             DocumentTemplate = template,
             TemplateId = template.Id,
+            ParentOrderId = parentOrder?.Id,
+            ParentOrder = parentOrder,
             BillingAddress = billingAddress,
             ShippingAddress = shippingAddress,
             DocumentNumber = $"{template.Prefix}{template.NextNumber}{template.Postfix}",

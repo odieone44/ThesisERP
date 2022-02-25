@@ -23,6 +23,10 @@ internal class DocumentConfiguration : IEntityTypeConfiguration<Document>
                        .WithMany()
                        .HasForeignKey(t => t.InventoryLocationId);
 
+        documentBuilder.HasOne(o => o.ParentOrder)
+                       .WithMany(d => d.RelatedDocuments)
+                       .HasForeignKey(o => o.ParentOrderId);
+
         documentBuilder.Property(d => d.Timestamp).IsRowVersion();
 
         documentBuilder.OwnsMany(

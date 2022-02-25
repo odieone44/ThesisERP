@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using ThesisERP.Application.DTOs;
-using ThesisERP.Application.DTOs.Documents;
+using ThesisERP.Application.DTOs.Transactions.Documents;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Core.Entities;
-using ThesisERP.Core.Exceptions;
 
 namespace ThesisERP.Api.Api;
 
@@ -31,7 +27,7 @@ public class TemplatesController : BaseApiController
     /// </summary>
     /// <response code="200">Returns a list of document templates.</response>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(List<DocumentTemplateDTO>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DocumentTemplateDTO>))]
     public async Task<IActionResult> GetTemplates()
     {
         var templates = await _templatesRepo
@@ -49,7 +45,7 @@ public class TemplatesController : BaseApiController
     /// <response code="200">Returns the requested template.</response>
     /// <response code="404">If template does not exist.</response>
     [HttpGet("{id:int}", Name = "GetTemplate")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentTemplateDTO))]    
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentTemplateDTO))]
     public async Task<IActionResult> GetTemplate(int id)
     {
 
@@ -105,7 +101,7 @@ public class TemplatesController : BaseApiController
     /// <response code="400">If the request body is invalid.</response>
     /// <response code="404">If the template is not found.</response>    
     [HttpPut("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]    
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> UpdateTemplate(int id, [FromBody] UpdateDocumentTemplateDTO templateDTO)
     {
         if (!ModelState.IsValid || id < 1)
@@ -132,7 +128,7 @@ public class TemplatesController : BaseApiController
     /// <response code="400">If the request is invalid.</response>
     /// <response code="404">If the template is not found.</response>
     [HttpDelete("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]    
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteTemplate(int id)
     {
         if (id < 1)

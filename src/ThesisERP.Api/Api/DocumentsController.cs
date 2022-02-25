@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ThesisERP.Application.DTOs.Documents;
+using ThesisERP.Application.DTOs.Transactions.Documents;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Interfaces.Transactions;
 using ThesisERP.Application.Services.Transactions;
@@ -38,7 +37,7 @@ public class DocumentsController : BaseApiController
     /// <response code="200">Returns the created document.</response>
     /// <response code="400">If request is not valid.</response>
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(DocumentDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericDocumentDTO))]
     public async Task<IActionResult> CreateDocument([FromBody] CreateDocumentDTO documentDTO)
     {
         if (!ModelState.IsValid)
@@ -51,7 +50,7 @@ public class DocumentsController : BaseApiController
 
         var document = await _documentService.Create(documentDTO, username);
 
-        var response = _mapper.Map<DocumentDTO>(document);
+        var response = _mapper.Map<GenericDocumentDTO>(document);
         return Ok(response);
     }
 
@@ -69,18 +68,18 @@ public class DocumentsController : BaseApiController
     /// <response code="200">Returns the updated document.</response>
     /// <response code="400">If request is not valid.</response>
     [HttpPut("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericDocumentDTO))]
     public async Task<IActionResult> UpdateDocument(int id, [FromBody] UpdateDocumentDTO documentDTO)
     {
         if (!ModelState.IsValid)
         {
             _logger.LogError($"Invalid POST Request in {nameof(UpdateDocument)}");
             return BadRequest(ModelState);
-        }       
+        }
 
         var document = await _documentService.Update(id, documentDTO);
 
-        var response = _mapper.Map<DocumentDTO>(document);
+        var response = _mapper.Map<GenericDocumentDTO>(document);
         return Ok(response);
     }
 
@@ -95,7 +94,7 @@ public class DocumentsController : BaseApiController
     /// <response code="200">Returns the fulfilled document.</response>
     /// <response code="400">If request is not valid.</response>
     [HttpPost("{id:int}/Fulfill")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericDocumentDTO))]
     public async Task<IActionResult> FulfillDocument(int id)
     {
         if (id < 1)
@@ -105,7 +104,7 @@ public class DocumentsController : BaseApiController
 
         var document = await _documentService.Fulfill(id);
 
-        var response = _mapper.Map<DocumentDTO>(document);
+        var response = _mapper.Map<GenericDocumentDTO>(document);
         return Ok(response);
     }
 
@@ -119,7 +118,7 @@ public class DocumentsController : BaseApiController
     /// <response code="200">Returns the closed document.</response>
     /// <response code="400">If request is not valid.</response>
     [HttpPost("{id:int}/Close")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericDocumentDTO))]
     public async Task<IActionResult> CloseDocument(int id)
     {
         if (id < 1)
@@ -129,7 +128,7 @@ public class DocumentsController : BaseApiController
 
         var document = await _documentService.Close(id);
 
-        var response = _mapper.Map<DocumentDTO>(document);
+        var response = _mapper.Map<GenericDocumentDTO>(document);
         return Ok(response);
     }
 
@@ -143,7 +142,7 @@ public class DocumentsController : BaseApiController
     /// <response code="200">Returns the cancelled document.</response>
     /// <response code="400">If request is not valid.</response>
     [HttpPost("{id:int}/Cancel")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericDocumentDTO))]
     public async Task<IActionResult> CancelDocument(int id)
     {
         if (id < 1)
@@ -153,7 +152,7 @@ public class DocumentsController : BaseApiController
 
         var document = await _documentService.Cancel(id);
 
-        var response = _mapper.Map<DocumentDTO>(document);
+        var response = _mapper.Map<GenericDocumentDTO>(document);
         return Ok(response);
     }
 
@@ -162,7 +161,7 @@ public class DocumentsController : BaseApiController
     /// </summary>
     /// <response code="200">A list of all documents in your account.</response>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DocumentDTO>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GenericDocumentDTO>))]
     public async Task<IActionResult> GetDocuments()
     {
         var documents = await _docsRepo
@@ -178,7 +177,7 @@ public class DocumentsController : BaseApiController
                                                 .Include(q => q.Rows)
                                                     .ThenInclude(d => d.Discount));
 
-        var results = _mapper.Map<List<DocumentDTO>>(documents);
+        var results = _mapper.Map<List<GenericDocumentDTO>>(documents);
 
         return Ok(results);
     }
@@ -190,7 +189,7 @@ public class DocumentsController : BaseApiController
     /// <response code="200">Returns the requested document.</response>
     /// <response code="404">If document does not exist.</response>
     [HttpGet("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericDocumentDTO))]
     public async Task<IActionResult> GetDocument(int id)
     {
         if (id < 1)
@@ -202,7 +201,7 @@ public class DocumentsController : BaseApiController
 
         if (document == null) { return NotFound(); }
 
-        var result = _mapper.Map<DocumentDTO>(document);
+        var result = _mapper.Map<GenericDocumentDTO>(document);
 
         return Ok(result);
     }
