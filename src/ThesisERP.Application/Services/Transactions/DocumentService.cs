@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using ThesisERP.Application.DTOs.Transactions.Documents;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Interfaces.Transactions;
@@ -8,6 +8,7 @@ using ThesisERP.Application.Models.Stock;
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Enums;
 using ThesisERP.Core.Exceptions;
+using ThesisERP.Core.Extensions;
 
 namespace ThesisERP.Application.Services.Transactions;
 
@@ -47,7 +48,7 @@ public class DocumentService : IDocumentService
     }
 
     //TODO - This is a temp implementation for testing.
-    public async Task<Document> Create(CreateDocumentDTO documentDTO, string username)
+    public async Task<GenericDocumentDTO> Create(CreateDocumentDTO documentDTO, string username)
     {
         //todo - add transaction? 
         await _InitializeNewDocument(documentDTO, username);
@@ -55,18 +56,18 @@ public class DocumentService : IDocumentService
 
         _document.Status = TransactionStatus.pending;
         _document.Comments = documentDTO.Comments;
-        _document.DocumentTemplate.NextNumber++;
+        _document.Template.NextNumber++;
 
         var docResult = _documentsRepo.Add(_document);
 
-        _templatesRepo.Update(_document.DocumentTemplate);
+        _templatesRepo.Update(_document.Template);
 
         await _documentsRepo.SaveChangesAsync();
 
-        return docResult;
+        return _mapper.Map<GenericDocumentDTO>(docResult);
     }
 
-    public async Task<Document> Update(int id, UpdateDocumentDTO documentDTO)
+    public async Task<GenericDocumentDTO> Update(int id, UpdateDocumentDTO documentDTO)
     {
         _document = await _documentsRepo.GetDocumentByIdIncludeRelations(id);
         _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
@@ -95,11 +96,11 @@ public class DocumentService : IDocumentService
 
         _documentsRepo.Update(_document);
         await _documentsRepo.SaveChangesAsync();
-
-        return _document;
+        
+        return _mapper.Map<GenericDocumentDTO>(_document);        
     }
 
-    public async Task<Document> Fulfill(int id)
+    public async Task<GenericDocumentDTO> Fulfill(int id)
     {
         _document = await _documentsRepo.GetDocumentByIdIncludeRelations(id);
         _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
@@ -113,13 +114,12 @@ public class DocumentService : IDocumentService
         _document.Status = TransactionStatus.fulfilled;
 
         _documentsRepo.Update(_document);
-
         await _documentsRepo.SaveChangesAsync();
 
-        return _document;
+        return _mapper.Map<GenericDocumentDTO>(_document);
     }
 
-    public async Task<Document> Close(int id)
+    public async Task<GenericDocumentDTO> Close(int id)
     {
         _document = await _documentsRepo.GetDocumentByIdIncludeRelations(id);
         _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
@@ -133,12 +133,11 @@ public class DocumentService : IDocumentService
         _document.DateUpdated = DateTime.UtcNow;
 
         _documentsRepo.Update(_document);
-
         await _documentsRepo.SaveChangesAsync();
 
-        return _document;
+        return _mapper.Map<GenericDocumentDTO>(_document);
     }
-    public async Task<Document> Cancel(int id)
+    public async Task<GenericDocumentDTO> Cancel(int id)
     {
         _document = await _documentsRepo.GetDocumentByIdIncludeRelations(id);
         _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
@@ -148,10 +147,9 @@ public class DocumentService : IDocumentService
         _document.DateUpdated = DateTime.UtcNow;
 
         _documentsRepo.Update(_document);
-
         await _documentsRepo.SaveChangesAsync();
 
-        return _document;
+        return _mapper.Map<GenericDocumentDTO>(_document);        
     }
 
     private async Task _UpdatePendingDocumentWithNewValues(UpdateDocumentDTO documentDTO)
@@ -161,24 +159,24 @@ public class DocumentService : IDocumentService
 
         var taxIds = documentDTO.Rows.Where(y => y.TaxID != null).Select(x => (int)x.TaxID).Distinct().ToList();
         var discountIds = documentDTO.Rows.Where(y => y.DiscountID != null).Select(x => (int)x.DiscountID).Distinct().ToList();
-        
+
         var entityId = documentDTO.EntityId ?? throw new ThesisERPException($"EntityId has to be provided when updating a pending document.");
         var locationId = documentDTO.InventoryLocationId ?? throw new ThesisERPException($"InventoryLocationId has to be provided when updating a pending document.");
-        
+
         var newRequestValues = await _GetDocumentRequestValuesAsync(entityId, _document.TemplateId, locationId, productIds, taxIds, discountIds);
 
         _document.Entity = newRequestValues.Entity;
         _document.InventoryLocation = newRequestValues.InventoryLocation;
-        
+
         var rowsList = new List<DocumentRow>();
-        foreach (var rowDTO in documentDTO.Rows)
+        foreach (var (rowDTO, rowIndex) in documentDTO.Rows.WithIndex())
         {
             var thisProduct = newRequestValues.Products.FirstOrDefault(x => x.Id == rowDTO.ProductId);
 
             var thisTax = rowDTO.TaxID != null ? newRequestValues.Taxes.FirstOrDefault(x => x.Id == rowDTO.TaxID) : null;
             var thisDiscount = rowDTO.DiscountID != null ? newRequestValues.Discounts.FirstOrDefault(x => x.Id == rowDTO.DiscountID) : null;
 
-            var detail = new DocumentRow(thisProduct, rowDTO.ProductQuantity, rowDTO.UnitPrice, thisTax, thisDiscount);
+            var detail = new DocumentRow(rowIndex, thisProduct, rowDTO.ProductQuantity, rowDTO.UnitPrice, thisTax, thisDiscount);
             rowsList.Add(detail);
         }
 
@@ -186,15 +184,15 @@ public class DocumentService : IDocumentService
     }
 
     private async Task _InitializeNewDocument(CreateDocumentDTO documentDTO, string username)
-    {       
+    {
         var productIds = documentDTO.Rows.Select(x => x.ProductId).Distinct().ToList();
         if (!productIds.Any()) { throw new ThesisERPException("A valid document rows list has to be provided."); }
-     
-        var taxIds = documentDTO.Rows.Where(y => y.TaxID != null).Select(x => (int)x.TaxID).Distinct().ToList();        
+
+        var taxIds = documentDTO.Rows.Where(y => y.TaxID != null).Select(x => (int)x.TaxID).Distinct().ToList();
         var discountIds = documentDTO.Rows.Where(y => y.DiscountID != null).Select(x => (int)x.DiscountID).Distinct().ToList();
-        
+
         var requestValues = await _GetDocumentRequestValuesAsync(documentDTO.EntityId, documentDTO.TemplateId, documentDTO.InventoryLocationId, productIds, taxIds, discountIds);
-        
+
         var billAddress = _mapper.Map<Address>(documentDTO.BillingAddress);
         var shipAddress = _mapper.Map<Address>(documentDTO.ShippingAddress);
 
@@ -207,14 +205,14 @@ public class DocumentService : IDocumentService
                                         username);
 
         var rowsList = new List<DocumentRow>();
-        foreach (var rowDTO in documentDTO.Rows)
+        foreach (var (rowDTO, rowIndex) in documentDTO.Rows.WithIndex())
         {
             var thisProduct = requestValues.Products.FirstOrDefault(x => x.Id == rowDTO.ProductId);
-            
+
             var thisTax = rowDTO.TaxID != null ? requestValues.Taxes.FirstOrDefault(x => x.Id == rowDTO.TaxID) : null;
             var thisDiscount = rowDTO.DiscountID != null ? requestValues.Discounts.FirstOrDefault(x => x.Id == rowDTO.DiscountID) : null;
 
-            var detail = new DocumentRow(thisProduct, rowDTO.ProductQuantity, rowDTO.UnitPrice, thisTax, thisDiscount);
+            var detail = new DocumentRow(rowIndex, thisProduct, rowDTO.ProductQuantity, rowDTO.UnitPrice, thisTax, thisDiscount);
             rowsList.Add(detail);
         }
 
@@ -231,7 +229,7 @@ public class DocumentService : IDocumentService
                               .GetAllAsync(x => _document.Rows.Select(x => x.Product.Id).Contains(x.ProductId)
                                            && x.InventoryLocationId == locationId))
                               .ToDictionary(x => x.ProductId, v => v);
-        
+
         foreach (var row in _document.Rows)
         {
             var stockUpdateHelper = new StockLevelUpdateHelper(stockAction, row.ProductQuantity);
@@ -252,11 +250,11 @@ public class DocumentService : IDocumentService
         }
     }
 
-    private async Task<DocumentRequestValues> _GetDocumentRequestValuesAsync(int entityId, 
-                                                                             int templateId, 
-                                                                             int locationId, 
-                                                                             List<int> productIds, 
-                                                                             List<int> taxIds, 
+    private async Task<DocumentRequestValues> _GetDocumentRequestValuesAsync(int entityId,
+                                                                             int templateId,
+                                                                             int locationId,
+                                                                             List<int> productIds,
+                                                                             List<int> taxIds,
                                                                              List<int> discountIds)
     {
         var template = await _templatesRepo.GetByIdAsync(templateId);
@@ -268,7 +266,7 @@ public class DocumentService : IDocumentService
 
         var location = await _locationsRepo.GetByIdAsync(locationId);
         _ = location ?? throw new ThesisERPException($"Inventory Location with id: '{locationId}' not found.");
-                
+
         if (!productIds.Any()) { throw new ThesisERPException("A valid document rows list has to be provided."); }
 
         var products = await _productsRepo.GetAllAsync(expression: x => productIds.Contains(x.Id),
@@ -280,7 +278,7 @@ public class DocumentService : IDocumentService
         {
             throw new ThesisERPException($"Some products were not found: '{string.Join(", ", nonExistingProducts.Select(x => $"ProductId: {x}"))}'. Document Creation failed.");
         }
-        
+
         var taxes = new List<Tax>();
 
         if (taxIds.Any())
@@ -293,7 +291,7 @@ public class DocumentService : IDocumentService
                 throw new ThesisERPException($"Some taxes were not found: '{string.Join(", ", nonExistingProducts.Select(x => $"TaxId: {x}"))}'. Document Creation failed.");
             }
         }
-        
+
         var discounts = new List<Discount>();
 
         if (discountIds.Any())
@@ -326,7 +324,7 @@ public class DocumentService : IDocumentService
             DocumentTemplate = template;
             Products = products;
             Taxes = taxes;
-            Discounts = discounts;            
+            Discounts = discounts;
         }
     }
 

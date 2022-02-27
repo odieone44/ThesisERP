@@ -1,15 +1,16 @@
 ﻿using ThesisERP.Application.DTOs.Transactions;
-using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Application.Interfaces.Transactions;
-public interface ITransactionService<T, TCreate, TUpdate>
-    where T : TransactionBase
-    where TCreate : CreateTransactionBaseDTO
-    where TUpdate : UpdateTransactionBaseDTO
+public interface ITransactionService<TTransactionDTO, TCreateDTO, TUpdateDTO, TRowDTO, TCreateRowDTO>
+    where TTransactionDTO : TransactionBaseDTO<TRowDTO>
+    where TCreateDTO : CreateTransactionBaseDTO<TCreateRowDTO>
+    where TUpdateDTO : UpdateTransactionBaseDTO<TCreateRowDTO>
+    where TRowDTO : TransactionRowBaseDTO
+    where TCreateRowDTO : CreateTransactionRowBaseDTO
 {
-    Task<T> Create(TCreate createTransactionDTO, string username);
-    Task<T> Update(int id, TUpdate updateTransactionDTO);
-    Task<T> Fulfill(int id);
-    Task<T> Close(int id);
-    Task<T> Cancel(int id);
+    Task<TTransactionDTO> Create(TCreateDTO createTransactionDTO, string username);
+    Task<TTransactionDTO> Update(int id, TUpdateDTO updateTransactionDTO);
+    Task<TTransactionDTO> Fulfill(int id);
+    Task<TTransactionDTO> Close(int id);
+    Task<TTransactionDTO> Cancel(int id);
 }

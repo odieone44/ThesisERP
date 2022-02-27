@@ -19,4 +19,5 @@ public abstract class TransactionTemplateBase
     public DateTime DateCreated { get; set; }
     public DateTime? DateUpdated { get; set; }
     public bool IsDeleted { get; set; } = false;
+    public byte[] Timestamp { get; set; }
 }

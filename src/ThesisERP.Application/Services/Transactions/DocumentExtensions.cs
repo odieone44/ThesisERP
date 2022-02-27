@@ -19,7 +19,7 @@ public static class DocumentExtensions
                                  (expression: x => x.Id == documentId,
                                   include: i => i.Include(p => p.Entity)
                                                  .Include(x => x.InventoryLocation)
-                                                 .Include(t => t.DocumentTemplate)
+                                                 .Include(t => t.Template)
                                                  .Include(q => q.Rows)
                                                      .ThenInclude(d => d.Product)
                                                  .Include(q => q.Rows)

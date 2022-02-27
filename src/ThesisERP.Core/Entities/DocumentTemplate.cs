@@ -6,8 +6,7 @@ public class DocumentTemplate : TransactionTemplateBase
 {
     public const int AbbreviationMaxLength = 20;
 
-    public DocumentType DocumentType { get; set; }
-    public byte[] Timestamp { get; set; }
+    public DocumentType DocumentType { get; set; }    
     public bool IsPositiveStockTransaction => GetStockChangeType() == StockChangeType.positive;
     public bool IsNegativeStockTransaction => !IsPositiveStockTransaction;
     public bool UsesClientEntity => GetDocumentEntityType() == EntityType.client;

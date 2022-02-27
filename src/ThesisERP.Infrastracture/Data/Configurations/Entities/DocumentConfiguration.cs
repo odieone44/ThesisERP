@@ -15,7 +15,7 @@ internal class DocumentConfiguration : IEntityTypeConfiguration<Document>
                        .WithMany()
                        .HasForeignKey(d => d.EntityId);
 
-        documentBuilder.HasOne(t => t.DocumentTemplate)
+        documentBuilder.HasOne(t => t.Template)
                        .WithMany()
                        .HasForeignKey(t => t.TemplateId);
 

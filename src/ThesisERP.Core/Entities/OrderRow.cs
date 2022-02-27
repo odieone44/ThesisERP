@@ -10,8 +10,8 @@ public class OrderRow : TransactionRowBase
 
     public byte[] Timestamp { get; private set; }
 
-    public OrderRow(Product product, decimal quantity, decimal fulfilledQuantity, decimal price, Tax? tax = null, Discount? discount = null)
-        : base(product, quantity, price, tax, discount)
+    public OrderRow(int lineNumber, Product product, decimal quantity, decimal fulfilledQuantity, decimal price, Tax? tax = null, Discount? discount = null)
+        : base(lineNumber, product, quantity, price, tax, discount)
     {
         FulfilledQuantity = fulfilledQuantity;
     }

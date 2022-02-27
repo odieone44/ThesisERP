@@ -10,7 +10,7 @@ public class OrderService : IOrderService
 {
     private readonly IRepositoryBase<Order> _ordersRepo;
     private readonly IRepositoryBase<Product> _productsRepo;
-    private readonly IRepositoryBase<DocumentTemplate> _templatesRepo;
+    private readonly IRepositoryBase<OrderTemplate> _templatesRepo;
     private readonly IRepositoryBase<Entity> _entitiesRepo;
     private readonly IRepositoryBase<InventoryLocation> _locationsRepo;
     private readonly IRepositoryBase<StockLevel> _stockRepo;
@@ -18,27 +18,27 @@ public class OrderService : IOrderService
     private readonly IRepositoryBase<Discount> _discountRepo;
     private readonly IMapper _mapper;
 
-    public Task<Order> Cancel(int id)
+    public Task<GenericOrderDTO> Cancel(int id)
     {
         throw new NotImplementedException();
     }
 
-    public Task<Order> Close(int id)
+    public Task<GenericOrderDTO> Close(int id)
     {
         throw new NotImplementedException();
     }
 
-    public Task<Order> Create(CreateOrderDTO createTransactionDTO, string username)
+    public Task<GenericOrderDTO> Create(CreateOrderDTO createTransactionDTO, string username)
     {
         throw new NotImplementedException();
     }
 
-    public Task<Order> Fulfill(int id)
+    public Task<GenericOrderDTO> Fulfill(int id)
     {
         throw new NotImplementedException();
     }
 
-    public Task<Order> Update(int id, UpdateOrderDTO updateTransactionDTO)
+    public Task<GenericOrderDTO> Update(int id, UpdateOrderDTO updateTransactionDTO)
     {
         throw new NotImplementedException();
     }

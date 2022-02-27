@@ -18,6 +18,7 @@ public abstract class CreateTransactionRowBaseDTO
 
 public abstract class TransactionRowBaseDTO
 {
+    public int LineNumber { get; set; }
     public int ProductId { get; set; }
     public string ProductSKU { get; set; }
     public string ProductDescription { get; set; }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ThesisERP.Application.DTOs;
+using ThesisERP.Application.DTOs.Transactions;
 using ThesisERP.Application.DTOs.Transactions.Documents;
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Enums;
@@ -69,10 +70,10 @@ public class MapperInitializer : Profile
                 .ForMember(dest => dest.EntityType,
                            opt => opt.MapFrom(val => EntityType.supplier));
 
-        CreateMap<Entity, SupplierBaseInfoDTO>()
-         .ReverseMap()
-             .ForMember(dest => dest.EntityType,
-                        opt => opt.MapFrom(val => EntityType.supplier));
+        //CreateMap<Entity, SupplierBaseInfoDTO>()
+        // .ReverseMap()
+        //     .ForMember(dest => dest.EntityType,
+        //                opt => opt.MapFrom(val => EntityType.supplier));
 
         CreateMap<Entity, CreateSupplierDTO>()
            .ReverseMap()
@@ -158,11 +159,11 @@ public class MapperInitializer : Profile
 
         CreateMap<Document, GenericDocumentDTO>();
 
-        CreateMap<Document, SalesDocumentDTO>()
-            .ForMember(x=>x.Client, opt => opt.MapFrom(src=>src.Entity));
+        //CreateMap<Document, SalesDocumentDTO>()
+        //    .ForMember(x=>x.Client, opt => opt.MapFrom(src=>src.Entity));
 
-        CreateMap<Document, PurchaseDocumentDTO>()
-            .ForMember(x => x.Supplier, opt => opt.MapFrom(src => src.Entity));       
+        //CreateMap<Document, PurchaseDocumentDTO>()
+        //    .ForMember(x => x.Supplier, opt => opt.MapFrom(src => src.Entity));       
 
     }
 

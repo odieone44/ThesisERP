@@ -48,9 +48,8 @@ public class DocumentsController : BaseApiController
 
         var username = HttpContext.User.Identity?.Name ?? string.Empty;
 
-        var document = await _documentService.Create(documentDTO, username);
-
-        var response = _mapper.Map<GenericDocumentDTO>(document);
+        var response = await _documentService.Create(documentDTO, username);
+       
         return Ok(response);
     }
 
@@ -77,9 +76,8 @@ public class DocumentsController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var document = await _documentService.Update(id, documentDTO);
-
-        var response = _mapper.Map<GenericDocumentDTO>(document);
+        var response = await _documentService.Update(id, documentDTO);
+        
         return Ok(response);
     }
 
@@ -102,9 +100,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var document = await _documentService.Fulfill(id);
-
-        var response = _mapper.Map<GenericDocumentDTO>(document);
+        var response = await _documentService.Fulfill(id);        
         return Ok(response);
     }
 
@@ -126,9 +122,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var document = await _documentService.Close(id);
-
-        var response = _mapper.Map<GenericDocumentDTO>(document);
+        var response = await _documentService.Close(id);
         return Ok(response);
     }
 
@@ -150,9 +144,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var document = await _documentService.Cancel(id);
-
-        var response = _mapper.Map<GenericDocumentDTO>(document);
+        var response = await _documentService.Cancel(id);
         return Ok(response);
     }
 
@@ -169,7 +161,7 @@ public class DocumentsController : BaseApiController
                                  (orderBy: o => o.OrderByDescending(d => d.DateUpdated),
                                  include: i => i.Include(p => p.Entity)
                                                 .Include(x => x.InventoryLocation)
-                                                .Include(t => t.DocumentTemplate)
+                                                .Include(t => t.Template)
                                                 .Include(q => q.Rows)
                                                     .ThenInclude(d => d.Product)
                                                 .Include(q => q.Rows)

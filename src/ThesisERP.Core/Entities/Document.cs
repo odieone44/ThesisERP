@@ -2,20 +2,30 @@
 
 namespace ThesisERP.Core.Entities;
 
-public class Document : TransactionBase
+public class Document : TransactionBase<DocumentTemplate,DocumentRow>
 {   
     public int InventoryLocationId { get; set; }
-    public InventoryLocation InventoryLocation { get; set; }
-    public int TemplateId { get; set; }
-    public DocumentTemplate DocumentTemplate { get; set; }
+    public InventoryLocation InventoryLocation { get; set; }    
     public int? ParentOrderId { get; set; }
     public Order? ParentOrder { get; set; }
-    public string DocumentNumber { get; set; }
-    public ICollection<DocumentRow> Rows { get; set; } = new List<DocumentRow>();
-    public byte[] Timestamp { get; set; }
-    public DocumentType Type => DocumentTemplate.DocumentType;
+    public DocumentType Type => Template.DocumentType;
  
     private Document() : base() { }
+
+    private Document(
+        Entity entity,
+        InventoryLocation location,
+        DocumentTemplate template,
+        Address billingAddress,
+        Address shippingAddress,
+        Order? parentOrder,
+        string username) : base(entity, template, billingAddress, shippingAddress, username) { 
+    
+        InventoryLocation = location;
+        InventoryLocationId = location.Id;
+        ParentOrderId = parentOrder?.Id;
+        ParentOrder = parentOrder;    
+    }
 
     public static Document Initialize(Entity entity,
                                       InventoryLocation location,
@@ -24,24 +34,7 @@ public class Document : TransactionBase
                                       Address shippingAddress,
                                       Order? parentOrder,
                                       string username)
-    {
-        return new()
-        {
-            Entity = entity,
-            EntityId = entity.Id,
-            InventoryLocation = location,
-            InventoryLocationId = location.Id,
-            DocumentTemplate = template,
-            TemplateId = template.Id,
-            ParentOrderId = parentOrder?.Id,
-            ParentOrder = parentOrder,
-            BillingAddress = billingAddress,
-            ShippingAddress = shippingAddress,
-            DocumentNumber = $"{template.Prefix}{template.NextNumber}{template.Postfix}",
-            Status = TransactionStatus.draft,
-            DateCreated = DateTime.UtcNow,
-            DateUpdated = DateTime.UtcNow,
-            CreatedBy = username
-        };
+    {        
+        return new(entity, location, template, billingAddress, shippingAddress, parentOrder, username);        
     }
 }

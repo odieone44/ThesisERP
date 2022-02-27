@@ -3,6 +3,7 @@ using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Application.Interfaces.Transactions;
 
-public interface IOrderService : ITransactionService<Order, CreateOrderDTO, UpdateOrderDTO>
+public interface IOrderService : 
+    ITransactionService<GenericOrderDTO, CreateOrderDTO, UpdateOrderDTO, OrderRowDTO, CreateOrderRowDTO>
 {
 }

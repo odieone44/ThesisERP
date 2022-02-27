@@ -5,6 +5,7 @@ namespace ThesisERP.Core.Entities;
 public abstract class TransactionRowBase
 {
     public int Id { get; set; }
+    public int LineNumber { get; set; }
     public int ProductId { get; set; }
     public Product Product { get; set; }
 
@@ -37,8 +38,9 @@ public abstract class TransactionRowBase
         private set => _lineTotalGross = value.RoundTo(2);
     }
 
-    public TransactionRowBase(Product product, decimal quantity, decimal price, Tax? tax = null, Discount? discount = null)
+    public TransactionRowBase(int lineNumber, Product product, decimal quantity, decimal price, Tax? tax = null, Discount? discount = null)
     {
+        LineNumber = lineNumber;
         Product = product;
         ProductId = product.Id;
         Discount = discount;

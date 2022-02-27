@@ -20,7 +20,7 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
                     .WithMany()
                     .HasForeignKey(d => d.EntityId);
 
-        orderBuilder.HasOne(t => t.OrderTemplate)
+        orderBuilder.HasOne(t => t.Template)
                     .WithMany()
                     .HasForeignKey(t => t.TemplateId);
 

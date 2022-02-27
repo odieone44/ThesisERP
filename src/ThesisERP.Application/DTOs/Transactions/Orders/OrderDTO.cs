@@ -1,14 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
-using ThesisERP.Application.DTOs.Transactions.Documents;
+﻿using ThesisERP.Core.Enums;
 
 namespace ThesisERP.Application.DTOs.Transactions.Orders;
 
-public class CreateOrderDTO : CreateTransactionBaseDTO
+public class CreateOrderDTO : CreateTransactionBaseDTO<CreateOrderRowDTO>
 {
-    public ICollection<CreateOrderRowDTO> Rows { get; set; } = new List<CreateOrderRowDTO>();
 }
 
-public class UpdateOrderDTO : UpdateTransactionBaseDTO
+public class UpdateOrderDTO : UpdateTransactionBaseDTO<CreateOrderRowDTO>
 {
-    public ICollection<CreateOrderRowDTO>? Rows { get; set; } = new List<CreateOrderRowDTO>();
+}
+
+public class BaseOrderDTO : TransactionBaseDTO<OrderRowDTO>
+{
+    public OrderType Type { get; set; }
+    public ICollection<int> RelatedDocumentIDs { get; set; }
+    public bool IsPartiallyFulfilled { get; set; }
+}
+
+public class GenericOrderDTO : BaseOrderDTO
+{
+    public EntityBaseInfoDTO Entity { get; set; }
 }

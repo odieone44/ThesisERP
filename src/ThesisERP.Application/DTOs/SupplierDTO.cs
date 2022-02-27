@@ -40,13 +40,13 @@ public class CreateSupplierDTO
 
 public class UpdateSupplierDTO : CreateSupplierDTO { }
 
-public class SupplierBaseInfoDTO
-{
-    public int Id { get; set; }
-    public string? Organization { get; set; }
-    public string FirstName { get; set; } = string.Empty;
-    public string? LastName { get; set; }
+//public class SupplierBaseInfoDTO
+//{
+//    public int Id { get; set; }
+//    public string? Organization { get; set; }
+//    public string FirstName { get; set; } = string.Empty;
+//    public string? LastName { get; set; }
 
-    [DataType(DataType.EmailAddress)]
-    public string Email { get; set; } = string.Empty;
-}
+//    [DataType(DataType.EmailAddress)]
+//    public string Email { get; set; } = string.Empty;
+//}

@@ -11,8 +11,8 @@ public class DocumentRow : TransactionRowBase
 
     public byte[] Timestamp { get; private set; }
 
-    public DocumentRow(Product product, decimal quantity, decimal price, Tax? tax = null, Discount? discount = null) 
-        : base(product, quantity, price, tax, discount)
+    public DocumentRow(int lineNumber,Product product, decimal quantity, decimal price, Tax? tax = null, Discount? discount = null) 
+        : base(lineNumber, product, quantity, price, tax, discount)
     {
     }
     private DocumentRow()
