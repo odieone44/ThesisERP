@@ -8,7 +8,9 @@ public interface IAppDbContext
     DbSet<AppUser> AppUsers { get; }
     DbSet<Entity> Entities { get; }
     DbSet<Document> Documents { get; }
+    DbSet<Order> Orders { get; }
     DbSet<DocumentTemplate> DocumentTemplates { get; }
+    DbSet<OrderTemplate> OrderTemplates { get; }
     DbSet<InventoryLocation> InventoryLocations { get; }
     DbSet<StockLevel> StockLevels { get; }
     DbSet<Tax> Taxes { get; }

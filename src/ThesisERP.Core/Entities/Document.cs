@@ -12,15 +12,14 @@ public class Document : TransactionBase<DocumentTemplate,DocumentRow>
  
     private Document() : base() { }
 
-    private Document(
-        Entity entity,
-        InventoryLocation location,
-        DocumentTemplate template,
-        Address billingAddress,
-        Address shippingAddress,
-        Order? parentOrder,
-        string username) : base(entity, template, billingAddress, shippingAddress, username) { 
-    
+    private Document(Entity entity,
+                     InventoryLocation location,
+                     DocumentTemplate template,
+                     Address billingAddress,
+                     Address shippingAddress,
+                     Order? parentOrder,
+                     string username) : base(entity, template, billingAddress, shippingAddress, username) 
+    {     
         InventoryLocation = location;
         InventoryLocationId = location.Id;
         ParentOrderId = parentOrder?.Id;
