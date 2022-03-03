@@ -8,15 +8,15 @@ namespace ThesisERP.Application.Services.Transactions;
 
 public class OrderService : IOrderService
 {
-    private readonly IRepositoryBase<Order> _ordersRepo;
-    private readonly IRepositoryBase<Product> _productsRepo;
-    private readonly IRepositoryBase<OrderTemplate> _templatesRepo;
-    private readonly IRepositoryBase<Entity> _entitiesRepo;
-    private readonly IRepositoryBase<InventoryLocation> _locationsRepo;
-    private readonly IRepositoryBase<StockLevel> _stockRepo;
-    private readonly IRepositoryBase<Tax> _taxRepo;
-    private readonly IRepositoryBase<Discount> _discountRepo;
+    private readonly IApiService _api;
     private readonly IMapper _mapper;
+
+    public OrderService(IApiService apiService,
+                        IMapper mapper)
+    {
+        _api = apiService;
+        _mapper = mapper;
+    }
 
     public Task<GenericOrderDTO> Cancel(int id)
     {
@@ -33,7 +33,7 @@ public class OrderService : IOrderService
         throw new NotImplementedException();
     }
 
-    public Task<GenericOrderDTO> Fulfill(int id)
+    public Task<GenericOrderDTO> Fulfill(int id, FulfillOrderDTO fulfillDTO)
     {
         throw new NotImplementedException();
     }

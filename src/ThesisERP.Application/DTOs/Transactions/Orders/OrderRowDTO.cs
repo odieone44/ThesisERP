@@ -10,3 +10,9 @@ public class OrderRowDTO : TransactionRowBaseDTO
 
     public bool RowIsFulfilled { get; set; }
 }
+
+public class FulfillOrderRowDTO
+{
+    public int LineNumber { get; set; }
+    public decimal QuantityToFulfill { get; set;} = decimal.Zero;
+}

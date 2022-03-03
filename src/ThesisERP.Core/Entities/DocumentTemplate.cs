@@ -4,8 +4,6 @@ namespace ThesisERP.Core.Entities;
 
 public class DocumentTemplate : TransactionTemplateBase
 {
-    public const int AbbreviationMaxLength = 20;
-
     public DocumentType DocumentType { get; set; }    
     public bool IsPositiveStockTransaction => GetStockChangeType() == StockChangeType.positive;
     public bool IsNegativeStockTransaction => !IsPositiveStockTransaction;

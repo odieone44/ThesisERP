@@ -26,6 +26,7 @@ public static class DependancyInjection
         services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<DatabaseContext>());
         services.AddScoped(typeof(IRepositoryBase<>), typeof(ThesisEFRepository<>));
         services.AddScoped<IAuthManager, AuthManager>();
+        services.AddScoped<IApiService, ApiService>();
         services.AddScoped<IDocumentService, DocumentService>();
 
         return services;

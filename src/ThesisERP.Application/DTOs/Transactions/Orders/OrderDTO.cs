@@ -10,6 +10,13 @@ public class UpdateOrderDTO : UpdateTransactionBaseDTO<CreateOrderRowDTO>
 {
 }
 
+public class FulfillOrderDTO
+{
+    public int FulfillmentDocumentTemplateId { get; set; }
+    public int LocationId { get; set; }
+    public ICollection<FulfillOrderRowDTO>? FullfillmentRows { get; set; }
+}
+
 public class BaseOrderDTO : TransactionBaseDTO<OrderRowDTO>
 {
     public OrderType Type { get; set; }

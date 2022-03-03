@@ -15,7 +15,7 @@ internal class OrderTemplateConfiguration : IEntityTypeConfiguration<OrderTempla
     {
         templateBuilder.ToTable("OrderTemplates").HasKey(t => t.Id);
         templateBuilder.Property(t => t.Timestamp).IsRowVersion();
-        templateBuilder.Property(t => t.Abbreviation).HasMaxLength(DocumentTemplate.AbbreviationMaxLength);
+        templateBuilder.Property(t => t.Abbreviation).HasMaxLength(TransactionTemplateBase.AbbreviationMaxLength);
 
         templateBuilder.HasIndex(t => t.Abbreviation)
             .IncludeProperties(

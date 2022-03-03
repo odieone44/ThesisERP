@@ -21,7 +21,7 @@ public class CreateDocumentTemplateDTO
     public string Description { get; set; }
 
     [Required]
-    [StringLength(DocumentTemplate.AbbreviationMaxLength, ErrorMessage = "Length must be between {2} and {1} characters.", MinimumLength = 1)]
+    [StringLength(TransactionTemplateBase.AbbreviationMaxLength, ErrorMessage = "Length must be between {2} and {1} characters.", MinimumLength = 1)]
     public string Abbreviation { get; set; }
 
     [StringLength(10)]
@@ -45,7 +45,7 @@ public class UpdateDocumentTemplateDTO
     public string Description { get; set; }
 
     [Required]
-    [StringLength(DocumentTemplate.AbbreviationMaxLength, ErrorMessage = "Length must be between {2} and {1} characters.",MinimumLength = 1)]    
+    [StringLength(TransactionTemplateBase.AbbreviationMaxLength, ErrorMessage = "Length must be between {2} and {1} characters.",MinimumLength = 1)]    
     public string Abbreviation { get; set; }
 
     [StringLength(10)]
