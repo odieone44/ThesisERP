@@ -5,9 +5,10 @@ public enum DocumentType
     purchase_bill = 1,
     sales_invoice = 2,    
     stock_adjustment_plus = 3,
-    stock_adjustment_minus = 4,
-    purchase_return = 5,
-    sales_return = 6
+    stock_adjustment_minus = 4
+    //not implemeneted yet
+    //purchase_return = 5,
+    //sales_return = 6
 }
 
 public enum OrderType
@@ -34,7 +35,8 @@ public enum TransactionStatus
     pending = 1,
     fulfilled = 2,
     closed = 3,
-    cancelled = 4
+    cancelled = 4,
+    processing = 5
 }
 
 public enum TransactionAction

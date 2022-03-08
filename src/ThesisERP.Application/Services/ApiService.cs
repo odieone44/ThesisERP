@@ -7,7 +7,7 @@ namespace ThesisERP.Application.Services;
 public class ApiService : IApiService
 {
     public IRepositoryBase<Document> DocumentsRepo => _documentsRepo;
-    public IRepositoryBase<Order> Orders => _ordersRepo;
+    public IRepositoryBase<Order> OrdersRepo => _ordersRepo;
     public IRepositoryBase<Product> ProductsRepo => _productsRepo;
     public IRepositoryBase<DocumentTemplate> DocumentTemplatesRepo => _documentTemplatesRepo;
     public IRepositoryBase<OrderTemplate> OrderTemplatesRepo => _orderTemplatesRepo;

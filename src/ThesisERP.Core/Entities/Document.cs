@@ -18,7 +18,8 @@ public class Document : TransactionBase<DocumentTemplate,DocumentRow>
                      Address billingAddress,
                      Address shippingAddress,
                      Order? parentOrder,
-                     string username) : base(entity, template, billingAddress, shippingAddress, username) 
+                     string username) 
+        : base(entity, template, billingAddress, shippingAddress, username) 
     {     
         InventoryLocation = location;
         InventoryLocationId = location.Id;

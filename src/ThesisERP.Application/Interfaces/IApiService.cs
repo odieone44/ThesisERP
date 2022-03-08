@@ -5,7 +5,7 @@ namespace ThesisERP.Application.Interfaces;
 public interface IApiService
 {
     IRepositoryBase<Document> DocumentsRepo { get; }
-    IRepositoryBase<Order> Orders { get; }
+    IRepositoryBase<Order> OrdersRepo { get; }
     IRepositoryBase<Product> ProductsRepo { get; }
     IRepositoryBase<DocumentTemplate> DocumentTemplatesRepo { get; }
     IRepositoryBase<OrderTemplate> OrderTemplatesRepo { get; }

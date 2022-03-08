@@ -51,8 +51,8 @@ public abstract class TransactionRowBase
         UnitPrice = price;
 
         LineTotalNet = quantity * price;
-        LineTotalTax = tax == null ? decimal.Zero : (price * tax.Amount * quantity).RoundTo(2);
-        LineTotalDiscount = discount == null ? decimal.Zero : (price * discount.Amount * quantity).RoundTo(2);
+        LineTotalTax = tax == null ? decimal.Zero : (LineTotalNet * tax.Amount).RoundTo(2);
+        LineTotalDiscount = discount == null ? decimal.Zero : ((LineTotalNet + LineTotalTax) * discount.Amount).RoundTo(2);
 
         LineTotalGross = LineTotalNet + LineTotalTax - LineTotalDiscount;
     }
