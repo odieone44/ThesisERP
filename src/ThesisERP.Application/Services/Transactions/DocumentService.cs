@@ -201,7 +201,7 @@ public class DocumentService : IDocumentService
 
     private async Task _HandleStockUpdateForAction(TransactionAction action)
     {
-        var stockAction = new TransactionStockAction(action, _document.Status, _document.Type);
+        var stockAction = new TransactionStockAction(action, _document.Status, _document.Template.StockChangeType);
         int locationId = _document.InventoryLocation.Id;
 
         var stockDict = (await _api.StockRepo

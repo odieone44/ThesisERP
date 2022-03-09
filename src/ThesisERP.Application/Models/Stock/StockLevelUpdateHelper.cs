@@ -4,7 +4,7 @@ using ThesisERP.Core.Enums;
 
 namespace ThesisERP.Application.Models.Stock;
 
-public readonly record struct TransactionStockAction(TransactionAction Action, TransactionStatus OldStatus, DocumentType Type);
+public readonly record struct TransactionStockAction(TransactionAction Action, TransactionStatus OldStatus, StockChangeType StockChangeType);
 
 public class StockLevelUpdateHelper
 {
@@ -53,77 +53,41 @@ public class StockLevelUpdateHelper
 
     private static IEnumerable<TransactionStockAction> GetActionsThatIncreaseIncomingStock()
     {
-        var actionList = new List<TransactionStockAction>();
-        foreach (var type in DocumentTemplate.GetPositiveStockChangeDocumentTypes())
-        {
-            actionList.Add(new TransactionStockAction(TransactionAction.create, TransactionStatus.pending, type));
-            actionList.Add(new TransactionStockAction(TransactionAction.create, TransactionStatus.draft, type));
-        }
-        return actionList;
+        yield return new TransactionStockAction(TransactionAction.create, TransactionStatus.pending, StockChangeType.positive);
+        yield return new TransactionStockAction(TransactionAction.create, TransactionStatus.draft, StockChangeType.positive);       
     }
 
     private static IEnumerable<TransactionStockAction> GetActionsThatDecreaseIncomingStock()
     {
-        var actionList = new List<TransactionStockAction>();
-        foreach (var type in DocumentTemplate.GetPositiveStockChangeDocumentTypes())
-        {
-            actionList.Add(new TransactionStockAction(TransactionAction.fulfill, TransactionStatus.pending, type));
-            actionList.Add(new TransactionStockAction(TransactionAction.cancel, TransactionStatus.pending, type));
-        }
-        return actionList;
+        yield return new TransactionStockAction(TransactionAction.fulfill, TransactionStatus.pending, StockChangeType.positive);
+        yield return new TransactionStockAction(TransactionAction.cancel, TransactionStatus.pending, StockChangeType.positive);        
     }
 
     private static IEnumerable<TransactionStockAction> GetActionsThatIncreaseOutgoingStock()
     {
-        var actionList = new List<TransactionStockAction>();
-        foreach (var type in DocumentTemplate.GetNegativeStockChangeDocumentTypes())
-        {
-            actionList.Add(new TransactionStockAction(TransactionAction.create, TransactionStatus.pending, type));
-            actionList.Add(new TransactionStockAction(TransactionAction.create, TransactionStatus.draft, type));
-        }
-        return actionList;
+        yield return new TransactionStockAction(TransactionAction.create, TransactionStatus.pending, StockChangeType.negative);
+        yield return new TransactionStockAction(TransactionAction.create, TransactionStatus.draft, StockChangeType.negative);      
     }
 
     private static IEnumerable<TransactionStockAction> GetActionsThatDecreaseOutgoingStock()
     {
-        var actionList = new List<TransactionStockAction>();
-        foreach (var type in DocumentTemplate.GetNegativeStockChangeDocumentTypes())
-        {
-            actionList.Add(new TransactionStockAction(TransactionAction.fulfill, TransactionStatus.pending, type));
-            actionList.Add(new TransactionStockAction(TransactionAction.cancel, TransactionStatus.pending, type));
-        }
-        return actionList;
+        yield return new TransactionStockAction(TransactionAction.fulfill, TransactionStatus.pending, StockChangeType.negative);
+        yield return new TransactionStockAction(TransactionAction.cancel, TransactionStatus.pending, StockChangeType.negative);
     }
 
 
     private static IEnumerable<TransactionStockAction> GetActionsThatIncreaseAvailableStock()
     {
-        var actionList = new List<TransactionStockAction>();
-        foreach (var type in DocumentTemplate.GetPositiveStockChangeDocumentTypes())
-        {
-            actionList.Add(new TransactionStockAction(TransactionAction.fulfill, TransactionStatus.pending, type));
-        }
-        foreach (var type in DocumentTemplate.GetNegativeStockChangeDocumentTypes())
-        {
-            actionList.Add(new TransactionStockAction(TransactionAction.cancel, TransactionStatus.fulfilled, type));
-            actionList.Add(new TransactionStockAction(TransactionAction.cancel, TransactionStatus.closed, type));
-        }
-        return actionList;
+        yield return new TransactionStockAction(TransactionAction.fulfill, TransactionStatus.pending, StockChangeType.positive);
+        yield return new TransactionStockAction(TransactionAction.cancel, TransactionStatus.fulfilled, StockChangeType.negative);
+        yield return new TransactionStockAction(TransactionAction.cancel, TransactionStatus.closed, StockChangeType.negative);        
     }
 
     private static IEnumerable<TransactionStockAction> GetActionsThatDecreaseAvailableStock()
     {
-        var actionList = new List<TransactionStockAction>();
-        foreach (var type in DocumentTemplate.GetPositiveStockChangeDocumentTypes())
-        {
-            actionList.Add(new TransactionStockAction(TransactionAction.cancel, TransactionStatus.fulfilled, type));
-            actionList.Add(new TransactionStockAction(TransactionAction.cancel, TransactionStatus.closed, type));
-        }
-        foreach (var type in DocumentTemplate.GetNegativeStockChangeDocumentTypes())
-        {
-            actionList.Add(new TransactionStockAction(TransactionAction.fulfill, TransactionStatus.pending, type));
-        }
-        return actionList;
+        yield return new TransactionStockAction(TransactionAction.cancel, TransactionStatus.fulfilled, StockChangeType.positive);
+        yield return new TransactionStockAction(TransactionAction.cancel, TransactionStatus.closed, StockChangeType.positive);
+        yield return new TransactionStockAction(TransactionAction.fulfill, TransactionStatus.pending, StockChangeType.negative);        
     }
 
 }
