@@ -16,6 +16,10 @@ public class StockService : IStockService
     private readonly IRepositoryBase<StockLevel> _stockRepo;
     private readonly IMapper _mapper;
 
+    private IEnumerable<TransactionRowBase> _transactionRows;
+    private InventoryLocation _location;
+    private TransactionStockAction _action;
+
     public StockService(IRepositoryBase<StockLevel> stockRepo, IMapper mapper)
     {
         _stockRepo = stockRepo;
@@ -32,30 +36,38 @@ public class StockService : IStockService
         return await _stockRepo.GetProductStock(productId);
     }
 
-    public async Task HandleStockUpdateForTransactionRows(
-        InventoryLocation location,
-        IEnumerable<TransactionRowBase> transactionRows,
-        TransactionStockAction stockAction)
+    public async Task HandleStockUpdateFromDocumentAction(Document document, TransactionStockAction stockAction)
     {
-        if (!StockLevelUpdateHelper.GetActionsThatChangeStock().Contains(stockAction))
-        {
-            return;
-        }       
+        _transactionRows = document.Rows;
+        _location = document.InventoryLocation;
+        _action = stockAction;
+
+        await _HandleStockUpdate();
+    }
+
+    private async Task _HandleStockUpdate()
+    {
+        //if (!StockLevelUpdateHelper.GetActionsThatChangeStock().Contains(_action))
+        //{
+        //    return;
+        //}
 
         var stockDict = (await _stockRepo
-                              .GetAllAsync(x => transactionRows.Select(x => x.Product.Id).Contains(x.ProductId)
-                                           && x.InventoryLocationId == location.Id))
-                              .ToDictionary(x => x.ProductId, v => v);
+                             .GetAllAsync(x => _transactionRows.Select(x => x.Product.Id).Contains(x.ProductId)
+                                          && x.InventoryLocationId == _location.Id))
+                             .ToDictionary(x => x.ProductId, v => v);
 
-        var stockUpdateHelper = new StockLevelUpdateHelper(stockAction);
-        
-        foreach (var row in transactionRows)
+        var stockUpdateHelper = new StockLevelUpdateHelper(_action);
+
+        foreach (var row in _transactionRows)
         {
+            if (row.Product.Type == ProductType.service) { continue; }
+
             if (!stockDict.TryGetValue(row.ProductId, out var locationStockEntry))
             {
                 locationStockEntry = new StockLevel()
                 {
-                    InventoryLocation = location,
+                    InventoryLocation = _location,
                     Product = row.Product
                 };
                 var result = _stockRepo.Add(locationStockEntry);
@@ -65,6 +77,7 @@ public class StockService : IStockService
             stockUpdateHelper.HandleStockLevelUpdate(locationStockEntry, row.ProductQuantity);
             if (locationStockEntry.Id > 0) { _stockRepo.Update(locationStockEntry); }
         }
+
     }
 
     private class StockLevelUpdateHelper
@@ -78,29 +91,29 @@ public class StockService : IStockService
 
         public void HandleStockLevelUpdate(StockLevel stockEntry, decimal updateAmount)
         {
-            if (GetActionsThatIncreaseIncomingStock().Contains(_stockAction))
+            if (_stockAction.IncreasesIncomingStock)
             {
                 stockEntry.Incoming += updateAmount;
             }
-            else if (GetActionsThatDecreaseIncomingStock().Contains(_stockAction))
+            else if (_stockAction.DecreasesIncomingStock)
             {
                 stockEntry.Incoming -= updateAmount;
             }
 
-            if (GetActionsThatIncreaseOutgoingStock().Contains(_stockAction))
+            if (_stockAction.IncreasesOutgoingStock)
             {
                 stockEntry.Outgoing += updateAmount;
             }
-            else if (GetActionsThatDecreaseOutgoingStock().Contains(_stockAction))
+            else if (_stockAction.DecreasesOutgoingStock)
             {
                 stockEntry.Outgoing -= updateAmount;
             }
 
-            if (GetActionsThatIncreaseAvailableStock().Contains(_stockAction))
+            if (_stockAction.IncreasesAvailableStock)
             {
                 stockEntry.Available += updateAmount;
             }
-            else if (GetActionsThatDecreaseAvailableStock().Contains(_stockAction))
+            else if (_stockAction.DecreasesAvailableStock)
             {
                 stockEntry.Available -= updateAmount;
                 if (stockEntry.Available < 0)
@@ -108,60 +121,6 @@ public class StockService : IStockService
                     throw new ThesisERPException($"Cannot complete transaction as it will result in negative stock for product '{stockEntry.Product.SKU}' in location '{stockEntry.InventoryLocation.Name}'");
                 }
             }
-        }
-
-        public static IEnumerable<TransactionStockAction> GetActionsThatChangeStock()
-        {
-            var actions = new List<TransactionStockAction>();
-            
-            actions.AddRange(GetActionsThatIncreaseIncomingStock());
-            actions.AddRange(GetActionsThatDecreaseIncomingStock());
-            actions.AddRange(GetActionsThatIncreaseOutgoingStock());
-            actions.AddRange(GetActionsThatDecreaseOutgoingStock());
-            actions.AddRange(GetActionsThatIncreaseAvailableStock());
-            actions.AddRange(GetActionsThatDecreaseAvailableStock());
-
-            return actions.Distinct();
-        }
-
-        private static IEnumerable<TransactionStockAction> GetActionsThatIncreaseIncomingStock()
-        {
-            yield return new TransactionStockAction(TransactionStatus.draft, TransactionStatus.pending, StockChangeType.positive);
-        }
-
-        private static IEnumerable<TransactionStockAction> GetActionsThatDecreaseIncomingStock()
-        {
-            yield return new TransactionStockAction(TransactionStatus.pending, TransactionStatus.fulfilled, StockChangeType.positive);
-            yield return new TransactionStockAction(TransactionStatus.pending, TransactionStatus.cancelled, StockChangeType.positive);
-            yield return new TransactionStockAction(TransactionStatus.pending, TransactionStatus.draft, StockChangeType.positive);
-        }
-
-        private static IEnumerable<TransactionStockAction> GetActionsThatIncreaseOutgoingStock()
-        {
-            yield return new TransactionStockAction(TransactionStatus.draft, TransactionStatus.pending, StockChangeType.negative);
-        }
-
-        private static IEnumerable<TransactionStockAction> GetActionsThatDecreaseOutgoingStock()
-        {
-            yield return new TransactionStockAction(TransactionStatus.pending, TransactionStatus.fulfilled, StockChangeType.negative);
-            yield return new TransactionStockAction(TransactionStatus.pending, TransactionStatus.cancelled, StockChangeType.negative);
-            yield return new TransactionStockAction(TransactionStatus.pending, TransactionStatus.draft, StockChangeType.negative);
-        }
-
-        private static IEnumerable<TransactionStockAction> GetActionsThatIncreaseAvailableStock()
-        {
-            yield return new TransactionStockAction(TransactionStatus.draft, TransactionStatus.fulfilled, StockChangeType.positive);
-            yield return new TransactionStockAction(TransactionStatus.pending, TransactionStatus.fulfilled, StockChangeType.positive);
-            yield return new TransactionStockAction(TransactionStatus.fulfilled, TransactionStatus.cancelled, StockChangeType.negative);
-            yield return new TransactionStockAction(TransactionStatus.closed, TransactionStatus.cancelled, StockChangeType.negative);
-        }
-
-        private static IEnumerable<TransactionStockAction> GetActionsThatDecreaseAvailableStock()
-        {
-            yield return new TransactionStockAction(TransactionStatus.draft, TransactionStatus.fulfilled, StockChangeType.negative);
-            yield return new TransactionStockAction(TransactionStatus.pending, TransactionStatus.fulfilled, StockChangeType.negative);
-            yield return new TransactionStockAction(TransactionStatus.fulfilled, TransactionStatus.cancelled, StockChangeType.positive);
-            yield return new TransactionStockAction(TransactionStatus.closed, TransactionStatus.cancelled, StockChangeType.positive);
         }
 
     }

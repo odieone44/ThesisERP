@@ -6,13 +6,10 @@ namespace ThesisERP.Application.Interfaces;
 
 public interface IStockService
 {
-    Task HandleStockUpdateForTransactionRows(
-        InventoryLocation location,
-        IEnumerable<TransactionRowBase> transactionRows,
-        TransactionStockAction stockAction);
+    Task HandleStockUpdateFromDocumentAction(Document document, TransactionStockAction stockAction);
+    //Task HandleStockUpdateFromOrderAction(Order order, TransactionStockAction stockAction);
 
     Task<List<GetLocationStockDTO>> GetLocationStock(int? locationId);
 
     Task<List<GetProductStockDTO>> GetProductStock(int? productId);
-
 }

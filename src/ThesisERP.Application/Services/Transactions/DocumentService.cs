@@ -38,11 +38,7 @@ public class DocumentService : IDocumentService
             _document.Status,
             _document.Template.StockChangeType);
 
-        await _stockService
-                .HandleStockUpdateForTransactionRows(
-                    _document.InventoryLocation,
-                    _document.Rows,
-                    stockAction);
+        await _stockService.HandleStockUpdateFromDocumentAction(_document, stockAction);
 
         _document.Comments = documentDTO.Comments;
         _document.Template.NextNumber++;
@@ -74,18 +70,16 @@ public class DocumentService : IDocumentService
         _document.Comments = documentDTO.Comments;
         _document.DateUpdated = DateTime.UtcNow;
 
-        if (_document.Status == TransactionStatus.pending || _document.Status == TransactionStatus.draft)
+        //only allow document rows and location to be updated if document is pending/draft.
+        if (_document.Status == TransactionStatus.pending ||
+             _document.Status == TransactionStatus.draft)
         {
             var stockActionForOldRows = new TransactionStockAction(
                 _document.Status,
                 TransactionStatus.draft,
                 _document.Template.StockChangeType);
 
-            await _stockService
-                    .HandleStockUpdateForTransactionRows(
-                        _document.InventoryLocation,
-                        _document.Rows,
-                        stockActionForOldRows);
+            await _stockService.HandleStockUpdateFromDocumentAction(_document, stockActionForOldRows);
 
             await _UpdatePendingDocumentWithNewValues(documentDTO);
 
@@ -95,11 +89,7 @@ public class DocumentService : IDocumentService
                   _document.Status,
                   _document.Template.StockChangeType);
 
-            await _stockService
-                    .HandleStockUpdateForTransactionRows(
-                        _document.InventoryLocation,
-                        _document.Rows,
-                        stockActionForNewRows);
+            await _stockService.HandleStockUpdateFromDocumentAction(_document, stockActionForNewRows);
         }
 
         _api.DocumentsRepo.Update(_document);
@@ -123,11 +113,7 @@ public class DocumentService : IDocumentService
                TransactionStatus.fulfilled,
                _document.Template.StockChangeType);
 
-        await _stockService
-                .HandleStockUpdateForTransactionRows(
-                    _document.InventoryLocation,
-                    _document.Rows,
-                    stockAction);
+        await _stockService.HandleStockUpdateFromDocumentAction(_document, stockAction);
 
         _document.Status = TransactionStatus.fulfilled;
 
@@ -165,11 +151,7 @@ public class DocumentService : IDocumentService
                TransactionStatus.cancelled,
                _document.Template.StockChangeType);
 
-        await _stockService
-                .HandleStockUpdateForTransactionRows(
-                    _document.InventoryLocation,
-                    _document.Rows,
-                    stockAction);
+        await _stockService.HandleStockUpdateFromDocumentAction(_document, stockAction);
 
         _document.Status = TransactionStatus.cancelled;
         _document.DateUpdated = DateTime.UtcNow;

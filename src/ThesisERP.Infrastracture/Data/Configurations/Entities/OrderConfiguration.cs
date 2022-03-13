@@ -24,9 +24,9 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
                     .WithMany()
                     .HasForeignKey(t => t.TemplateId);
 
-        //orderBuilder.HasOne(t => t.InventoryLocation)
-        //               .WithMany()
-        //               .HasForeignKey(t => t.InventoryLocationId);
+        orderBuilder.HasOne(t => t.InventoryLocation)
+                    .WithMany()
+                    .HasForeignKey(t => t.InventoryLocationId);
 
         orderBuilder.Property(d => d.Timestamp).IsRowVersion();
 
