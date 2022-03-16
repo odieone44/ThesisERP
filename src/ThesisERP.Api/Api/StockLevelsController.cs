@@ -12,14 +12,12 @@ namespace ThesisERP.Api;
 /// </summary>
 public class StockLevelsController : BaseApiController
 {
-    private readonly ILogger<StockLevelsController> _logger;
-    private readonly IMapper _mapper;
+    private readonly ILogger<StockLevelsController> _logger;    
     private readonly IStockService _stockService;
 
-    public StockLevelsController(ILogger<StockLevelsController> logger, IMapper mapper, IStockService stockService)
+    public StockLevelsController(ILogger<StockLevelsController> logger, IStockService stockService)
     {
         _logger = logger;
-        _mapper = mapper;
         _stockService = stockService;
     }
 
