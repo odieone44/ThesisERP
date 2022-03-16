@@ -28,12 +28,57 @@ public class StockService : IStockService
 
     public async Task<List<GetLocationStockDTO>> GetLocationStock(int? locationId)
     {
-        return await _stockRepo.GetLocationStock(locationId);
+        var stock =  await _stockRepo.GetLocationStock(locationId);
+
+        var results = stock
+                       .GroupBy(x => x.InventoryLocationId)
+                       .Select(x => (id: x.Key, stockList: x.ToList()))
+                       .Select(
+                           x => new GetLocationStockDTO()
+                           {
+                               InventoryLocationId = x.id,
+                               InventoryLocationName = x.stockList.FirstOrDefault().InventoryLocation.Name,
+                               InventoryLocationAbbreviation = x.stockList.FirstOrDefault().InventoryLocation.Abbreviation,
+                               ProductStockLevels = x.stockList.Select(s => new ProductStockLevelDTO()
+                               {
+                                   ProductSKU = s.Product.SKU!,
+                                   ProductId = s.ProductId,
+                                   ProductDescription = s.Product.Description!,
+                                   Available = s.Available,
+                                   Incoming = s.Incoming,
+                                   Outgoing = s.Outgoing
+                               }).ToList()
+                           });
+
+        return results.ToList();
+        
     }
 
     public async Task<List<GetProductStockDTO>> GetProductStock(int? productId)
     {
-        return await _stockRepo.GetProductStock(productId);
+        var stock = await _stockRepo.GetProductStock(productId);
+
+        var results = stock
+                        .GroupBy(x => x.ProductId)
+                        .Select(x => (id: x.Key, stockList: x.ToList()))
+                        .Select(
+                            x => new GetProductStockDTO()
+                            {
+                                ProductId = x.id,
+                                ProductSKU = x.stockList.FirstOrDefault().Product.SKU,
+                                ProductDescription = x.stockList.FirstOrDefault().Product.Description,
+                                LocationStockLevels = x.stockList.Select(s => new LocationStockLevelDTO()
+                                {
+                                    InventoryLocationId = s.InventoryLocation.Id,
+                                    InventoryLocationName = s.InventoryLocation.Name,
+                                    InventoryLocationAbbreviation = s.InventoryLocation.Abbreviation!,
+                                    Available = s.Available,
+                                    Incoming = s.Incoming,
+                                    Outgoing = s.Outgoing
+                                }).ToList()
+                            });
+
+        return results.ToList();
     }
 
     public async Task HandleStockUpdateFromDocumentAction(Document document, TransactionStockAction stockAction)
@@ -47,17 +92,15 @@ public class StockService : IStockService
 
     private async Task _HandleStockUpdate()
     {
-        //if (!StockLevelUpdateHelper.GetActionsThatChangeStock().Contains(_action))
-        //{
-        //    return;
-        //}
+        if (!_action.HasStockEffect)
+        {
+            return;
+        }
 
         var stockDict = (await _stockRepo
                              .GetAllAsync(x => _transactionRows.Select(x => x.Product.Id).Contains(x.ProductId)
                                           && x.InventoryLocationId == _location.Id))
-                             .ToDictionary(x => x.ProductId, v => v);
-
-        var stockUpdateHelper = new StockLevelUpdateHelper(_action);
+                             .ToDictionary(x => x.ProductId, v => v);        
 
         foreach (var row in _transactionRows)
         {
@@ -74,54 +117,44 @@ public class StockService : IStockService
                 stockDict.Add(row.ProductId, result);
             }
 
-            stockUpdateHelper.HandleStockLevelUpdate(locationStockEntry, row.ProductQuantity);
+            _UpdateStockLevelProperties(locationStockEntry, row.ProductQuantity);
             if (locationStockEntry.Id > 0) { _stockRepo.Update(locationStockEntry); }
         }
 
     }
 
-    private class StockLevelUpdateHelper
-    {        
-        private readonly TransactionStockAction _stockAction;
-
-        public StockLevelUpdateHelper(TransactionStockAction transStockAction)
-        {            
-            _stockAction = transStockAction;
-        }
-
-        public void HandleStockLevelUpdate(StockLevel stockEntry, decimal updateAmount)
+    private void _UpdateStockLevelProperties(StockLevel stockEntry, decimal updateAmount)
+    {
+        if (_action.IncreasesIncomingStock)
         {
-            if (_stockAction.IncreasesIncomingStock)
-            {
-                stockEntry.Incoming += updateAmount;
-            }
-            else if (_stockAction.DecreasesIncomingStock)
-            {
-                stockEntry.Incoming -= updateAmount;
-            }
-
-            if (_stockAction.IncreasesOutgoingStock)
-            {
-                stockEntry.Outgoing += updateAmount;
-            }
-            else if (_stockAction.DecreasesOutgoingStock)
-            {
-                stockEntry.Outgoing -= updateAmount;
-            }
-
-            if (_stockAction.IncreasesAvailableStock)
-            {
-                stockEntry.Available += updateAmount;
-            }
-            else if (_stockAction.DecreasesAvailableStock)
-            {
-                stockEntry.Available -= updateAmount;
-                if (stockEntry.Available < 0)
-                {
-                    throw new ThesisERPException($"Cannot complete transaction as it will result in negative stock for product '{stockEntry.Product.SKU}' in location '{stockEntry.InventoryLocation.Name}'");
-                }
-            }
+            stockEntry.Incoming += updateAmount;
+        }
+        else if (_action.DecreasesIncomingStock)
+        {
+            stockEntry.Incoming -= updateAmount;
         }
 
+        if (_action.IncreasesOutgoingStock)
+        {
+            stockEntry.Outgoing += updateAmount;
+        }
+        else if (_action.DecreasesOutgoingStock)
+        {
+            stockEntry.Outgoing -= updateAmount;
+        }
+
+        if (_action.IncreasesAvailableStock)
+        {
+            stockEntry.Available += updateAmount;
+        }
+        else if (_action.DecreasesAvailableStock)
+        {
+            stockEntry.Available -= updateAmount;
+            if (stockEntry.Available < 0)
+            {
+                throw new ThesisERPException($"Cannot complete transaction as it will result in negative stock for product '{stockEntry.Product.SKU}' in location '{stockEntry.InventoryLocation.Name}'");
+            }
+        }
     }
+
 }

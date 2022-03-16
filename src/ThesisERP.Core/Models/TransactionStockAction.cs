@@ -14,7 +14,8 @@ public readonly record struct TransactionStockAction(
     public bool DecreasesOutgoingStock => GetActionsThatDecreaseOutgoingStock().Contains(this);
     public bool IncreasesAvailableStock => GetActionsThatIncreaseAvailableStock().Contains(this);
     public bool DecreasesAvailableStock => GetActionsThatDecreaseAvailableStock().Contains(this);
-    
+    public bool HasStockEffect => GetActionsThatChangeStock().Contains(this);
+
     private static IEnumerable<TransactionStockAction> GetActionsThatChangeStock()
     {
         var actions = new List<TransactionStockAction>();
