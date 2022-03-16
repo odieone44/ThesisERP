@@ -155,10 +155,7 @@ public class AuthManager : IAuthManager
     {
         var user = await _context.AppUsers.SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
 
-        if (user == null)
-            throw new Exception("Invalid token");
-
-        return user;
+        return user ?? throw new Exception("Invalid token");
     }
     #endregion
 }

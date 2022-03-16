@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ThesisERP.Application.DTOs.Transactions;
 
@@ -10,7 +6,11 @@ namespace ThesisERP.Application.DTOs.Transactions;
 public abstract class CreateTransactionRowBaseDTO
 {
     public int ProductId { get; set; }
+
+    [Range(0.0001, double.MaxValue, ErrorMessage = "Must be a positive value")]
     public decimal ProductQuantity { get; set; }
+
+    [Range(0.01, double.MaxValue, ErrorMessage = "Must be a positive value")]
     public decimal UnitPrice { get; set; }
     public int? DiscountID { get; set; }
     public int? TaxID { get; set; }

@@ -12,4 +12,7 @@ public interface IOrderService
     Task<GenericOrderDTO> Fulfill(int id, FulfillOrderDTO fulfillOrderDTO);
     Task<GenericOrderDTO> Close(int id);
     Task<GenericOrderDTO> Cancel(int id);
+
+    Task<List<GenericOrderDTO>> GetOrders();
+    Task<GenericOrderDTO?> GetOrder(int id);
 }

@@ -12,19 +12,16 @@ namespace ThesisERP.Api;
 /// <summary>
 /// Issue and manage Invoices, Bills and other business documents.
 /// </summary>
+[Route("api/Transactions/[controller]")]
 public class DocumentsController : BaseApiController
 {
-    private readonly ILogger<DocumentsController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IDocumentService _documentService;
-    private readonly IRepositoryBase<Document> _docsRepo;
+    private readonly ILogger<DocumentsController> _logger;    
+    private readonly IDocumentService _documentService;    
 
-    public DocumentsController(ILogger<DocumentsController> logger, IMapper mapper, IDocumentService docService, IRepositoryBase<Document> docsRepo)
+    public DocumentsController(ILogger<DocumentsController> logger, IDocumentService docService)
     {
-        _logger = logger;
-        _mapper = mapper;
-        _documentService = docService;
-        _docsRepo = docsRepo;
+        _logger = logger;        
+        _documentService = docService;        
     }
 
     /// <summary>
@@ -156,22 +153,10 @@ public class DocumentsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GenericDocumentDTO>))]
     public async Task<IActionResult> GetDocuments()
     {
-        var documents = await _docsRepo
-                                .GetAllAsync
-                                 (orderBy: o => o.OrderByDescending(d => d.DateUpdated),
-                                 include: i => i.Include(p => p.Entity)
-                                                .Include(x => x.InventoryLocation)
-                                                .Include(t => t.Template)
-                                                .Include(q => q.Rows)
-                                                    .ThenInclude(d => d.Product)
-                                                .Include(q => q.Rows)
-                                                    .ThenInclude(d => d.Tax)
-                                                .Include(q => q.Rows)
-                                                    .ThenInclude(d => d.Discount));
+       
+        var documents = await _documentService.GetDocuments();
 
-        var results = _mapper.Map<List<GenericDocumentDTO>>(documents);
-
-        return Ok(results);
+        return Ok(documents);
     }
 
     /// <summary>
@@ -189,13 +174,11 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var document = await _docsRepo.GetDocumentByIdIncludeRelations(id);
+       var document = await _documentService.GetDocument(id);
 
         if (document == null) { return NotFound(); }
 
-        var result = _mapper.Map<GenericDocumentDTO>(document);
-
-        return Ok(result);
+        return Ok(document);
     }
 
 }

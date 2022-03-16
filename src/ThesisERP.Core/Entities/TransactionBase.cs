@@ -31,6 +31,8 @@ public abstract class TransactionBase<TTemplate, TRow>
     public ICollection<TRow> Rows { get; set; } = new List<TRow>();
     public byte[] Timestamp { get; set; }
 
+    public abstract bool CanBeUpdated { get; }
+
     public TransactionBase()
     {
 

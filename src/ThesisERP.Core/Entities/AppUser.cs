@@ -28,10 +28,14 @@ public class AppUser : IdentityUser
         if (!string.IsNullOrEmpty(refreshToken.ReplacedByToken))
         {
             var childToken = RefreshTokens.FirstOrDefault(x => x.Token == refreshToken.ReplacedByToken);
-            if (childToken!.IsActive)
+            if (childToken!.IsActive) 
+            { 
                 childToken.Revoke(ipAddress: ipAddress, reason: reason);
-            else
+            }
+            else 
+            {             
                 RevokeAllDescendantRefreshTokens(childToken, ipAddress, reason);
+            }
         }
     }
 }

@@ -28,9 +28,12 @@ public class DocumentService : IDocumentService
         _mapper = mapper;
     }
 
-    public async Task<GenericDocumentDTO> Create(CreateDocumentDTO documentDTO, string username)
+    public async Task<GenericDocumentDTO> Create(
+        CreateDocumentDTO documentDTO, 
+        string username, 
+        Order? parentOrder = null)
     {
-        await _InitializeNewDocument(documentDTO, username);
+        await _InitializeNewDocument(documentDTO, username, parentOrder);
         _document.Status = documentDTO.CreateAsFulfilled ? TransactionStatus.fulfilled : TransactionStatus.pending;
 
         var stockAction = new TransactionStockAction(
@@ -165,7 +168,7 @@ public class DocumentService : IDocumentService
     private async Task _UpdatePendingDocumentWithNewValues(UpdateDocumentDTO documentDTO)
     {
         var productIds = documentDTO.Rows.Select(x => x.ProductId).Distinct().ToList();
-        if (!productIds.Any()) { throw new ThesisERPException("A valid document rows list has to be provided."); }
+        if (!productIds.Any()) { throw new ThesisERPException("A valid document row list has to be provided."); }
 
         var taxIds = documentDTO.Rows.Where(y => y.TaxID != null).Select(x => (int)x.TaxID).Distinct().ToList();
         var discountIds = documentDTO.Rows.Where(y => y.DiscountID != null).Select(x => (int)x.DiscountID).Distinct().ToList();
@@ -178,22 +181,10 @@ public class DocumentService : IDocumentService
         _document.Entity = newRequestValues.Entity;
         _document.InventoryLocation = newRequestValues.InventoryLocation;
 
-        var rowsList = new List<DocumentRow>();
-        foreach (var (rowDTO, rowIndex) in documentDTO.Rows.WithIndex())
-        {
-            var thisProduct = newRequestValues.Products.FirstOrDefault(x => x.Id == rowDTO.ProductId);
-
-            var thisTax = rowDTO.TaxID != null ? newRequestValues.Taxes.FirstOrDefault(x => x.Id == rowDTO.TaxID) : null;
-            var thisDiscount = rowDTO.DiscountID != null ? newRequestValues.Discounts.FirstOrDefault(x => x.Id == rowDTO.DiscountID) : null;
-
-            var detail = new DocumentRow(rowIndex, thisProduct, rowDTO.ProductQuantity, rowDTO.UnitPrice, thisTax, thisDiscount);
-            rowsList.Add(detail);
-        }
-
-        _document.Rows = rowsList;
+        _AssignRowsToDocument(documentDTO.Rows, newRequestValues);
     }
 
-    private async Task _InitializeNewDocument(CreateDocumentDTO documentDTO, string username)
+    private async Task _InitializeNewDocument(CreateDocumentDTO documentDTO, string username, Order? parentOrder = null)
     {
         var productIds = documentDTO.Rows.Select(x => x.ProductId).Distinct().ToList();
         if (!productIds.Any()) { throw new ThesisERPException("A valid document rows list has to be provided."); }
@@ -203,6 +194,12 @@ public class DocumentService : IDocumentService
 
         var requestValues = await _GetDocumentRequestValuesAsync(documentDTO.EntityId, documentDTO.TemplateId, documentDTO.InventoryLocationId, productIds, taxIds, discountIds);
 
+        if (parentOrder is not null && 
+            !parentOrder.CanBeFulfilledBy(requestValues.DocumentTemplate.DocumentType))
+        {
+            throw new ThesisERPException($"Orders of type '{parentOrder.Type}' cannot be fulfilled by documents of type '{requestValues.DocumentTemplate.DocumentType}'. Document creation failed.");
+        }
+
         var billAddress = _mapper.Map<Address>(documentDTO.BillingAddress);
         var shipAddress = _mapper.Map<Address>(documentDTO.ShippingAddress);
 
@@ -211,23 +208,28 @@ public class DocumentService : IDocumentService
                                         requestValues.DocumentTemplate,
                                         billAddress,
                                         shipAddress,
-                                        null,
+                                        parentOrder,
                                         username);
 
+        _AssignRowsToDocument(documentDTO.Rows, requestValues);
+
+    }
+
+    private void _AssignRowsToDocument(IEnumerable<CreateDocumentRowDTO> documentDtoRows, DocumentRequestValues requestValues)
+    {
         var rowsList = new List<DocumentRow>();
-        foreach (var (rowDTO, rowIndex) in documentDTO.Rows.WithIndex())
+        foreach (var (rowDTO, rowIndex) in documentDtoRows.WithIndex())
         {
             var thisProduct = requestValues.Products.FirstOrDefault(x => x.Id == rowDTO.ProductId);
 
             var thisTax = rowDTO.TaxID != null ? requestValues.Taxes.FirstOrDefault(x => x.Id == rowDTO.TaxID) : null;
             var thisDiscount = rowDTO.DiscountID != null ? requestValues.Discounts.FirstOrDefault(x => x.Id == rowDTO.DiscountID) : null;
 
-            var detail = new DocumentRow(rowIndex, thisProduct, rowDTO.ProductQuantity, rowDTO.UnitPrice, thisTax, thisDiscount);
+            var detail = new DocumentRow(rowIndex + 1, thisProduct, rowDTO.ProductQuantity, rowDTO.UnitPrice, thisTax, thisDiscount);
             rowsList.Add(detail);
         }
 
         _document.Rows = rowsList;
-
     }
 
     private async Task<DocumentRequestValues> _GetDocumentRequestValuesAsync(int entityId,
@@ -286,6 +288,38 @@ public class DocumentService : IDocumentService
         }
 
         return new DocumentRequestValues(entity, location, template, products, taxes, discounts);
+    }
+
+    public async Task<List<GenericDocumentDTO>> GetDocuments()
+    {
+        var documents = await _api.DocumentsRepo
+                               .GetAllAsync
+                                (orderBy: o => o.OrderByDescending(d => d.DateUpdated),
+                                include: i => i.Include(p => p.Entity)
+                                               .Include(x => x.InventoryLocation)
+                                               .Include(t => t.Template)
+                                               .Include(p => p.ParentOrder)
+                                               .Include(q => q.Rows)
+                                                   .ThenInclude(d => d.Product)
+                                               .Include(q => q.Rows)
+                                                   .ThenInclude(d => d.Tax)
+                                               .Include(q => q.Rows)
+                                                   .ThenInclude(d => d.Discount));
+
+        var results = _mapper.Map<List<GenericDocumentDTO>>(documents);
+
+        return results;
+    }
+
+    public async Task<GenericDocumentDTO?> GetDocument(int id)
+    {
+        var document = await _api.DocumentsRepo.GetDocumentByIdIncludeRelations(id);
+
+        if (document == null) { return null; }
+
+        var result = _mapper.Map<GenericDocumentDTO>(document);
+
+        return result;
     }
 
     private class DocumentRequestValues

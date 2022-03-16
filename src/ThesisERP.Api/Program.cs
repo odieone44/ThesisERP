@@ -1,14 +1,13 @@
 using AspNetCoreRateLimit;
+using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Reflection;
 using System.Text.Json.Serialization;
 using ThesisERP;
+using ThesisERP.Api.Extensions;
 using ThesisERP.Application;
 using ThesisERP.Application.Models;
 using ThesisERP.Infrastracture;
-using ThesisERP.Api.Extensions;
-using Microsoft.Extensions.Options;
-using System.Reflection;
-using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,42 +56,42 @@ builder.Services.AddControllers()
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen( opt =>
+builder.Services.AddSwaggerGen(opt =>
 {
-    opt.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Version = "v1",
-        Title = "ThesisERP Api",
-        Description = "An ASP.NET Core 6.0 Web API for **ThesisERP**, " +
-                      "a simple ERP application created for my BSc Computer Science Thesis @ University Of Pireaus." +
-                      "<br />  <br />" +
-                      "After logging in, you can authenticate your requests by including an <code>Authorization: Bearer *YourToken*</code> header. <br /><br />" +
-                      "To test the API from this page, login using the 'api/Account/login' endpoint and then authorize by clicking the button on the right and entering your JWT in the required field. "
+   opt.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+   {
+       Version = "v1",
+       Title = "ThesisERP Api",
+       Description = "An ASP.NET Core 6.0 Web API for **ThesisERP**, " +
+                     "a simple ERP application created for my BSc Computer Science Thesis @ University Of Pireaus." +
+                     "<br />  <br />" +
+                     "After logging in, you can authenticate your requests by including an <code>Authorization: Bearer *YourToken*</code> header. <br /><br />" +
+                     "To test the API from this page, login using the 'api/Account/login' endpoint and then authorize by clicking the button on the right and entering your JWT in the required field. "
 
-    });
+   });
 
-    var securityScheme = new OpenApiSecurityScheme()
-    {
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Scheme = "bearer",
-        Description = "Insert your JWT into the field",
-        Name = "Authorization",
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-        Reference = new OpenApiReference()
-        {
-            Id = "Bearer",
-            Type = ReferenceType.SecurityScheme
-        }
-    };
+   var securityScheme = new OpenApiSecurityScheme()
+   {
+       In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+       Scheme = "bearer",
+       Description = "Insert your JWT into the field",
+       Name = "Authorization",
+       Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+       Reference = new OpenApiReference()
+       {
+           Id = "Bearer",
+           Type = ReferenceType.SecurityScheme
+       }
+   };
 
-    opt.AddSecurityDefinition("Bearer", securityScheme);
-    opt.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
+   opt.AddSecurityDefinition("Bearer", securityScheme);
+   opt.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+   {
         { securityScheme, new[] { "Bearer"} }
-    });
+   });
 
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    opt.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename), includeControllerXmlComments:true);
+   var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+   opt.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename), includeControllerXmlComments: true);
 
 });
 
@@ -108,14 +107,14 @@ app.UseStaticFiles();
 
 app.UseSwagger(c =>
 {
-    c.RouteTemplate = "api/{documentname}/swagger.json";    
+    c.RouteTemplate = "api/{documentname}/swagger.json";
 });
 app.UseSwaggerUI(c =>
 {
-    c.DocumentTitle = "Thesis ERP";    
+    c.DocumentTitle = "Thesis ERP";
     c.InjectStylesheet("../swagger/logo.css");
     c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
-    c.RoutePrefix = "api";   
+    c.RoutePrefix = "api";
 
     c.SwaggerEndpoint($"v1/swagger.json", "ThesisERP API v1");
 });
@@ -135,9 +134,9 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    
+
     try
-    {               
+    {
         await SeedDatabase.Initialize(services, app.Configuration);
     }
     catch (Exception ex)

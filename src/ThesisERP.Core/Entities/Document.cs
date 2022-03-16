@@ -9,7 +9,7 @@ public class Document : TransactionBase<DocumentTemplate,DocumentRow>
     public int? ParentOrderId { get; set; }
     public Order? ParentOrder { get; set; }
     public DocumentType Type => Template.DocumentType;
-    public bool CanBeUpdated => GetDocumentStatusesThatCanBeUpdated().Contains(Status);
+    public override bool CanBeUpdated => GetDocumentStatusesThatCanBeUpdated().Contains(Status);
 
     private Document() : base() { }
 
