@@ -4,9 +4,10 @@ namespace ThesisERP.Core.Entities;
 
 public class DocumentTemplate : TransactionTemplateBase
 {
-    public DocumentType DocumentType { get; set; }    
-    public bool IsPositiveStockTransaction => GetStockChangeType() == StockChangeType.positive;
-    public bool IsNegativeStockTransaction => !IsPositiveStockTransaction;
+    public DocumentType DocumentType { get; set; }
+
+    public override StockChangeType StockChangeType => GetStockChangeType();
+
     public bool UsesClientEntity => GetDocumentEntityType() == EntityType.client;
     public bool UsesSupplierEntity => !UsesClientEntity;
 
@@ -23,28 +24,28 @@ public class DocumentTemplate : TransactionTemplateBase
     public static IEnumerable<DocumentType> GetSupplierDocumentTypes()
     {
         yield return DocumentType.purchase_bill;
-        yield return DocumentType.purchase_return;
+        //yield return DocumentType.purchase_return;
         yield return DocumentType.stock_adjustment_plus;
     }
 
     public static IEnumerable<DocumentType> GetClientDocumentTypes()
     {
         yield return DocumentType.sales_invoice;
-        yield return DocumentType.sales_return;
+        //yield return DocumentType.sales_return;
         yield return DocumentType.stock_adjustment_minus;
     }
 
     public static IEnumerable<DocumentType> GetPositiveStockChangeDocumentTypes()
     {
         yield return DocumentType.purchase_bill;
-        yield return DocumentType.sales_return;
+        //yield return DocumentType.sales_return;
         yield return DocumentType.stock_adjustment_plus;
     }
 
     public static IEnumerable<DocumentType> GetNegativeStockChangeDocumentTypes()
     {
         yield return DocumentType.sales_invoice;
-        yield return DocumentType.purchase_return;
+        //yield return DocumentType.purchase_return;
         yield return DocumentType.stock_adjustment_minus;
     }
 

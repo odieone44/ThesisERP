@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ThesisERP.Core.Enums;
+﻿using ThesisERP.Core.Enums;
 using ThesisERP.Core.Models;
 
 namespace ThesisERP.Core.Entities;

@@ -22,4 +22,9 @@ public abstract class TransactionTemplateBase
     public DateTime? DateUpdated { get; set; }
     public bool IsDeleted { get; set; } = false;
     public byte[] Timestamp { get; set; }
+
+    public abstract StockChangeType StockChangeType { get; }
+
+    public bool IsPositiveStockTransaction => StockChangeType == StockChangeType.positive;
+    public bool IsNegativeStockTransaction => !IsPositiveStockTransaction;
 }

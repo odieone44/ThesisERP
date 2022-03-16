@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using ThesisERP.Application.DTOs.Transactions.Documents;
 using ThesisERP.Application.DTOs.Transactions.Orders;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Interfaces.Transactions;
@@ -17,6 +16,7 @@ public class OrderService : IOrderService
     private readonly IMapper _mapper;
 
     private Order _order;
+
     public OrderService(IApiService apiService,
                         IMapper mapper)
     {
@@ -24,23 +24,12 @@ public class OrderService : IOrderService
         _mapper = mapper;
     }
 
-    public Task<GenericOrderDTO> Cancel(int id)
+    public async Task<GenericOrderDTO> Create(CreateOrderDTO createOrderDTO, string username)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<GenericOrderDTO> Close(int id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task<GenericOrderDTO> Create(CreateOrderDTO createTransactionDTO, string username)
-    {        
-        await _InitializeNewOrder(createTransactionDTO, username);
-        //await _HandleStockUpdateForAction(TransactionAction.create); //todo 
+        await _InitializeNewOrder(createOrderDTO, username);
 
         _order.Status = TransactionStatus.pending;
-        _order.Comments = createTransactionDTO.Comments;
+        _order.Comments = createOrderDTO.Comments;
         _order.Template.NextNumber++;
 
         var orderResult = _api.OrdersRepo.Add(_order);
@@ -52,12 +41,27 @@ public class OrderService : IOrderService
         return _mapper.Map<GenericOrderDTO>(orderResult);
     }
 
-    public Task<GenericOrderDTO> Fulfill(int id, FulfillOrderDTO fulfillDTO)
+    public Task<GenericOrderDTO> Update(int id, UpdateOrderDTO updateOrderDTO)
     {
         throw new NotImplementedException();
     }
 
-    public Task<GenericOrderDTO> Update(int id, UpdateOrderDTO updateTransactionDTO)
+    public Task<GenericOrderDTO> Process(int id, ProcessOrderDTO processOrderDTO)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<GenericOrderDTO> Fulfill(int id, FulfillOrderDTO fulfillOrderDTO)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<GenericOrderDTO> Close(int id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<GenericOrderDTO> Cancel(int id)
     {
         throw new NotImplementedException();
     }
@@ -153,7 +157,6 @@ public class OrderService : IOrderService
 
         return new OrderRequestValues(entity, template, products, taxes, discounts);
     }
-
 
     private class OrderRequestValues
     {

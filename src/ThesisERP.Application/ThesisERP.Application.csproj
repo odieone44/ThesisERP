@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\Stock\" />
     <Folder Include="Models\Transactions\" />
     <Folder Include="Services\Templates\" />
   </ItemGroup>

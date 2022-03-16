@@ -1,10 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Core.Entities;
 
@@ -19,6 +13,7 @@ public static class DocumentExtensions
                                  (expression: x => x.Id == documentId,
                                   include: i => i.Include(p => p.Entity)
                                                  .Include(x => x.InventoryLocation)
+                                                 .Include(o => o.ParentOrder)
                                                  .Include(t => t.Template)
                                                  .Include(q => q.Rows)
                                                      .ThenInclude(d => d.Product)

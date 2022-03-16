@@ -12,4 +12,5 @@ public class OrderTemplate : TransactionTemplateBase
     public OrderType OrderType { get; set; }   
     public bool UsesClientEntity => OrderType == OrderType.sales_order;
     public bool UsesSupplierEntity => !UsesClientEntity;
+    public override StockChangeType StockChangeType => OrderType == OrderType.purchase_order ? StockChangeType.positive : StockChangeType.negative;
 }

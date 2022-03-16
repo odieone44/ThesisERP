@@ -11,7 +11,7 @@ using ThesisERP.Infrastracture.Data;
 
 namespace ThesisERP.Infrastracture;
 
-public static class DependancyInjection
+public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
@@ -28,6 +28,7 @@ public static class DependancyInjection
         services.AddScoped<IAuthManager, AuthManager>();
         services.AddScoped<IApiService, ApiService>();
         services.AddScoped<IDocumentService, DocumentService>();
+        services.AddScoped<IStockService, StockService>();
 
         return services;
     }

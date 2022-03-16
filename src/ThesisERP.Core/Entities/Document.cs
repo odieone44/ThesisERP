@@ -9,7 +9,8 @@ public class Document : TransactionBase<DocumentTemplate,DocumentRow>
     public int? ParentOrderId { get; set; }
     public Order? ParentOrder { get; set; }
     public DocumentType Type => Template.DocumentType;
- 
+    public bool CanBeUpdated => GetDocumentStatusesThatCanBeUpdated().Contains(Status);
+
     private Document() : base() { }
 
     private Document(Entity entity,
@@ -37,4 +38,13 @@ public class Document : TransactionBase<DocumentTemplate,DocumentRow>
     {        
         return new(entity, location, template, billingAddress, shippingAddress, parentOrder, username);        
     }
+
+    private static IEnumerable<TransactionStatus> GetDocumentStatusesThatCanBeUpdated()
+    {
+        yield return TransactionStatus.draft;
+        yield return TransactionStatus.pending;
+        yield return TransactionStatus.fulfilled;
+    }
+
+
 }

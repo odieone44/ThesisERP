@@ -1,39 +1,45 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ThesisERP.Application.DTOs.Transactions.Documents;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Interfaces.Transactions;
-using ThesisERP.Application.Models.Stock;
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Enums;
 using ThesisERP.Core.Exceptions;
 using ThesisERP.Core.Extensions;
+using ThesisERP.Core.Models;
 
 namespace ThesisERP.Application.Services.Transactions;
 
 public class DocumentService : IDocumentService
 {
     private readonly IApiService _api;
+    private readonly IStockService _stockService;
     private readonly IMapper _mapper;
 
     private Document _document;
 
     public DocumentService(IApiService apiService,
+                           IStockService stockService,
                            IMapper mapper)
     {
         _api = apiService;
+        _stockService = stockService;
         _mapper = mapper;
     }
 
-    //TODO - This is a temp implementation for testing.
     public async Task<GenericDocumentDTO> Create(CreateDocumentDTO documentDTO, string username)
     {
-        //todo - add transaction? 
         await _InitializeNewDocument(documentDTO, username);
-        await _HandleStockUpdateForAction(TransactionAction.create);
+        _document.Status = documentDTO.CreateAsFulfilled ? TransactionStatus.fulfilled : TransactionStatus.pending;
 
-        _document.Status = TransactionStatus.pending;
+        var stockAction = new TransactionStockAction(
+            TransactionStatus.draft,
+            _document.Status,
+            _document.Template.StockChangeType);
+
+        await _stockService.HandleStockUpdateFromDocumentAction(_document, stockAction);
+
         _document.Comments = documentDTO.Comments;
         _document.Template.NextNumber++;
 
@@ -51,18 +57,9 @@ public class DocumentService : IDocumentService
         _document = await _api.DocumentsRepo.GetDocumentByIdIncludeRelations(id);
         _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
 
-        switch (_document.Status)
+        if (!_document.CanBeUpdated)
         {
-            case TransactionStatus.pending:
-                //TODO - this is a temp way to handle stock. More elegant implementation pending.
-                await _HandleStockUpdateForAction(TransactionAction.cancel);
-                await _UpdatePendingDocumentWithNewValues(documentDTO);
-                await _HandleStockUpdateForAction(TransactionAction.create);
-                break;
-            case TransactionStatus.fulfilled:
-                break;
-            default:
-                throw new ThesisERPException($"Document with id: '{id}' cannot be updated because its status is '{_document.Status}'.");
+            throw new ThesisERPException($"Document with id: '{id}' cannot be updated because its status is '{_document.Status}'.");
         }
 
         var billAddress = _mapper.Map<Address>(documentDTO.BillingAddress);
@@ -73,10 +70,32 @@ public class DocumentService : IDocumentService
         _document.Comments = documentDTO.Comments;
         _document.DateUpdated = DateTime.UtcNow;
 
+        //only allow document rows and location to be updated if document is pending/draft.
+        if (_document.Status == TransactionStatus.pending ||
+             _document.Status == TransactionStatus.draft)
+        {
+            var stockActionForOldRows = new TransactionStockAction(
+                _document.Status,
+                TransactionStatus.draft,
+                _document.Template.StockChangeType);
+
+            await _stockService.HandleStockUpdateFromDocumentAction(_document, stockActionForOldRows);
+
+            await _UpdatePendingDocumentWithNewValues(documentDTO);
+
+            var stockActionForNewRows = 
+                new TransactionStockAction(
+                  TransactionStatus.draft,
+                  _document.Status,
+                  _document.Template.StockChangeType);
+
+            await _stockService.HandleStockUpdateFromDocumentAction(_document, stockActionForNewRows);
+        }
+
         _api.DocumentsRepo.Update(_document);
         await _api.DocumentsRepo.SaveChangesAsync();
-        
-        return _mapper.Map<GenericDocumentDTO>(_document);        
+
+        return _mapper.Map<GenericDocumentDTO>(_document);
     }
 
     public async Task<GenericDocumentDTO> Fulfill(int id)
@@ -89,7 +108,13 @@ public class DocumentService : IDocumentService
             throw new ThesisERPException($"Document with id: '{id}' cannot be fulfilled because its status is not '{TransactionStatus.pending}'.");
         }
 
-        await _HandleStockUpdateForAction(TransactionAction.fulfill);
+        var stockAction = new TransactionStockAction(
+               _document.Status,
+               TransactionStatus.fulfilled,
+               _document.Template.StockChangeType);
+
+        await _stockService.HandleStockUpdateFromDocumentAction(_document, stockAction);
+
         _document.Status = TransactionStatus.fulfilled;
 
         _api.DocumentsRepo.Update(_document);
@@ -121,14 +146,20 @@ public class DocumentService : IDocumentService
         _document = await _api.DocumentsRepo.GetDocumentByIdIncludeRelations(id);
         _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
 
-        await _HandleStockUpdateForAction(TransactionAction.cancel);
+        var stockAction = new TransactionStockAction(
+               _document.Status,
+               TransactionStatus.cancelled,
+               _document.Template.StockChangeType);
+
+        await _stockService.HandleStockUpdateFromDocumentAction(_document, stockAction);
+
         _document.Status = TransactionStatus.cancelled;
         _document.DateUpdated = DateTime.UtcNow;
 
         _api.DocumentsRepo.Update(_document);
         await _api.DocumentsRepo.SaveChangesAsync();
 
-        return _mapper.Map<GenericDocumentDTO>(_document);        
+        return _mapper.Map<GenericDocumentDTO>(_document);
     }
 
     private async Task _UpdatePendingDocumentWithNewValues(UpdateDocumentDTO documentDTO)
@@ -197,36 +228,6 @@ public class DocumentService : IDocumentService
 
         _document.Rows = rowsList;
 
-    }
-
-    private async Task _HandleStockUpdateForAction(TransactionAction action)
-    {
-        var stockAction = new TransactionStockAction(action, _document.Status, _document.Type);
-        int locationId = _document.InventoryLocation.Id;
-
-        var stockDict = (await _api.StockRepo
-                              .GetAllAsync(x => _document.Rows.Select(x => x.Product.Id).Contains(x.ProductId)
-                                           && x.InventoryLocationId == locationId))
-                              .ToDictionary(x => x.ProductId, v => v);
-
-        foreach (var row in _document.Rows)
-        {
-            var stockUpdateHelper = new StockLevelUpdateHelper(stockAction, row.ProductQuantity);
-
-            if (!stockDict.TryGetValue(row.ProductId, out var locationStockEntry))
-            {
-                locationStockEntry = new StockLevel()
-                {
-                    InventoryLocation = _document.InventoryLocation,
-                    Product = row.Product
-                };
-                var result = _api.StockRepo.Add(locationStockEntry);
-                stockDict.Add(row.ProductId, result);
-            }
-
-            stockUpdateHelper.HandleStockLevelUpdate(locationStockEntry);
-            if (locationStockEntry.Id > 0) { _api.StockRepo.Update(locationStockEntry); }
-        }
     }
 
     private async Task<DocumentRequestValues> _GetDocumentRequestValuesAsync(int entityId,

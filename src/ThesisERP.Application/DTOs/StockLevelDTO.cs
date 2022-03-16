@@ -8,6 +8,10 @@ public class StockLevelDTO : StockInfo
     public ProductDTO Product { get; set; }
 }
 
+public class UpdateProductStockDTO
+{
+    public decimal Amount;
+}
 
 public class GetLocationStockDTO
 {
@@ -17,7 +21,6 @@ public class GetLocationStockDTO
     public ICollection<ProductStockLevelDTO> ProductStockLevels { get; set; } = new List<ProductStockLevelDTO>();
 
 }
-
 
 public class GetProductStockDTO
 {
