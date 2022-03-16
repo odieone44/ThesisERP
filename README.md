@@ -20,7 +20,8 @@ To run the application locally, you need to have the .NET 6 SDK installed.
   ii. `Update-Database`
 
 3. Open a powershell window and run `setx THESIS_JWT_KEY "[your key]" /M`.  
-  This will set a system environment variable. Use a strong key for this variable as it is used for signing and authenticating JWTs. 
+  This will set a system environment variable. Use a strong key for this variable as it is used for signing and authenticating JWTs.  
+  Be sure to restart Visual Studio after setting the variable in order for it to be detected.
 
 4. Set `ThesisERP.Api` as the startup project, and run the app from Visual Studio. 
 
