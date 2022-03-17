@@ -38,7 +38,8 @@ public static class DependencyInjection
     {
         var builder = services.AddIdentityCore<AppUser>(u => u.User.RequireUniqueEmail = true)
                                .AddRoles<IdentityRole>()
-                               .AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders();
+                               .AddEntityFrameworkStores<DatabaseContext>()
+                               .AddDefaultTokenProviders();
 
         //builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), services);
         //builder.AddEntityFrameworkStores<DatabaseContext>().AddDefaultTokenProviders();
