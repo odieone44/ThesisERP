@@ -59,6 +59,32 @@ public static class SeedDatabase
         DateUpdated = DateTime.UtcNow
     };
 
+    public static readonly OrderTemplate TestPurchaseOrder = new()
+    {
+        Name = "Purchase Order",
+        Abbreviation = "PO",
+        Description = "Handles the purchase orders of goods from suppliers",
+        NextNumber = 1,
+        Prefix = "PO-",
+        Postfix = string.Empty,
+        OrderType = OrderType.purchase_order,
+        DateCreated = DateTime.UtcNow,
+        DateUpdated = DateTime.UtcNow
+    };
+
+    public static readonly OrderTemplate TestSalesOrder = new()
+    {
+        Name = "Sales Order",
+        Abbreviation = "SO",
+        Description = "Handles the Sales Orders of goods from clients",
+        NextNumber = 1,
+        Prefix = "SO-",
+        Postfix = string.Empty,
+        OrderType = OrderType.sales_order,
+        DateCreated = DateTime.UtcNow,
+        DateUpdated = DateTime.UtcNow
+    };
+
     public static readonly Product TestProduct = new()
     {
         SKU = "TST0001",
@@ -137,7 +163,11 @@ public static class SeedDatabase
                 
         dbContext.DocumentTemplates.Add(TestSalesInvoice);
         dbContext.DocumentTemplates.Add(TestPurchaseBill);
-        await dbContext.SaveChangesAsync();             
+        await dbContext.SaveChangesAsync();
+
+        dbContext.OrderTemplates.Add(TestSalesOrder);
+        dbContext.OrderTemplates.Add(TestPurchaseOrder);
+        await dbContext.SaveChangesAsync();
 
         dbContext.Products.Add(TestProduct);
         await dbContext.SaveChangesAsync();

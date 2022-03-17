@@ -299,7 +299,7 @@ public class OrderService : IOrderService
 
         if (nonExistingProducts.Any())
         {
-            throw new ThesisERPException($"Some products were not found: '{string.Join(", ", nonExistingProducts.Select(x => $"ProductId: {x}"))}'. Document Creation failed.");
+            throw new ThesisERPException($"Some products were not found: '{string.Join(", ", nonExistingProducts)}'. Order Creation failed.");
         }
 
         var taxes = new List<Tax>();
@@ -311,7 +311,7 @@ public class OrderService : IOrderService
 
             if (nonExistingTaxes.Any())
             {
-                throw new ThesisERPException($"Some taxes were not found: '{string.Join(", ", nonExistingProducts.Select(x => $"TaxId: {x}"))}'. Document Creation failed.");
+                throw new ThesisERPException($"Some taxes were not found: '{string.Join(", ", nonExistingTaxes)}'. Order Creation failed.");
             }
         }
 
@@ -324,7 +324,7 @@ public class OrderService : IOrderService
 
             if (nonExistingDiscounts.Any())
             {
-                throw new ThesisERPException($"Some discounts were not found: '{string.Join(", ", nonExistingProducts.Select(x => $"DiscountID: {x}"))}'. Document Creation failed.");
+                throw new ThesisERPException($"Some discounts were not found: '{string.Join(", ", nonExistingDiscounts)}'. Order Creation failed.");
             }
         }
 

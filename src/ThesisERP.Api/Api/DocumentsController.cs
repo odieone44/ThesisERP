@@ -1,27 +1,21 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using ThesisERP.Application.DTOs.Transactions.Documents;
-using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Interfaces.Transactions;
-using ThesisERP.Application.Services.Transactions;
-using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api;
 
 /// <summary>
 /// Issue and manage Invoices, Bills and other business documents.
 /// </summary>
-[Route("api/Transactions/[controller]")]
 public class DocumentsController : BaseApiController
 {
-    private readonly ILogger<DocumentsController> _logger;    
-    private readonly IDocumentService _documentService;    
+    private readonly ILogger<DocumentsController> _logger;
+    private readonly IDocumentService _documentService;
 
     public DocumentsController(ILogger<DocumentsController> logger, IDocumentService docService)
     {
-        _logger = logger;        
-        _documentService = docService;        
+        _logger = logger;
+        _documentService = docService;
     }
 
     /// <summary>
@@ -46,7 +40,7 @@ public class DocumentsController : BaseApiController
         var username = HttpContext.User.Identity?.Name ?? string.Empty;
 
         var response = await _documentService.Create(documentDTO, username);
-       
+
         return Ok(response);
     }
 
@@ -74,7 +68,7 @@ public class DocumentsController : BaseApiController
         }
 
         var response = await _documentService.Update(id, documentDTO);
-        
+
         return Ok(response);
     }
 
@@ -97,7 +91,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var response = await _documentService.Fulfill(id);        
+        var response = await _documentService.Fulfill(id);
         return Ok(response);
     }
 
@@ -153,7 +147,7 @@ public class DocumentsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GenericDocumentDTO>))]
     public async Task<IActionResult> GetDocuments()
     {
-       
+
         var documents = await _documentService.GetDocuments();
 
         return Ok(documents);
@@ -174,7 +168,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-       var document = await _documentService.GetDocument(id);
+        var document = await _documentService.GetDocument(id);
 
         if (document == null) { return NotFound(); }
 

@@ -7,7 +7,6 @@ namespace ThesisERP.Api.Api;
 /// <summary>
 /// Issue and manage Purchase and Sales Orders.
 /// </summary>
-[Route("api/Transactions/[controller]")]
 public class OrdersController : BaseApiController
 {
     private readonly ILogger<OrdersController> _logger;

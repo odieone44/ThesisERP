@@ -258,7 +258,7 @@ public class DocumentService : IDocumentService
 
         if (nonExistingProducts.Any())
         {
-            throw new ThesisERPException($"Some products were not found: '{string.Join(", ", nonExistingProducts.Select(x => $"ProductId: {x}"))}'. Document Creation failed.");
+            throw new ThesisERPException($"Some products were not found: '{string.Join(", ", nonExistingProducts)}'. Document Creation failed.");
         }
 
         var taxes = new List<Tax>();
@@ -270,7 +270,7 @@ public class DocumentService : IDocumentService
 
             if (nonExistingTaxes.Any())
             {
-                throw new ThesisERPException($"Some taxes were not found: '{string.Join(", ", nonExistingProducts.Select(x => $"TaxId: {x}"))}'. Document Creation failed.");
+                throw new ThesisERPException($"Some taxes were not found: '{string.Join(", ", nonExistingTaxes)}'. Document Creation failed.");
             }
         }
 
@@ -283,7 +283,7 @@ public class DocumentService : IDocumentService
 
             if (nonExistingDiscounts.Any())
             {
-                throw new ThesisERPException($"Some discounts were not found: '{string.Join(", ", nonExistingProducts.Select(x => $"DiscountID: {x}"))}'. Document Creation failed.");
+                throw new ThesisERPException($"Some discounts were not found: '{string.Join(", ",nonExistingDiscounts)}'. Document Creation failed.");
             }
         }
 
