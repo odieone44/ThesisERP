@@ -17,7 +17,7 @@ public static class EntitiesExtensions
                               .GetAllAsync
                                (expression: x => x.EntityType == EntityType.client && x.Id == id);
 
-        return getClient.FirstOrDefault();
+        return getClient?.FirstOrDefault();
     }
 
     public async static Task<Entity?> GetSupplierById(this IRepositoryBase<Entity> entityRepo, int id)
@@ -26,6 +26,6 @@ public static class EntitiesExtensions
                               .GetAllAsync
                                (expression: x => x.EntityType == EntityType.client && x.Id == id);
 
-        return getClient.FirstOrDefault();
+        return getClient?.FirstOrDefault();
     }
 }

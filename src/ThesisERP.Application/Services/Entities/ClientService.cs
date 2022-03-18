@@ -10,13 +10,13 @@ namespace ThesisERP.Application.Services.Entities;
 
 public class ClientService : IClientService
 {
-    private readonly ILogger<ClientService> _logger;
+    //private readonly ILogger<ClientService> _logger;
     private readonly IMapper _mapper;
     private readonly IRepositoryBase<Entity> _entityRepo;
 
-    public ClientService(ILogger<ClientService> logger, IMapper mapper, IRepositoryBase<Entity> entityRepo)
+    public ClientService(IMapper mapper, IRepositoryBase<Entity> entityRepo)
     {
-        _logger = logger;
+        //_logger = logger;
         _mapper = mapper;
         _entityRepo = entityRepo;
     }
