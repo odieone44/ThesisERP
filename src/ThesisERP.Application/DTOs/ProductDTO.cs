@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-using ThesisERP.Core.Entities;
+using ThesisERP.Application.DTOs.Entities;
 using ThesisERP.Core.Enums;
 
 namespace ThesisERP.Application.DTOs;
@@ -11,8 +10,8 @@ public class ProductDTO : CreateProductDTO
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
     public bool IsDeleted { get; set; }
-        
-    public virtual ICollection<ClientDTO> RelatedClients { get; set; } = new List<ClientDTO>();    
+
+    public virtual ICollection<ClientDTO> RelatedClients { get; set; } = new List<ClientDTO>();
     public virtual ICollection<SupplierDTO> RelatedSuppliers { get; set; } = new List<SupplierDTO>();
 
     //todo: not implemented yet
@@ -20,10 +19,10 @@ public class ProductDTO : CreateProductDTO
 }
 
 public class CreateProductDTO
-{    
+{
     public ProductType Type { get; set; }
-       
-    [Required]    
+
+    [Required]
     [StringLength(40, ErrorMessage = "Length must be between {2} and {1} characters.", MinimumLength = 1)]
     public string SKU { get; set; } = string.Empty;
 
@@ -33,12 +32,12 @@ public class CreateProductDTO
 
     [StringLength(4000, ErrorMessage = "Length must be between {2} and {1} characters.", MinimumLength = 0)]
     public string? LongDescription { get; set; }
-    
+
     [DataType(DataType.Currency)]
     public decimal? DefaultPurchasePrice { get; set; } = decimal.Zero;
     [DataType(DataType.Currency)]
-    public decimal? DefaultSaleSPrice { get; set; } = decimal.Zero;        
-    
+    public decimal? DefaultSaleSPrice { get; set; } = decimal.Zero;
+
 }
 
 public class UpdateProductDTO : CreateProductDTO

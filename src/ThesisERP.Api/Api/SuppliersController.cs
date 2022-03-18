@@ -1,12 +1,6 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
-using ThesisERP.Application.DTOs;
-using ThesisERP.Application.Interfaces;
-using ThesisERP.Core.Entities;
-using ThesisERP.Core.Enums;
+﻿using Microsoft.AspNetCore.Mvc;
+using ThesisERP.Application.DTOs.Entities;
+using ThesisERP.Application.Interfaces.Entities;
 
 namespace ThesisERP.Api;
 
@@ -16,14 +10,12 @@ namespace ThesisERP.Api;
 public class SuppliersController : BaseApiController
 {
     private readonly ILogger<SuppliersController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IRepositoryBase<Entity> _entityRepo;
+    private readonly ISupplierService _supplierService;
 
-    public SuppliersController(ILogger<SuppliersController> logger, IMapper mapper, IRepositoryBase<Entity> entityRepo)
+    public SuppliersController(ILogger<SuppliersController> logger, ISupplierService supplierService)
     {
         _logger = logger;
-        _mapper = mapper;
-        _entityRepo = entityRepo;
+        _supplierService = supplierService;
     }
 
     /// <summary>
@@ -31,18 +23,11 @@ public class SuppliersController : BaseApiController
     /// </summary>
     /// <response code="200">Returns a list of suppliers.</response>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetSuppliers()
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<SupplierDTO>))]
+    public async Task<IActionResult> GetSuppliers() //[FromQuery] RequestParams requestParams
     {
-        var suppliers = await _entityRepo
-                            .GetAllAsync
-                             (expression: x => x.EntityType == EntityType.supplier,
-                                 orderBy: o => o.OrderBy(d => d.DateCreated),
-                                 include: i => i.Include(p => p.RelatedProducts));
-
-        var results = _mapper.Map<List<SupplierDTO>>(suppliers);
-
-        return Ok(results);
+        var suppliers = await _supplierService.GetAllAsync();
+        return Ok(suppliers);
     }
 
     /// <summary>
@@ -52,15 +37,12 @@ public class SuppliersController : BaseApiController
     /// <response code="200">Returns the requested supplier.</response>
     /// <response code="404">If supplier does not exist.</response>
     [HttpGet("{id:int}", Name = "GetSupplier")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SupplierDTO))]    
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SupplierDTO))]
     public async Task<IActionResult> GetSupplier(int id)
     {
-        var supplier = await _getSupplierById(id);
-
+        var supplier = await _supplierService.GetAsync(id);
         if (supplier == null) { return NotFound(); }
-
-        var result = _mapper.Map<SupplierDTO>(supplier);
-        return Ok(result);
+        return Ok(supplier);
     }
 
     /// <summary>
@@ -79,18 +61,8 @@ public class SuppliersController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var supplier = _mapper.Map<Entity>(supplierDTO);
-
-        var result = _entityRepo.Add(supplier);
-
-        if (result == null) { return Problem(); }
-        
-        await _entityRepo.SaveChangesAsync();
-
-        var supplierAdded = _mapper.Map<SupplierDTO>(result);
-
-        return CreatedAtRoute("GetSupplier", new { id = supplierAdded.Id }, supplierAdded);
-
+        var supplier = await _supplierService.CreateAsync(supplierDTO);
+        return CreatedAtRoute("GetSupplier", new { id = supplier.Id }, supplier);
     }
 
     /// <summary>
@@ -111,47 +83,28 @@ public class SuppliersController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var supplier = await _getSupplierById(id);
-
+        var supplier = await _supplierService.UpdateAsync(id, supplierDTO);
         if (supplier == null) { return NotFound(); }
-
-        _mapper.Map(supplierDTO, supplier);
-        _entityRepo.Update(supplier);
-
-        await _entityRepo.SaveChangesAsync();
-
         return NoContent();
     }
-
 
     /// <summary>
     /// Soft Delete a supplier.
     /// </summary>
     /// <param name="id">The id of the supplier to delete</param>
     /// <response code="204">On success</response>
-    /// <response code="400">If the request is invalid.</response>
-    /// <response code="404">If the supplier is not found.</response>
+    /// <response code="400">If the request is invalid.</response>    
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteSupplier(int id)
     {
         if (id < 1)
         {
-            //_logger.LogError($"Invalid Delete Request in {nameof(DeleteSupplier)}");
             return BadRequest("Id has to be provided for Delete action");
         }
 
-        var supplier = await _getSupplierById(id);
-
-        if (supplier == null) { return NotFound(); }
-
-        supplier.IsDeleted = true;
-        //_entityRepo.Delete(supplier);
-        _entityRepo.Update(supplier);
-        await _entityRepo.SaveChangesAsync();
-
+        await _supplierService.DeleteAsync(id);
         return NoContent();
-
     }
 
     /// <summary>
@@ -167,30 +120,11 @@ public class SuppliersController : BaseApiController
     {
         if (id < 1)
         {
-            //_logger.LogError($"Invalid Delete Request in {nameof(DeleteSupplier)}");
             return BadRequest("Id has to be provided for Restore action");
         }
 
-        var supplier = await _getSupplierById(id);
-
-        if (supplier == null) { return NotFound(); }
-
-        supplier.IsDeleted = false;        
-        _entityRepo.Update(supplier);
-        await _entityRepo.SaveChangesAsync();
-
+        await _supplierService.RestoreAsync(id);
         return NoContent();
-
-    }
-
-    private async Task<Entity?> _getSupplierById(int id)
-    {
-        var getSupplier = await _entityRepo
-                              .GetAllAsync
-                               (expression: x => x.EntityType == EntityType.supplier && x.Id == id,
-                                   include: b => b.Include(p => p.RelatedProducts));
-
-        return getSupplier.FirstOrDefault();
     }
 
 }

@@ -1,22 +1,30 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ThesisERP.Application.DTOs;
+namespace ThesisERP.Application.DTOs.Entities;
 
-public class ClientProductsDTO : ClientDTO
+public abstract class EntityBaseDTO
 {
-    public virtual ICollection<ProductDTO>? RelatedProducts { get; set; } = new List<ProductDTO>();
-}
+    public string? Organization { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string? LastName { get; set; }
 
-public class ClientDTO : CreateClientDTO
-{
+    [DataType(DataType.EmailAddress)]
+    public string Email { get; set; } = string.Empty;
+
+    public AddressDTO BillingAddress { get; set; } = new AddressDTO();
+    public AddressDTO ShippingAddress { get; set; } = new AddressDTO();
     public int Id { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime? DateUpdated { get; set; }
     public bool IsDeleted { get; set; }
 }
 
-public class CreateClientDTO
+public abstract class CreateEntityBaseDTO
 {
     public string? Organization { get; set; }
 
@@ -33,11 +41,9 @@ public class CreateClientDTO
     public AddressDTO ShippingAddress { get; set; } = new AddressDTO();
 }
 
-public class UpdateClientDTO : CreateClientDTO
-{
-}
+public abstract class UpdateEntityBaseDTO : CreateEntityBaseDTO { }
 
-public class ClientBaseInfoDTO
+public abstract class EntityBasicInfoBaseDTO
 {
     public int Id { get; set; }
     public string? Organization { get; set; }

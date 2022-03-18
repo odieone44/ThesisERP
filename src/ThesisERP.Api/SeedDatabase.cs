@@ -137,53 +137,59 @@ public static class SeedDatabase
             await userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
         }
     }
+
     public async static Task PopulateTestDataAsync(DatabaseContext dbContext)
     {
-
-        if (dbContext.Entities.Any() ||
-           dbContext.Documents.Any() ||
-           dbContext.Products.Any())
+        if (!dbContext.Entities.Any())
         {
-            return;   // DB has been seeded
+            TestClient.ShippingAddress = TestAddress.Copy();
+            TestClient.BillingAddress = TestAddress.Copy();
+            dbContext.Entities.Add(TestClient);
+
+            TestSupplier.ShippingAddress = TestAddress.Copy();
+            TestSupplier.BillingAddress = TestAddress.Copy();
+            dbContext.Entities.Add(TestSupplier);
+
+            await dbContext.SaveChangesAsync();
         }
 
-        TestClient.ShippingAddress = TestAddress.Copy();
-        TestClient.BillingAddress = TestAddress.Copy();
-        dbContext.Entities.Add(TestClient);
-
-        TestSupplier.ShippingAddress = TestAddress.Copy();
-        TestSupplier.BillingAddress = TestAddress.Copy();
-        dbContext.Entities.Add(TestSupplier);
-        
-        await dbContext.SaveChangesAsync();
-
-        TestInventoryLocation.Address = TestAddress.Copy();
-        dbContext.InventoryLocations.Add(TestInventoryLocation);
-        await dbContext.SaveChangesAsync();
-                
-        dbContext.DocumentTemplates.Add(TestSalesInvoice);
-        dbContext.DocumentTemplates.Add(TestPurchaseBill);
-        await dbContext.SaveChangesAsync();
-
-        dbContext.OrderTemplates.Add(TestSalesOrder);
-        dbContext.OrderTemplates.Add(TestPurchaseOrder);
-        await dbContext.SaveChangesAsync();
-
-        dbContext.Products.Add(TestProduct);
-        await dbContext.SaveChangesAsync();
-
-        var stockEntry = new StockLevel()
+        if (!dbContext.InventoryLocations.Any())
         {
-            InventoryLocation = TestInventoryLocation,
-            Product = TestProduct,
-            Available = 0.0m,
-            Incoming = 0.0m,
-            Outgoing = 0.0m
-        };
+            TestInventoryLocation.Address = TestAddress.Copy();
+            dbContext.InventoryLocations.Add(TestInventoryLocation);
+            await dbContext.SaveChangesAsync();
+        }
 
-        dbContext.StockLevels.Add(stockEntry);
-        await dbContext.SaveChangesAsync();
+        if (!dbContext.DocumentTemplates.Any())
+        {
+            dbContext.DocumentTemplates.Add(TestSalesInvoice);
+            dbContext.DocumentTemplates.Add(TestPurchaseBill);
+            await dbContext.SaveChangesAsync();
+        }
 
+        if (!dbContext.OrderTemplates.Any())
+        {
+            dbContext.OrderTemplates.Add(TestSalesOrder);
+            dbContext.OrderTemplates.Add(TestPurchaseOrder);
+            await dbContext.SaveChangesAsync();
+        }
+
+        if (!dbContext.Products.Any())
+        {
+            dbContext.Products.Add(TestProduct);
+            await dbContext.SaveChangesAsync();
+
+            var stockEntry = new StockLevel()
+            {
+                InventoryLocation = TestInventoryLocation,
+                Product = TestProduct,
+                Available = 0.0m,
+                Incoming = 0.0m,
+                Outgoing = 0.0m
+            };
+
+            dbContext.StockLevels.Add(stockEntry);
+            await dbContext.SaveChangesAsync();
+        }
     }
-
 }

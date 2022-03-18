@@ -1,12 +1,6 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
-using ThesisERP.Application.DTOs;
-using ThesisERP.Application.Interfaces;
-using ThesisERP.Core.Entities;
-using ThesisERP.Core.Enums;
+﻿using Microsoft.AspNetCore.Mvc;
+using ThesisERP.Application.DTOs.Entities;
+using ThesisERP.Application.Interfaces.Entities;
 
 namespace ThesisERP.Api;
 
@@ -15,16 +9,13 @@ namespace ThesisERP.Api;
 /// </summary>
 public class ClientsController : BaseApiController
 {
-
     private readonly ILogger<ClientsController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IRepositoryBase<Entity> _entityRepo;
+    private readonly IClientService _clientService;
 
-    public ClientsController(ILogger<ClientsController> logger, IMapper mapper, IRepositoryBase<Entity> entityRepo)
+    public ClientsController(ILogger<ClientsController> logger, IClientService clientService)
     {
         _logger = logger;
-        _mapper = mapper;
-        _entityRepo = entityRepo;
+        _clientService = clientService;
     }
 
     /// <summary>
@@ -32,17 +23,11 @@ public class ClientsController : BaseApiController
     /// </summary>
     /// <response code="200">Returns a list of clients.</response>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(List<ClientDTO>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ClientDTO>))]
     public async Task<IActionResult> GetClients() //[FromQuery] RequestParams requestParams
     {
-        var clients = await _entityRepo
-                            .GetAllAsync
-                             (expression: x => x.EntityType == EntityType.client,
-                                 orderBy: o => o.OrderBy(d => d.DateCreated)); //i => i.Include(p => p.RelatedProducts)
-
-        var results = _mapper.Map<List<ClientDTO>>(clients);
-
-        return Ok(results);
+        var clients = await _clientService.GetAllAsync();
+        return Ok(clients);
     }
 
     /// <summary>
@@ -52,15 +37,12 @@ public class ClientsController : BaseApiController
     /// <response code="200">Returns the requested client.</response>
     /// <response code="404">If client does not exist.</response>
     [HttpGet("{id:int}", Name = "GetClient")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(ClientDTO))]    
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ClientDTO))]
     public async Task<IActionResult> GetClient(int id)
     {
-        var client = await _getClientById(id);
-
+        var client = await _clientService.GetAsync(id);
         if (client == null) { return NotFound(); }
-
-        var result = _mapper.Map<ClientDTO>(client);
-        return Ok(result);
+        return Ok(client);
     }
 
     /// <summary>
@@ -79,14 +61,8 @@ public class ClientsController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var client = _mapper.Map<Entity>(clientDTO);
-
-        var result = _entityRepo.Add(client);
-        await _entityRepo.SaveChangesAsync();
-        var clientAdded = _mapper.Map<ClientDTO>(result);
-
-        return CreatedAtRoute("GetClient", new { id = clientAdded.Id }, clientAdded);
-
+        var client = await _clientService.CreateAsync(clientDTO);
+        return CreatedAtRoute("GetClient", new { id = client.Id }, client);
     }
 
     /// <summary>
@@ -107,16 +83,8 @@ public class ClientsController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var client = await _getClientById(id);
-
+        var client = await _clientService.UpdateAsync(id, clientDTO);
         if (client == null) { return NotFound(); }
-
-        _mapper.Map(clientDTO, client);
-        
-        _entityRepo.Update(client);
-
-        await _entityRepo.SaveChangesAsync();
-
         return NoContent();
     }
 
@@ -125,28 +93,18 @@ public class ClientsController : BaseApiController
     /// </summary>
     /// <param name="id">The id of the client to delete</param>
     /// <response code="204">On success</response>
-    /// <response code="400">If the request is invalid.</response>
-    /// <response code="404">If the client is not found.</response>
+    /// <response code="400">If the request is invalid.</response>    
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteClient(int id)
     {
         if (id < 1)
-        {            
+        {
             return BadRequest("Id has to be provided for Delete action");
         }
 
-        var client = await _getClientById(id);
-
-        if (client == null) { return NotFound(); }
-
-        client.IsDeleted = true;
-        //_entityRepo.Delete(client);
-        _entityRepo.Update(client);
-        await _entityRepo.SaveChangesAsync();
-
+        await _clientService.DeleteAsync(id);
         return NoContent();
-
     }
 
     /// <summary>
@@ -165,27 +123,10 @@ public class ClientsController : BaseApiController
             return BadRequest("Id has to be provided for Restore action");
         }
 
-        var client = await _getClientById(id);
-
-        if (client == null) { return NotFound(); }
-
-        client.IsDeleted = false;        
-        _entityRepo.Update(client);
-        await _entityRepo.SaveChangesAsync();
-
+        await _clientService.RestoreAsync(id);
         return NoContent();
-
     }
 
-    private async Task<Entity?> _getClientById(int id)
-    {
-        var getClient = await _entityRepo
-                              .GetAllAsync
-                               (expression: x => x.EntityType == EntityType.client && x.Id == id,
-                                   include: b => b.Include(p => p.RelatedProducts));
-
-        return getClient.FirstOrDefault();
-    }
 }
 
 
