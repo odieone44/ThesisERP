@@ -15,13 +15,17 @@ internal class DocumentConfiguration : IEntityTypeConfiguration<Document>
                        .WithMany()
                        .HasForeignKey(d => d.EntityId);
 
-        documentBuilder.HasOne(t => t.DocumentTemplate)
+        documentBuilder.HasOne(t => t.Template)
                        .WithMany()
                        .HasForeignKey(t => t.TemplateId);
 
         documentBuilder.HasOne(t => t.InventoryLocation)
                        .WithMany()
                        .HasForeignKey(t => t.InventoryLocationId);
+
+        documentBuilder.HasOne(o => o.ParentOrder)
+                       .WithMany(d => d.RelatedDocuments)
+                       .HasForeignKey(o => o.ParentOrderId);
 
         documentBuilder.Property(d => d.Timestamp).IsRowVersion();
 

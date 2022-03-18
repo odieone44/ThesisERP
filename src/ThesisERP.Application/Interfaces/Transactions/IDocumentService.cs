@@ -1,13 +1,15 @@
-﻿using ThesisERP.Application.DTOs.Documents;
+﻿using ThesisERP.Application.DTOs.Transactions.Documents;
 using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Application.Interfaces.Transactions;
 
-public interface IDocumentService
+public interface IDocumentService 
 {
-    Task<Document> Create(CreateDocumentDTO documentDTO, string username);
-    Task<Document> Update(int id, UpdateDocumentDTO documentDTO);
-    Task<Document> Fulfill(int id);
-    Task<Document> Close(int id);
-    Task<Document> Cancel(int id);
+    Task<GenericDocumentDTO> Create(CreateDocumentDTO createTransactionDTO, string username, Order? parentOrder = null);
+    Task<GenericDocumentDTO> Update(int id, UpdateDocumentDTO updateTransactionDTO);
+    Task<GenericDocumentDTO> Fulfill(int id);
+    Task<GenericDocumentDTO> Close(int id);
+    Task<GenericDocumentDTO> Cancel(int id);
+    Task<List<GenericDocumentDTO>> GetDocuments();
+    Task<GenericDocumentDTO?> GetDocument(int id);
 }

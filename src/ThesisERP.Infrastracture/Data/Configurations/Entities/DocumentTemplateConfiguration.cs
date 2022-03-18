@@ -10,7 +10,7 @@ internal class DocumentTemplateConfiguration : IEntityTypeConfiguration<Document
     {
         templateBuilder.ToTable("DocumentTemplates").HasKey(t => t.Id);
         templateBuilder.Property(t => t.Timestamp).IsRowVersion();
-        templateBuilder.Property(t => t.Abbreviation).HasMaxLength(DocumentTemplate.AbbreviationMaxLength);
+        templateBuilder.Property(t => t.Abbreviation).HasMaxLength(TransactionTemplateBase.AbbreviationMaxLength);
 
         templateBuilder.HasIndex(t => t.Abbreviation)
             .IncludeProperties(

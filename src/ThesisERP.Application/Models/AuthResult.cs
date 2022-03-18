@@ -15,5 +15,6 @@ public abstract class AuthResult
     {
         JwtToken = jwtToken;
         RefreshToken = refreshToken;
+        Authorized = true;
     }
 }

@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using ThesisERP.Application.DTOs;
-using ThesisERP.Application.DTOs.Documents;
+using ThesisERP.Application.DTOs.Entities;
+using ThesisERP.Application.DTOs.Transactions;
+using ThesisERP.Application.DTOs.Transactions.Documents;
+using ThesisERP.Application.DTOs.Transactions.Orders;
 using ThesisERP.Core.Entities;
 using ThesisERP.Core.Enums;
 
@@ -69,10 +72,10 @@ public class MapperInitializer : Profile
                 .ForMember(dest => dest.EntityType,
                            opt => opt.MapFrom(val => EntityType.supplier));
 
-        CreateMap<Entity, SupplierBaseInfoDTO>()
-         .ReverseMap()
-             .ForMember(dest => dest.EntityType,
-                        opt => opt.MapFrom(val => EntityType.supplier));
+        //CreateMap<Entity, SupplierBaseInfoDTO>()
+        // .ReverseMap()
+        //     .ForMember(dest => dest.EntityType,
+        //                opt => opt.MapFrom(val => EntityType.supplier));
 
         CreateMap<Entity, CreateSupplierDTO>()
            .ReverseMap()
@@ -114,10 +117,10 @@ public class MapperInitializer : Profile
     private void _createProductMaps()
     {
         CreateMap<Product, ProductDTO>()
-            .ForMember(dest => dest.RelatedClients, 
-                       opt=> opt.MapFrom(val => val.RelatedEntities
-                                                .Where(x=>x.EntityType == EntityType.client)
-                                                .ToList()))
+            .ForMember(dest => dest.RelatedClients,
+                       opt => opt.MapFrom(val => val.RelatedEntities
+                                                 .Where(x => x.EntityType == EntityType.client)
+                                                 .ToList()))
             .ForMember(dest => dest.RelatedSuppliers,
                        opt => opt.MapFrom(val => val.RelatedEntities
                                                  .Where(x => x.EntityType == EntityType.supplier)
@@ -156,14 +159,26 @@ public class MapperInitializer : Profile
             .ForMember(x => x.DiscountName, opt => opt.MapFrom(src => src.Discount.Name));
 
 
-        CreateMap<Document, DocumentDTO>();
+        CreateMap<Document, GenericDocumentDTO>();
 
-        CreateMap<Document, SalesDocumentDTO>()
-            .ForMember(x=>x.Client, opt => opt.MapFrom(src=>src.Entity));
+        //CreateMap<Document, SalesDocumentDTO>()
+        //    .ForMember(x=>x.Client, opt => opt.MapFrom(src=>src.Entity));
 
-        CreateMap<Document, PurchaseDocumentDTO>()
-            .ForMember(x => x.Supplier, opt => opt.MapFrom(src => src.Entity));       
+        //CreateMap<Document, PurchaseDocumentDTO>()
+        //    .ForMember(x => x.Supplier, opt => opt.MapFrom(src => src.Entity));       
 
+    }
+
+    private void _createOrderMaps()
+    {
+        CreateMap<OrderRow, OrderRowDTO>()
+            .ForMember(x => x.ProductSKU, opt => opt.MapFrom(src => src.Product.SKU))
+            .ForMember(x => x.ProductDescription, opt => opt.MapFrom(src => src.Product.Description))
+            .ForMember(x => x.TaxName, opt => opt.MapFrom(src => src.Tax.Name))
+            .ForMember(x => x.DiscountName, opt => opt.MapFrom(src => src.Discount.Name));
+
+
+        CreateMap<Order, GenericOrderDTO>();
     }
 
     private void _createTemplateMaps()
@@ -172,12 +187,19 @@ public class MapperInitializer : Profile
             .ReverseMap();
 
         CreateMap<DocumentTemplate, CreateDocumentTemplateDTO>()
-            .ReverseMap().ForMember(d=>d.DateCreated, opt => opt.MapFrom(s => DateTime.UtcNow));
+            .ReverseMap().ForMember(d => d.DateCreated, opt => opt.MapFrom(s => DateTime.UtcNow));
 
         CreateMap<UpdateDocumentTemplateDTO, DocumentTemplate>()
             .ForMember(d => d.DateUpdated, opt => opt.MapFrom(s => DateTime.UtcNow));
-            
-            
+
+        CreateMap<OrderTemplate, OrderTemplateDTO>()
+            .ReverseMap();
+
+        CreateMap<OrderTemplate, CreateOrderTemplateDTO>()
+            .ReverseMap().ForMember(d => d.DateCreated, opt => opt.MapFrom(s => DateTime.UtcNow));
+
+        CreateMap<UpdateOrderTemplateDTO, OrderTemplate>()
+            .ForMember(d => d.DateUpdated, opt => opt.MapFrom(s => DateTime.UtcNow));
 
     }
 

@@ -17,5 +17,4 @@ public class Product
     public byte[] Timestamp { get; set; }
     public virtual ICollection<Entity> RelatedEntities { get; set; } = new List<Entity>();
     public virtual ICollection<StockLevel> StockLevels { get; set; } = new List<StockLevel>();
-
 }

@@ -1,25 +1,21 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using ThesisERP.Application.DTOs;
-using ThesisERP.Application.DTOs.Documents;
+using ThesisERP.Application.DTOs.Transactions.Documents;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Core.Entities;
-using ThesisERP.Core.Exceptions;
 
 namespace ThesisERP.Api.Api;
 
 /// <summary>
 /// Manage the Templates used to issue documents.
 /// </summary>
-public class TemplatesController : BaseApiController
+public class DocumentTemplatesController : BaseApiController
 {
-    private readonly ILogger<TemplatesController> _logger;
+    private readonly ILogger<DocumentTemplatesController> _logger;
     private readonly IMapper _mapper;
     private readonly IRepositoryBase<DocumentTemplate> _templatesRepo;
 
-    public TemplatesController(ILogger<TemplatesController> logger, IMapper mapper, IRepositoryBase<DocumentTemplate> templatesRepo)
+    public DocumentTemplatesController(ILogger<DocumentTemplatesController> logger, IMapper mapper, IRepositoryBase<DocumentTemplate> templatesRepo)
     {
         _logger = logger;
         _mapper = mapper;
@@ -31,8 +27,8 @@ public class TemplatesController : BaseApiController
     /// </summary>
     /// <response code="200">Returns a list of document templates.</response>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(List<DocumentTemplateDTO>))]
-    public async Task<IActionResult> GetTemplates()
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DocumentTemplateDTO>))]
+    public async Task<IActionResult> GetDocumentTemplates()
     {
         var templates = await _templatesRepo
                             .GetAllAsync(orderBy: o => o.OrderBy(d => d.Id));
@@ -48,9 +44,9 @@ public class TemplatesController : BaseApiController
     /// <param name="id">The id to search for.</param>
     /// <response code="200">Returns the requested template.</response>
     /// <response code="404">If template does not exist.</response>
-    [HttpGet("{id:int}", Name = "GetTemplate")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentTemplateDTO))]    
-    public async Task<IActionResult> GetTemplate(int id)
+    [HttpGet("{id:int}", Name = "GetDocumentTemplate")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentTemplateDTO))]
+    public async Task<IActionResult> GetDocumentTemplate(int id)
     {
 
         if (id < 1)
@@ -74,11 +70,11 @@ public class TemplatesController : BaseApiController
     /// <response code="400">If the request body is invalid.</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(DocumentTemplateDTO))]
-    public async Task<IActionResult> CreateTemplate([FromBody] CreateDocumentTemplateDTO templateDTO)
+    public async Task<IActionResult> CreateDocumentTemplate([FromBody] CreateDocumentTemplateDTO templateDTO)
     {
         if (!ModelState.IsValid)
         {
-            _logger.LogError($"Invalid POST Request in {nameof(CreateTemplate)}");
+            _logger.LogError($"Invalid POST Request in {nameof(CreateDocumentTemplate)}");
             return BadRequest(ModelState);
         }
 
@@ -90,7 +86,7 @@ public class TemplatesController : BaseApiController
 
         var templateAdded = _mapper.Map<DocumentTemplateDTO>(result);
 
-        return CreatedAtRoute("GetTemplate", new { id = templateAdded.Id }, templateAdded);
+        return CreatedAtRoute("GetDocumentTemplate", new { id = templateAdded.Id }, templateAdded);
     }
 
     /// <summary>
@@ -105,12 +101,12 @@ public class TemplatesController : BaseApiController
     /// <response code="400">If the request body is invalid.</response>
     /// <response code="404">If the template is not found.</response>    
     [HttpPut("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]    
-    public async Task<IActionResult> UpdateTemplate(int id, [FromBody] UpdateDocumentTemplateDTO templateDTO)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> UpdateDocumentTemplate(int id, [FromBody] UpdateDocumentTemplateDTO templateDTO)
     {
         if (!ModelState.IsValid || id < 1)
         {
-            _logger.LogError($"Invalid PUT Request in {nameof(UpdateTemplate)}");
+            _logger.LogError($"Invalid PUT Request in {nameof(UpdateDocumentTemplate)}");
             return BadRequest(ModelState);
         }
 
@@ -132,8 +128,8 @@ public class TemplatesController : BaseApiController
     /// <response code="400">If the request is invalid.</response>
     /// <response code="404">If the template is not found.</response>
     [HttpDelete("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]    
-    public async Task<IActionResult> DeleteTemplate(int id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteDocumentTemplate(int id)
     {
         if (id < 1)
         {
@@ -163,7 +159,7 @@ public class TemplatesController : BaseApiController
     /// <response code="404">If the template is not found.</response>
     [HttpPut("{id:int}/Restore")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<IActionResult> RestoreTemplate(int id)
+    public async Task<IActionResult> RestoreDocumentTemplate(int id)
     {
         if (id < 1)
         {

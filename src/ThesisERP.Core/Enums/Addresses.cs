@@ -1,10 +1,4 @@
 ﻿namespace ThesisERP.Core.Enums;
-//public enum AddressTypes
-//{
-//    billiing = 0,
-//    shipping = 1,
-//    general = 2
-//}
 
 public enum CountryCode
 {

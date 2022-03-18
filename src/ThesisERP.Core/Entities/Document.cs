@@ -2,56 +2,49 @@
 
 namespace ThesisERP.Core.Entities;
 
-public class Document
-{
-    public int Id { get; set; }
-
-    public int EntityId { get; set; }
-    public Entity Entity { get; set; }
+public class Document : TransactionBase<DocumentTemplate,DocumentRow>
+{   
     public int InventoryLocationId { get; set; }
-    public InventoryLocation InventoryLocation { get; set; }
-    public int TemplateId { get; set; }
-    public DocumentTemplate DocumentTemplate { get; set; }
-    public string DocumentNumber { get; set; }
-    public TransactionStatus Status { get; set; }
-    public Address BillingAddress { get; set; }
-    public Address ShippingAddress { get; set; }
-    public string Comments { get; set; } = string.Empty;
-    public ICollection<DocumentRow> Rows { get; set; } = new List<DocumentRow>();
-    public byte[] Timestamp { get; set; }
-    public DateTime DateCreated { get; set; }
-    public DateTime? DateUpdated { get; set; }
-    public bool IsDeleted { get; set; } = false;
-    public string CreatedBy { get; set; }
-    public DocumentType Type => DocumentTemplate.DocumentType;
-    public bool IsFulfilled => Status == TransactionStatus.fulfilled;
-    public bool IsClosed => Status == TransactionStatus.closed;
-    public bool IsCancelled => Status == TransactionStatus.cancelled;
+    public InventoryLocation InventoryLocation { get; set; }    
+    public int? ParentOrderId { get; set; }
+    public Order? ParentOrder { get; set; }
+    public DocumentType Type => Template.DocumentType;
+    public override bool CanBeUpdated => GetDocumentStatusesThatCanBeUpdated().Contains(Status);
 
-    private Document() { }
+    private Document() : base() { }
+
+    private Document(Entity entity,
+                     InventoryLocation location,
+                     DocumentTemplate template,
+                     Address billingAddress,
+                     Address shippingAddress,
+                     Order? parentOrder,
+                     string username) 
+        : base(entity, template, billingAddress, shippingAddress, username) 
+    {     
+        InventoryLocation = location;
+        InventoryLocationId = location.Id;
+        ParentOrderId = parentOrder?.Id;
+        ParentOrder = parentOrder;    
+    }
 
     public static Document Initialize(Entity entity,
                                       InventoryLocation location,
                                       DocumentTemplate template,
                                       Address billingAddress,
                                       Address shippingAddress,
+                                      Order? parentOrder,
                                       string username)
-    {
-        return new()
-        {
-            Entity = entity,
-            EntityId = entity.Id,
-            InventoryLocation = location,
-            InventoryLocationId = location.Id,
-            DocumentTemplate = template,
-            TemplateId = template.Id,
-            BillingAddress = billingAddress,
-            ShippingAddress = shippingAddress,
-            DocumentNumber = $"{template.Prefix}{template.NextNumber}{template.Postfix}",
-            Status = TransactionStatus.draft,
-            DateCreated = DateTime.UtcNow,
-            DateUpdated = DateTime.UtcNow,
-            CreatedBy = username
-        };
+    {        
+        return new(entity, location, template, billingAddress, shippingAddress, parentOrder, username);        
     }
+
+    private static IEnumerable<TransactionStatus> GetDocumentStatusesThatCanBeUpdated()
+    {
+        yield return TransactionStatus.draft;
+        yield return TransactionStatus.pending;
+        yield return TransactionStatus.fulfilled;
+    }
+
+
 }

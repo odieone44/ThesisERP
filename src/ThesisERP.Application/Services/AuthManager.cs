@@ -112,7 +112,7 @@ public class AuthManager : IAuthManager
     {
 
         var expiration = DateTime.UtcNow
-                         .AddMinutes(Convert.ToDouble(_jwtSettings.Lifetime));
+                         .AddMinutes(_jwtSettings.Lifetime);
 
         var token = new JwtSecurityToken(
                 issuer: _jwtSettings.Issuer,
@@ -155,10 +155,7 @@ public class AuthManager : IAuthManager
     {
         var user = await _context.AppUsers.SingleOrDefaultAsync(u => u.RefreshTokens.Any(t => t.Token == token));
 
-        if (user == null)
-            throw new Exception("Invalid token");
-
-        return user;
+        return user ?? throw new Exception("Invalid token");
     }
     #endregion
 }

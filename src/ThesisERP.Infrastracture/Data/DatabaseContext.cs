@@ -14,7 +14,9 @@ public class DatabaseContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<AppUser> AppUsers => Set<AppUser>();
     public DbSet<Entity> Entities => Set<Entity>();
     public DbSet<Document> Documents => Set<Document>();
+    public DbSet<Order> Orders => Set<Order>();
     public DbSet<DocumentTemplate> DocumentTemplates => Set<DocumentTemplate>();
+    public DbSet<OrderTemplate> OrderTemplates => Set<OrderTemplate>();
     public DbSet<InventoryLocation> InventoryLocations => Set<InventoryLocation>();
     public DbSet<StockLevel> StockLevels => Set<StockLevel>();
     public DbSet<Tax> Taxes => Set<Tax>();
@@ -29,7 +31,7 @@ public class DatabaseContext : IdentityDbContext<AppUser>, IAppDbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
+               
         foreach (var property in builder.Model.GetEntityTypes()
                                                .SelectMany(t => t.GetProperties())
                                                .Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))

@@ -1,12 +1,6 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ThesisERP.Application.DTOs.Documents;
-using ThesisERP.Application.Interfaces;
+﻿using Microsoft.AspNetCore.Mvc;
+using ThesisERP.Application.DTOs.Transactions.Documents;
 using ThesisERP.Application.Interfaces.Transactions;
-using ThesisERP.Application.Services.Transactions;
-using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api;
 
@@ -16,16 +10,12 @@ namespace ThesisERP.Api;
 public class DocumentsController : BaseApiController
 {
     private readonly ILogger<DocumentsController> _logger;
-    private readonly IMapper _mapper;
     private readonly IDocumentService _documentService;
-    private readonly IRepositoryBase<Document> _docsRepo;
 
-    public DocumentsController(ILogger<DocumentsController> logger, IMapper mapper, IDocumentService docService, IRepositoryBase<Document> docsRepo)
+    public DocumentsController(ILogger<DocumentsController> logger, IDocumentService docService)
     {
         _logger = logger;
-        _mapper = mapper;
         _documentService = docService;
-        _docsRepo = docsRepo;
     }
 
     /// <summary>
@@ -38,7 +28,7 @@ public class DocumentsController : BaseApiController
     /// <response code="200">Returns the created document.</response>
     /// <response code="400">If request is not valid.</response>
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(DocumentDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericDocumentDTO))]
     public async Task<IActionResult> CreateDocument([FromBody] CreateDocumentDTO documentDTO)
     {
         if (!ModelState.IsValid)
@@ -49,9 +39,8 @@ public class DocumentsController : BaseApiController
 
         var username = HttpContext.User.Identity?.Name ?? string.Empty;
 
-        var document = await _documentService.Create(documentDTO, username);
+        var response = await _documentService.Create(documentDTO, username);
 
-        var response = _mapper.Map<DocumentDTO>(document);
         return Ok(response);
     }
 
@@ -69,18 +58,17 @@ public class DocumentsController : BaseApiController
     /// <response code="200">Returns the updated document.</response>
     /// <response code="400">If request is not valid.</response>
     [HttpPut("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericDocumentDTO))]
     public async Task<IActionResult> UpdateDocument(int id, [FromBody] UpdateDocumentDTO documentDTO)
     {
         if (!ModelState.IsValid)
         {
             _logger.LogError($"Invalid POST Request in {nameof(UpdateDocument)}");
             return BadRequest(ModelState);
-        }       
+        }
 
-        var document = await _documentService.Update(id, documentDTO);
+        var response = await _documentService.Update(id, documentDTO);
 
-        var response = _mapper.Map<DocumentDTO>(document);
         return Ok(response);
     }
 
@@ -95,7 +83,7 @@ public class DocumentsController : BaseApiController
     /// <response code="200">Returns the fulfilled document.</response>
     /// <response code="400">If request is not valid.</response>
     [HttpPost("{id:int}/Fulfill")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericDocumentDTO))]
     public async Task<IActionResult> FulfillDocument(int id)
     {
         if (id < 1)
@@ -103,9 +91,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var document = await _documentService.Fulfill(id);
-
-        var response = _mapper.Map<DocumentDTO>(document);
+        var response = await _documentService.Fulfill(id);
         return Ok(response);
     }
 
@@ -119,7 +105,7 @@ public class DocumentsController : BaseApiController
     /// <response code="200">Returns the closed document.</response>
     /// <response code="400">If request is not valid.</response>
     [HttpPost("{id:int}/Close")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericDocumentDTO))]
     public async Task<IActionResult> CloseDocument(int id)
     {
         if (id < 1)
@@ -127,9 +113,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var document = await _documentService.Close(id);
-
-        var response = _mapper.Map<DocumentDTO>(document);
+        var response = await _documentService.Close(id);
         return Ok(response);
     }
 
@@ -143,7 +127,7 @@ public class DocumentsController : BaseApiController
     /// <response code="200">Returns the cancelled document.</response>
     /// <response code="400">If request is not valid.</response>
     [HttpPost("{id:int}/Cancel")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericDocumentDTO))]
     public async Task<IActionResult> CancelDocument(int id)
     {
         if (id < 1)
@@ -151,9 +135,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var document = await _documentService.Cancel(id);
-
-        var response = _mapper.Map<DocumentDTO>(document);
+        var response = await _documentService.Cancel(id);
         return Ok(response);
     }
 
@@ -162,25 +144,13 @@ public class DocumentsController : BaseApiController
     /// </summary>
     /// <response code="200">A list of all documents in your account.</response>
     [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DocumentDTO>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GenericDocumentDTO>))]
     public async Task<IActionResult> GetDocuments()
     {
-        var documents = await _docsRepo
-                                .GetAllAsync
-                                 (orderBy: o => o.OrderByDescending(d => d.DateUpdated),
-                                 include: i => i.Include(p => p.Entity)
-                                                .Include(x => x.InventoryLocation)
-                                                .Include(t => t.DocumentTemplate)
-                                                .Include(q => q.Rows)
-                                                    .ThenInclude(d => d.Product)
-                                                .Include(q => q.Rows)
-                                                    .ThenInclude(d => d.Tax)
-                                                .Include(q => q.Rows)
-                                                    .ThenInclude(d => d.Discount));
 
-        var results = _mapper.Map<List<DocumentDTO>>(documents);
+        var documents = await _documentService.GetDocuments();
 
-        return Ok(results);
+        return Ok(documents);
     }
 
     /// <summary>
@@ -190,7 +160,7 @@ public class DocumentsController : BaseApiController
     /// <response code="200">Returns the requested document.</response>
     /// <response code="404">If document does not exist.</response>
     [HttpGet("{id:int}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DocumentDTO))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GenericDocumentDTO))]
     public async Task<IActionResult> GetDocument(int id)
     {
         if (id < 1)
@@ -198,13 +168,11 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var document = await _docsRepo.GetDocumentByIdIncludeRelations(id);
+        var document = await _documentService.GetDocument(id);
 
         if (document == null) { return NotFound(); }
 
-        var result = _mapper.Map<DocumentDTO>(document);
-
-        return Ok(result);
+        return Ok(document);
     }
 
 }

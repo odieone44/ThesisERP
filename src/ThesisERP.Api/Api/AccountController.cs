@@ -140,11 +140,14 @@ public class AccountController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthSuccessResponse))]
     public async Task<IActionResult> RefreshToken()
     {
-        string? refreshToken = Request.Cookies["refreshToken"];
+        var refreshToken = Request.Cookies["refreshToken"];
 
-        if (refreshToken == null) return BadRequest();
+        if (string.IsNullOrWhiteSpace(refreshToken))
+        {
+            return BadRequest();
+        }
 
-        AuthResult response = await _authManager.RefreshUser(refreshToken, _ipAddress());
+        var response = await _authManager.RefreshUser(refreshToken, _ipAddress());
 
         return _handleAuthorizationAttempt(response);
     }
