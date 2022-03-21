@@ -18,7 +18,6 @@ namespace ThesisERP.UnitTests.Application.Services.ClientServiceTests;
 
 public class ClientService_UpdateAsync
 {
-
     private Mock<IRepositoryBase<Entity>> _mockRepo = new();
 
     private ClientService _clientService;
@@ -54,8 +53,9 @@ public class ClientService_UpdateAsync
         var result = await _clientService.UpdateAsync(testClient.Id, testDto);
 
         Assert.NotNull(result);
+        Assert.NotNull(result!.DateUpdated);
         Assert.Equal(testDto.FirstName, result!.FirstName);
-        Assert.Equal(testDto.LastName, result!.LastName);       
+        Assert.Equal(testDto.LastName, result!.LastName);
 
     }
 

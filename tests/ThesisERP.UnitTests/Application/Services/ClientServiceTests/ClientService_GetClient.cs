@@ -34,16 +34,6 @@ public class ClientService_GetClient
     }
 
     [Fact]
-    public async Task ShouldReturnNullIfNoEntitiesExist()
-    {
-        _mockRepo.SetupGetAll(new List<Entity>());
-
-        var result = await _clientService.GetAsync(1);
-
-        Assert.Null(result);
-    }
-
-    [Fact]
     public async Task ShouldReturnClientIfIdExists()
     {
         var testEntities = EntityBuilder
@@ -64,8 +54,20 @@ public class ClientService_GetClient
 
         var result = await _clientService.GetAsync(testClient.Id);
 
-        Assert.Equal(testClient.Id, result?.Id);
+        Assert.NotNull(result);
+        Assert.Equal(testClient.Id, result!.Id);
     }
+
+    [Fact]
+    public async Task ShouldReturnNullIfNoEntitiesExist()
+    {
+        _mockRepo.SetupGetAll(new List<Entity>());
+
+        var result = await _clientService.GetAsync(1);
+
+        Assert.Null(result);
+    }
+
 
     [Fact]
     public async Task ShouldReturnNullIfIdBelongsToSupplier()
