@@ -172,7 +172,7 @@ public class OrderService : IOrderService
 
         _api.OrdersRepo.Update(_order);
 
-        var createdDocument = _documentService.Create(documentDto, _order.CreatedBy, _order);
+        var createdDocument = await _documentService.Create(documentDto, _order.CreatedBy, _order);
 
         await _api.OrdersRepo.SaveChangesAsync();
 

@@ -97,10 +97,11 @@ public class StockService : IStockService
             return;
         }
 
-        var stockDict = (await _stockRepo
+        var stockList = await _stockRepo
                              .GetAllAsync(x => _transactionRows.Select(x => x.Product.Id).Contains(x.ProductId)
-                                          && x.InventoryLocationId == _location.Id))
-                             .ToDictionary(x => x.ProductId, v => v);        
+                                          && x.InventoryLocationId == _location.Id);
+        
+        var stockDict = stockList.ToDictionary(x => x.ProductId, v => v);
 
         foreach (var row in _transactionRows)
         {

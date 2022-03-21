@@ -25,6 +25,7 @@ public class MapperInitializer : Profile
         _createInventoryLocationMaps();
         _createProductMaps();
         _createDocumentMaps();
+        _createOrderMaps();
         _createTemplateMaps();
         _createTaxMaps();
         _createDiscountMaps();
