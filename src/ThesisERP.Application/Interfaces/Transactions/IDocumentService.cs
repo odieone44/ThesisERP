@@ -5,11 +5,11 @@ namespace ThesisERP.Application.Interfaces.Transactions;
 
 public interface IDocumentService 
 {
-    Task<GenericDocumentDTO> Create(CreateDocumentDTO createTransactionDTO, string username, Order? parentOrder = null);
-    Task<GenericDocumentDTO> Update(int id, UpdateDocumentDTO updateTransactionDTO);
-    Task<GenericDocumentDTO> Fulfill(int id);
-    Task<GenericDocumentDTO> Close(int id);
-    Task<GenericDocumentDTO> Cancel(int id);
-    Task<List<GenericDocumentDTO>> GetDocuments();
-    Task<GenericDocumentDTO?> GetDocument(int id);
+    Task<GenericDocumentDTO> CreateAsync(CreateDocumentDTO createTransactionDTO, string username, Order? parentOrder = null);
+    Task<GenericDocumentDTO> UpdateAsync(int id, UpdateDocumentDTO updateTransactionDTO);
+    Task<GenericDocumentDTO> FulfillAsync(int id);
+    Task<GenericDocumentDTO> CloseAsync(int id);
+    Task<GenericDocumentDTO> CancelAsync(int id);
+    Task<List<GenericDocumentDTO>> GetDocumentsAsync();
+    Task<GenericDocumentDTO?> GetDocumentAsync(int id);
 }

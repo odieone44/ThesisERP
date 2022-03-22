@@ -20,4 +20,12 @@ public static class MockHelpers
                     It.IsAny<Func<IQueryable<T>, IIncludableQueryable<T, object?>>?>()))
                 .ReturnsAsync(returnList);
     }
+
+    public static void SetupGetById<T>(this Mock<IRepositoryBase<T>> mockRepo, T returns)
+        where T : class
+    {
+        mockRepo.Setup(r =>
+                r.GetByIdAsync(It.IsAny<It.IsAnyType>()))
+                .ReturnsAsync(returns);
+    }
 }

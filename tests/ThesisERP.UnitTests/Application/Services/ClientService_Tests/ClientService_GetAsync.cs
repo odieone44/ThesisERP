@@ -12,16 +12,16 @@ using ThesisERP.UnitTests.Helpers;
 using ThesisERP.UnitTests.Helpers.Builders;
 using Xunit;
 
-namespace ThesisERP.UnitTests.Application.Services.ClientServiceTests;
+namespace ThesisERP.UnitTests.Application.Services.ClientService_Tests;
 
-public class ClientService_GetClient
+public class ClientService_GetAsync
 {
     private Mock<IRepositoryBase<Entity>> _mockRepo = new();
 
     private ClientService _clientService;
     private IMapper _mapper;
 
-    public ClientService_GetClient()
+    public ClientService_GetAsync()
     {
         var mockMapper = new MapperConfiguration(cfg =>
         {

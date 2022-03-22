@@ -12,7 +12,7 @@ public class Product
     public decimal? DefaultPurchasePrice { get; set; }
     public decimal? DefaultSaleSPrice { get; set; }
     public DateTime DateCreated { get; set; }
-    public DateTime DateUpdated { get; set; }
+    public DateTime? DateUpdated { get; set; }
     public bool IsDeleted { get; set; }
     public byte[] Timestamp { get; set; }
     public virtual ICollection<Entity> RelatedEntities { get; set; } = new List<Entity>();

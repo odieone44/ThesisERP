@@ -14,7 +14,7 @@ using ThesisERP.UnitTests.Helpers;
 using ThesisERP.UnitTests.Helpers.Builders;
 using Xunit;
 
-namespace ThesisERP.UnitTests.Application.Services.ClientServiceTests;
+namespace ThesisERP.UnitTests.Application.Services.ClientService_Tests;
 
 public class ClientService_UpdateAsync
 {
@@ -56,7 +56,26 @@ public class ClientService_UpdateAsync
         Assert.NotNull(result!.DateUpdated);
         Assert.Equal(testDto.FirstName, result!.FirstName);
         Assert.Equal(testDto.LastName, result!.LastName);
+    }
 
+    [Fact]
+    public async Task ShouldReturnNullIfClientDoesNotExist()
+    {
+        var testClient = new EntityBuilder()
+                            .WithDefaultClientValues()
+                            .Build();
+
+        var testDto = _mapper.Map<UpdateClientDTO>(testClient);
+        testDto.FirstName = "Changed Name";
+        testDto.LastName = "Changed Last Name";
+
+        _mockRepo.SetupGetAll(new List<Entity>());
+        _mockRepo.Setup(x => x.Update(It.IsAny<Entity>())).Verifiable();
+        _mockRepo.Setup(x => x.SaveChangesAsync()).Verifiable();
+
+        var result = await _clientService.UpdateAsync(testClient.Id, testDto);
+
+        Assert.Null(result);        
     }
 
 }
