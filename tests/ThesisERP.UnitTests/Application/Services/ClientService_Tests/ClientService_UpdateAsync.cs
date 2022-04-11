@@ -1,24 +1,19 @@
-﻿using AutoMapper;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ThesisERP.Application.DTOs.Entities;
-using ThesisERP.Application.Interfaces;
-using ThesisERP.Application.Mappings;
-using ThesisERP.Application.Services.Entities;
-using ThesisERP.Core.Entities;
-using ThesisERP.UnitTests.Helpers;
-using ThesisERP.UnitTests.Helpers.Builders;
-using Xunit;
+﻿namespace ThesisERP.UnitTests.Application.Services.ClientService_Tests;
 
-namespace ThesisERP.UnitTests.Application.Services.ClientService_Tests;
+using Xunit;
+using AutoMapper;
+using System.Threading.Tasks;
+using ThesisERP.Core.Entities;
+using System.Collections.Generic;
+using ThesisERP.UnitTests.Helpers;
+using ThesisERP.Application.Mappings;
+using ThesisERP.Application.DTOs.Entities;
+using ThesisERP.UnitTests.Helpers.Builders;
+using ThesisERP.Application.Services.Entities;
 
 public class ClientService_UpdateAsync
 {
-    private Mock<IRepositoryBase<Entity>> _mockRepo = new();
+    private IMockRepositoryBase<Entity> _mockRepo = new MockRepositoryBase<Entity>();
 
     private ClientService _clientService;
     private IMapper _mapper;
@@ -32,7 +27,7 @@ public class ClientService_UpdateAsync
 
         _mapper = mockMapper.CreateMapper();
 
-        _clientService = new ClientService(_mapper, _mockRepo.Object);
+        _clientService = new ClientService(_mapper, _mockRepo.MockInstance);
     }
 
     [Fact]
@@ -46,9 +41,9 @@ public class ClientService_UpdateAsync
         testDto.FirstName = "Changed Name";
         testDto.LastName = "Changed Last Name";
 
-        _mockRepo.SetupGetAll(new List<Entity>() { testClient });
-        _mockRepo.Setup(x => x.Update(It.IsAny<Entity>())).Verifiable();
-        _mockRepo.Setup(x => x.SaveChangesAsync()).Verifiable();
+        _mockRepo.MockGetAll(new List<Entity>() { testClient })
+                 .MockUpdate()
+                 .MockSaveChanges();
 
         var result = await _clientService.UpdateAsync(testClient.Id, testDto);
 
@@ -69,13 +64,13 @@ public class ClientService_UpdateAsync
         testDto.FirstName = "Changed Name";
         testDto.LastName = "Changed Last Name";
 
-        _mockRepo.SetupGetAll(new List<Entity>());
-        _mockRepo.Setup(x => x.Update(It.IsAny<Entity>())).Verifiable();
-        _mockRepo.Setup(x => x.SaveChangesAsync()).Verifiable();
+        _mockRepo.MockGetAll(new List<Entity>())
+                 .MockUpdate()
+                 .MockSaveChanges();
 
         var result = await _clientService.UpdateAsync(testClient.Id, testDto);
 
-        Assert.Null(result);        
+        Assert.Null(result);
     }
 
 }

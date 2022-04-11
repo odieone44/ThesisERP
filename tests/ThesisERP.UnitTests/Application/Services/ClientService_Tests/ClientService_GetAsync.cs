@@ -16,7 +16,7 @@ namespace ThesisERP.UnitTests.Application.Services.ClientService_Tests;
 
 public class ClientService_GetAsync
 {
-    private Mock<IRepositoryBase<Entity>> _mockRepo = new();
+    private MockRepositoryBase<Entity> _mockRepo = new();
 
     private ClientService _clientService;
     private IMapper _mapper;
@@ -47,7 +47,7 @@ public class ClientService_GetAsync
 
         testEntities.Add(testClient);
 
-        _mockRepo.SetupGetAll(
+        _mockRepo.MockGetAll(
                     testEntities
                     .Where(x => x.EntityType == EntityType.client && x.Id == testClient.Id)
                     .ToList());
@@ -61,7 +61,7 @@ public class ClientService_GetAsync
     [Fact]
     public async Task ShouldReturnNullIfNoEntitiesExist()
     {
-        _mockRepo.SetupGetAll(new List<Entity>());
+        _mockRepo.MockGetAll(new List<Entity>());
 
         var result = await _clientService.GetAsync(1);
 
@@ -76,7 +76,7 @@ public class ClientService_GetAsync
                             .WithDefaultSupplierValues()
                             .Build();
 
-        _mockRepo.SetupGetAll(new List<Entity>());
+        _mockRepo.MockGetAll(new List<Entity>());
 
         var result = await _clientService.GetAsync(testSupplier.Id);
 

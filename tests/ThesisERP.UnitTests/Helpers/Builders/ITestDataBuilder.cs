@@ -3,7 +3,8 @@ using System.Collections.Generic;
 
 namespace ThesisERP.UnitTests.Helpers.Builders;
 
-internal interface ITestDataBuilder<T>
+public interface ITestDataBuilder<T>
+    where T : class
 {
     ITestDataBuilder<T> WithDefaultValues();
 

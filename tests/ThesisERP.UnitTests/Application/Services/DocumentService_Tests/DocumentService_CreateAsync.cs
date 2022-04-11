@@ -1,17 +1,18 @@
-﻿using AutoMapper;
-using Moq;
-using System.Collections.Generic;
+﻿using Moq;
+using Xunit;
+using AutoMapper;
 using System.Threading.Tasks;
-using ThesisERP.Application.DTOs.Transactions.Documents;
-using ThesisERP.Application.Interfaces;
-using ThesisERP.Application.Mappings;
-using ThesisERP.Application.Services.Transactions;
-using ThesisERP.Core.Entities;
+using System.Collections.Generic;
+
 using ThesisERP.Core.Enums;
 using ThesisERP.Core.Models;
+using ThesisERP.Core.Entities;
 using ThesisERP.UnitTests.Helpers;
+using ThesisERP.Application.Mappings;
+using ThesisERP.Application.Interfaces;
 using ThesisERP.UnitTests.Helpers.Builders;
-using Xunit;
+using ThesisERP.Application.Services.Transactions;
+using ThesisERP.Application.DTOs.Transactions.Documents;
 
 namespace ThesisERP.UnitTests.Application.Services.DocumentService_Tests;
 
@@ -36,29 +37,15 @@ public class DocumentService_CreateAsync
     }
 
     [Fact]
-    public async Task ShouldCreatePendingDocumentWhenAllEntitiesExist()
+    public async Task ShouldCreatePendingDocument_WhenAllEntitiesExist()
     {
-        var testSuppler = new EntityBuilder().WithDefaultSupplierValues().Build();
-        var testProduct = new ProductBuilder().WithDefaultValues().Build();
         var testLocation = new InventoryLocationBuilder().WithDefaultValues().Build();
         var testTemplate = new DocumentTemplateBuilder().WithDefaultPurchaseBillValues().Build();
-        var testTax = new Tax()
-        {
-            Id = 1,
-            Name = "Test",
-            Description = "Test Tax",
-            Amount = 0.24m,
-            IsDeleted = false
-        };
-        var testDiscount = new Discount()
-        {
-            Id = 1,
-            Name = "Test",
-            Description = "Test Discount",
-            Amount = 0.10m,
-            IsDeleted = false
-        };
-
+        var testSuppler = new EntityBuilder().WithDefaultSupplierValues().Build();
+        var testProduct = new ProductBuilder().WithDefaultValues().Build();
+        var testDiscount = new DiscountBuilder().WithDefaultValues().Build();
+        var testTax = new TaxBuilder().WithDefaultValues().Build();
+                
         _SetupMocksForDocumentCreate(
             testProducts: new List<Product> { testProduct },
             testLocation: testLocation,
@@ -112,65 +99,64 @@ public class DocumentService_CreateAsync
         List<Discount>? testDiscounts,
         DocumentTemplate? testTemplate)
     {
-        var docsRepo = new Mock<IRepositoryBase<Document>>();
 
-        docsRepo.Setup(x => x.Update(It.IsAny<Document>())).Verifiable();
-        docsRepo.Setup(x => x.SaveChangesAsync()).Verifiable();
-        docsRepo.Setup(x => x.Add(It.IsAny<Document>()))
-                .Returns(
-                    (Document x) =>
-                    {
-                        x.Id = 1;
-                        return x;
-                    });
+        var docsRepo = new MockRepositoryBase<Document>()
+                            .MockUpdate()
+                            .MockSaveChanges()
+                            .MockAdd((Document x) =>
+                            {
+                                x.Id = 1;
+                                return x;
+                            });
+
         //var testDocs = new List<Document>();
         //var ordersRepo = new Mock<IRepositoryBase<Order>>();
         //var testOrders = new List<Order>();
 
-        var productsRepo = new Mock<IRepositoryBase<Product>>();
+        var productsRepo = new MockRepositoryBase<Product>();
         if (testProducts != null)
         {
-            productsRepo.SetupGetAll(testProducts);
+            productsRepo.MockGetAll(testProducts);
         }
 
-        var documentTemplatesRepo = new Mock<IRepositoryBase<DocumentTemplate>>();
+        var documentTemplatesRepo = new MockRepositoryBase<DocumentTemplate>();
         if (testTemplate is not null)
         {
-            documentTemplatesRepo.SetupGetById(testTemplate);
+            documentTemplatesRepo.MockGetById(testTemplate);
         }
-        documentTemplatesRepo.Setup(x => x.Update(It.IsAny<DocumentTemplate>())).Verifiable();
+        documentTemplatesRepo.MockUpdate();
 
-        var entitiesRepo = new Mock<IRepositoryBase<Entity>>();
+        var entitiesRepo = new MockRepositoryBase<Entity>();
         if (testEntity is not null)
         {
             var entities = new List<Entity>() { testEntity };
-            entitiesRepo.SetupGetById(testEntity);
-            entitiesRepo.SetupGetAll(entities);
+            entitiesRepo.MockGetById(testEntity);
+            entitiesRepo.MockGetAll(entities);
         }
         else
         {
-            entitiesRepo.SetupGetAll(new List<Entity>());
+            entitiesRepo.MockGetAll(new List<Entity>());
         }
 
-        var locationsRepo = new Mock<IRepositoryBase<InventoryLocation>>();
+        var locationsRepo = new MockRepositoryBase<InventoryLocation>();
         if (testLocation is not null)
         {
-            locationsRepo.SetupGetById(testLocation);
+            locationsRepo.MockGetById(testLocation);
         }
 
         //var stockRepo = new Mock<IRepositoryBase<StockLevel>>();
         //var testStock = new List<StockLevel>();
 
-        var taxesRepo = new Mock<IRepositoryBase<Tax>>();
+        var taxesRepo = new MockRepositoryBase<Tax>();
         if (testTaxes is not null)
         {
-            taxesRepo.SetupGetAll(testTaxes);
+            taxesRepo.MockGetAll(testTaxes);
         }
 
-        var discountsRepo = new Mock<IRepositoryBase<Discount>>();
+        var discountsRepo = new MockRepositoryBase<Discount>();
         if (testDiscounts is not null)
         {
-            discountsRepo.SetupGetAll(testDiscounts);
+            discountsRepo.MockGetAll(testDiscounts);
         }
 
         _mockApi.Setup(x => x.DocumentsRepo).Returns(docsRepo.Object);
@@ -181,7 +167,11 @@ public class DocumentService_CreateAsync
         _mockApi.Setup(x => x.TaxesRepo).Returns(taxesRepo.Object);
         _mockApi.Setup(x => x.DiscountsRepo).Returns(discountsRepo.Object);
 
-        _mockStock.Setup(x => x.HandleStockUpdateFromDocumentAction(It.IsAny<Document>(), It.IsAny<TransactionStockAction>())).Verifiable();
+        _mockStock.Setup(
+                x => x.HandleStockUpdateFromDocumentAction(
+                        It.IsAny<Document>(), 
+                        It.IsAny<TransactionStockAction>()))
+                    .Verifiable();
     }
 
 }
