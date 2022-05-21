@@ -9,6 +9,7 @@ using ThesisERP.Application.Services;
 using ThesisERP.Application.Services.Entities;
 using ThesisERP.Application.Services.Transactions;
 using ThesisERP.Core.Entities;
+using ThesisERP.Infrastracture.Authorization;
 using ThesisERP.Infrastracture.Data;
 
 namespace ThesisERP.Infrastracture;
