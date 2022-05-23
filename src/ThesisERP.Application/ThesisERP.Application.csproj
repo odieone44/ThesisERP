@@ -7,18 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Models\Stock\**" />
-    <EmbeddedResource Remove="Models\Stock\**" />
-    <None Remove="Models\Stock\**" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ThesisERP.Core\ThesisERP.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\Transactions\" />
-    <Folder Include="Services\Templates\" />
   </ItemGroup>
 
 </Project>
