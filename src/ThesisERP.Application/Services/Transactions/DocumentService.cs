@@ -28,7 +28,7 @@ public class DocumentService : IDocumentService
         _mapper = mapper;
     }
 
-    public async Task<GenericDocumentDTO> Create(
+    public async Task<GenericDocumentDTO> CreateAsync(
         CreateDocumentDTO documentDTO, 
         string username, 
         Order? parentOrder = null)
@@ -55,7 +55,7 @@ public class DocumentService : IDocumentService
         return _mapper.Map<GenericDocumentDTO>(docResult);
     }
 
-    public async Task<GenericDocumentDTO> Update(int id, UpdateDocumentDTO documentDTO)
+    public async Task<GenericDocumentDTO> UpdateAsync(int id, UpdateDocumentDTO documentDTO)
     {
         _document = await _api.DocumentsRepo.GetDocumentByIdIncludeRelations(id);
         _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
@@ -101,7 +101,7 @@ public class DocumentService : IDocumentService
         return _mapper.Map<GenericDocumentDTO>(_document);
     }
 
-    public async Task<GenericDocumentDTO> Fulfill(int id)
+    public async Task<GenericDocumentDTO> FulfillAsync(int id)
     {
         _document = await _api.DocumentsRepo.GetDocumentByIdIncludeRelations(id);
         _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
@@ -126,7 +126,7 @@ public class DocumentService : IDocumentService
         return _mapper.Map<GenericDocumentDTO>(_document);
     }
 
-    public async Task<GenericDocumentDTO> Close(int id)
+    public async Task<GenericDocumentDTO> CloseAsync(int id)
     {
         _document = await _api.DocumentsRepo.GetDocumentByIdIncludeRelations(id);
         _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
@@ -144,7 +144,7 @@ public class DocumentService : IDocumentService
 
         return _mapper.Map<GenericDocumentDTO>(_document);
     }
-    public async Task<GenericDocumentDTO> Cancel(int id)
+    public async Task<GenericDocumentDTO> CancelAsync(int id)
     {
         _document = await _api.DocumentsRepo.GetDocumentByIdIncludeRelations(id);
         _ = _document ?? throw new ThesisERPException($"Document with id: '{id}' not found.");
@@ -170,8 +170,8 @@ public class DocumentService : IDocumentService
         var productIds = documentDTO.Rows.Select(x => x.ProductId).Distinct().ToList();
         if (!productIds.Any()) { throw new ThesisERPException("A valid document row list has to be provided."); }
 
-        var taxIds = documentDTO.Rows.Where(y => y.TaxID != null).Select(x => (int)x.TaxID).Distinct().ToList();
-        var discountIds = documentDTO.Rows.Where(y => y.DiscountID != null).Select(x => (int)x.DiscountID).Distinct().ToList();
+        var taxIds = documentDTO.Rows.Where(y => y.TaxID.GetValueOrDefault() > 0).Select(x => (int)x.TaxID).Distinct().ToList();
+        var discountIds = documentDTO.Rows.Where(y => y.DiscountID.GetValueOrDefault() > 0).Select(x => (int)x.DiscountID).Distinct().ToList();
 
         var entityId = documentDTO.EntityId ?? throw new ThesisERPException($"EntityId has to be provided when updating a pending document.");
         var locationId = documentDTO.InventoryLocationId ?? throw new ThesisERPException($"InventoryLocationId has to be provided when updating a pending document.");
@@ -189,8 +189,8 @@ public class DocumentService : IDocumentService
         var productIds = documentDTO.Rows.Select(x => x.ProductId).Distinct().ToList();
         if (!productIds.Any()) { throw new ThesisERPException("A valid document rows list has to be provided."); }
 
-        var taxIds = documentDTO.Rows.Where(y => y.TaxID != null).Select(x => (int)x.TaxID).Distinct().ToList();
-        var discountIds = documentDTO.Rows.Where(y => y.DiscountID != null).Select(x => (int)x.DiscountID).Distinct().ToList();
+        var taxIds = documentDTO.Rows.Where(y => y.TaxID.GetValueOrDefault() > 0).Select(x => (int)x.TaxID).Distinct().ToList();
+        var discountIds = documentDTO.Rows.Where(y => y.DiscountID.GetValueOrDefault() > 0).Select(x => (int)x.DiscountID).Distinct().ToList();
 
         var requestValues = await _GetDocumentRequestValuesAsync(documentDTO.EntityId, documentDTO.TemplateId, documentDTO.InventoryLocationId, productIds, taxIds, discountIds);
 
@@ -290,7 +290,7 @@ public class DocumentService : IDocumentService
         return new DocumentRequestValues(entity, location, template, products, taxes, discounts);
     }
 
-    public async Task<List<GenericDocumentDTO>> GetDocuments()
+    public async Task<List<GenericDocumentDTO>> GetDocumentsAsync()
     {
         var documents = await _api.DocumentsRepo
                                .GetAllAsync
@@ -311,7 +311,7 @@ public class DocumentService : IDocumentService
         return results;
     }
 
-    public async Task<GenericDocumentDTO?> GetDocument(int id)
+    public async Task<GenericDocumentDTO?> GetDocumentAsync(int id)
     {
         var document = await _api.DocumentsRepo.GetDocumentByIdIncludeRelations(id);
 

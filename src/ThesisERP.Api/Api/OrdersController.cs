@@ -40,7 +40,7 @@ public class OrdersController : BaseApiController
 
         var username = HttpContext.User.Identity?.Name ?? string.Empty;
 
-        var response = await _orderService.Create(orderDTO, username);
+        var response = await _orderService.CreateAsync(orderDTO, username);
 
         return Ok(response);
     }
@@ -68,7 +68,7 @@ public class OrdersController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var response = await _orderService.Update(id, orderDTO);
+        var response = await _orderService.UpdateAsync(id, orderDTO);
 
         return Ok(response);
     }
@@ -93,7 +93,7 @@ public class OrdersController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var response = await _orderService.Process(id, orderDTO);
+        var response = await _orderService.ProcessAsync(id, orderDTO);
 
         return Ok(response);
     }
@@ -119,7 +119,7 @@ public class OrdersController : BaseApiController
             return BadRequest("Order Id has to be provided.");
         }
 
-        var response = await _orderService.Fulfill(id, fulfillOrderDTO);
+        var response = await _orderService.FulfillAsync(id, fulfillOrderDTO);
         return Ok(response);
     }
 
@@ -141,7 +141,7 @@ public class OrdersController : BaseApiController
             return BadRequest("Order Id has to be provided.");
         }
 
-        var response = await _orderService.Close(id);
+        var response = await _orderService.CloseAsync(id);
         return Ok(response);
     }
 
@@ -163,7 +163,7 @@ public class OrdersController : BaseApiController
             return BadRequest("Order Id has to be provided.");
         }
 
-        var response = await _orderService.Cancel(id);
+        var response = await _orderService.CancelAsync(id);
         return Ok(response);
     }
 
@@ -175,7 +175,7 @@ public class OrdersController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<GenericOrderDTO>))]
     public async Task<IActionResult> GetOrders()
     {
-        var orders = await _orderService.GetOrders();
+        var orders = await _orderService.GetOrdersAsync();
 
         return Ok(orders);
     }
@@ -195,7 +195,7 @@ public class OrdersController : BaseApiController
             return BadRequest("Order Id has to be provided.");
         }
 
-        var order = await _orderService.GetOrder(id);
+        var order = await _orderService.GetOrderAsync(id);
 
         if (order == null) { return NotFound(); }
 

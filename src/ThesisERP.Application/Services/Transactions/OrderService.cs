@@ -29,7 +29,7 @@ public class OrderService : IOrderService
         _mapper = mapper;
     }
 
-    public async Task<GenericOrderDTO> Create(CreateOrderDTO createOrderDTO, string username)
+    public async Task<GenericOrderDTO> CreateAsync(CreateOrderDTO createOrderDTO, string username)
     {
         await _InitializeNewOrder(createOrderDTO, username);
 
@@ -46,7 +46,7 @@ public class OrderService : IOrderService
         return _mapper.Map<GenericOrderDTO>(orderResult);
     }
 
-    public async Task<GenericOrderDTO> Update(int id, UpdateOrderDTO updateOrderDTO)
+    public async Task<GenericOrderDTO> UpdateAsync(int id, UpdateOrderDTO updateOrderDTO)
     {
         _order = await _api.OrdersRepo.GetOrderByIdIncludeRelations(id);
         _ = _order ?? throw new ThesisERPException($"Order with id: '{id}' not found.");
@@ -76,7 +76,7 @@ public class OrderService : IOrderService
         return _mapper.Map<GenericOrderDTO>(_order);
     }
 
-    public async Task<GenericOrderDTO> Process(int id, ProcessOrderDTO processOrderDTO)
+    public async Task<GenericOrderDTO> ProcessAsync(int id, ProcessOrderDTO processOrderDTO)
     {
         _order = await _api.OrdersRepo.GetOrderByIdIncludeRelations(id);
         _ = _order ?? throw new ThesisERPException($"Order with id: '{id}' not found.");
@@ -98,7 +98,7 @@ public class OrderService : IOrderService
         return _mapper.Map<GenericOrderDTO>(_order);
     }
 
-    public async Task<GenericOrderDTO> Fulfill(int id, FulfillOrderDTO fulfillOrderDTO)
+    public async Task<GenericOrderDTO> FulfillAsync(int id, FulfillOrderDTO fulfillOrderDTO)
     {
         _order = await _api.OrdersRepo.GetOrderByIdIncludeRelations(id);
         _ = _order ?? throw new ThesisERPException($"Order with id: '{id}' not found.");
@@ -172,14 +172,14 @@ public class OrderService : IOrderService
 
         _api.OrdersRepo.Update(_order);
 
-        var createdDocument = _documentService.Create(documentDto, _order.CreatedBy, _order);
+        var createdDocument = await _documentService.CreateAsync(documentDto, _order.CreatedBy, _order);
 
         await _api.OrdersRepo.SaveChangesAsync();
 
         return _mapper.Map<GenericOrderDTO>(_order);
     }
 
-    public async Task<GenericOrderDTO> Close(int id)
+    public async Task<GenericOrderDTO> CloseAsync(int id)
     {
         _order = await _api.OrdersRepo.GetOrderByIdIncludeRelations(id);
         _ = _order ?? throw new ThesisERPException($"Order with id: '{id}' not found.");
@@ -198,7 +198,7 @@ public class OrderService : IOrderService
         return _mapper.Map<GenericOrderDTO>(_order);
     }
 
-    public async Task<GenericOrderDTO> Cancel(int id)
+    public async Task<GenericOrderDTO> CancelAsync(int id)
     {
         _order = await _api.OrdersRepo.GetOrderByIdIncludeRelations(id);
         _ = _order ?? throw new ThesisERPException($"Order with id: '{id}' not found.");
@@ -227,13 +227,13 @@ public class OrderService : IOrderService
         if (!productIds.Any()) { throw new ThesisERPException("A valid order rows list has to be provided."); }
 
         var taxIds = orderDTO.Rows
-                        .Where(y => y.TaxID != null)
+                        .Where(y => y.TaxID.GetValueOrDefault() > 0)
                         .Select(x => (int)x.TaxID)
                         .Distinct()
                         .ToList();
 
         var discountIds = orderDTO.Rows
-                            .Where(y => y.DiscountID != null)
+                            .Where(y => y.DiscountID.GetValueOrDefault() > 0)
                             .Select(x => (int)x.DiscountID)
                             .Distinct()
                             .ToList();
@@ -266,8 +266,13 @@ public class OrderService : IOrderService
         {
             var thisProduct = requestValues.Products.FirstOrDefault(x => x.Id == rowDTO.ProductId);
 
-            var thisTax = rowDTO.TaxID != null ? requestValues.Taxes.FirstOrDefault(x => x.Id == rowDTO.TaxID) : null;
-            var thisDiscount = rowDTO.DiscountID != null ? requestValues.Discounts.FirstOrDefault(x => x.Id == rowDTO.DiscountID) : null;
+            var thisTax = rowDTO.TaxID.GetValueOrDefault() > 0 
+                            ? requestValues.Taxes.FirstOrDefault(x => x.Id == rowDTO.TaxID) 
+                            : null;
+
+            var thisDiscount = rowDTO.DiscountID.GetValueOrDefault() > 0 
+                                ? requestValues.Discounts.FirstOrDefault(x => x.Id == rowDTO.DiscountID) 
+                                : null;
 
             var detail = new OrderRow(rowIndex + 1, thisProduct, rowDTO.ProductQuantity, decimal.Zero, rowDTO.UnitPrice, thisTax, thisDiscount);
             rowsList.Add(detail);
@@ -336,8 +341,8 @@ public class OrderService : IOrderService
         var productIds = updateOrderDTO.Rows.Select(x => x.ProductId).Distinct().ToList();
         if (!productIds.Any()) { throw new ThesisERPException("A valid order row list has to be provided."); }
 
-        var taxIds = updateOrderDTO.Rows.Where(y => y.TaxID != null).Select(x => (int)x.TaxID).Distinct().ToList();
-        var discountIds = updateOrderDTO.Rows.Where(y => y.DiscountID != null).Select(x => (int)x.DiscountID).Distinct().ToList();
+        var taxIds = updateOrderDTO.Rows.Where(y => y.TaxID.GetValueOrDefault() > 0).Select(x => (int)x.TaxID).Distinct().ToList();
+        var discountIds = updateOrderDTO.Rows.Where(y => y.DiscountID.GetValueOrDefault() > 0).Select(x => (int)x.DiscountID).Distinct().ToList();
 
         var entityId = updateOrderDTO.EntityId ?? throw new ThesisERPException($"EntityId has to be provided when updating a pending order.");
 
@@ -377,7 +382,7 @@ public class OrderService : IOrderService
         }
     }
 
-    public async Task<List<GenericOrderDTO>> GetOrders()
+    public async Task<List<GenericOrderDTO>> GetOrdersAsync()
     {
         var orders = await _api.OrdersRepo
                                 .GetAllAsync
@@ -397,7 +402,7 @@ public class OrderService : IOrderService
         return results;
     }
 
-    public async Task<GenericOrderDTO?> GetOrder(int id)
+    public async Task<GenericOrderDTO?> GetOrderAsync(int id)
     {     
 
         var order = await _api.OrdersRepo.GetOrderByIdIncludeRelations(id);

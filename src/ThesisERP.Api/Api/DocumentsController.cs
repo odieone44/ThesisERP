@@ -39,7 +39,7 @@ public class DocumentsController : BaseApiController
 
         var username = HttpContext.User.Identity?.Name ?? string.Empty;
 
-        var response = await _documentService.Create(documentDTO, username);
+        var response = await _documentService.CreateAsync(documentDTO, username);
 
         return Ok(response);
     }
@@ -67,7 +67,7 @@ public class DocumentsController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var response = await _documentService.Update(id, documentDTO);
+        var response = await _documentService.UpdateAsync(id, documentDTO);
 
         return Ok(response);
     }
@@ -91,7 +91,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var response = await _documentService.Fulfill(id);
+        var response = await _documentService.FulfillAsync(id);
         return Ok(response);
     }
 
@@ -113,7 +113,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var response = await _documentService.Close(id);
+        var response = await _documentService.CloseAsync(id);
         return Ok(response);
     }
 
@@ -135,7 +135,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var response = await _documentService.Cancel(id);
+        var response = await _documentService.CancelAsync(id);
         return Ok(response);
     }
 
@@ -148,7 +148,7 @@ public class DocumentsController : BaseApiController
     public async Task<IActionResult> GetDocuments()
     {
 
-        var documents = await _documentService.GetDocuments();
+        var documents = await _documentService.GetDocumentsAsync();
 
         return Ok(documents);
     }
@@ -168,7 +168,7 @@ public class DocumentsController : BaseApiController
             return BadRequest("Document Id has to be provided.");
         }
 
-        var document = await _documentService.GetDocument(id);
+        var document = await _documentService.GetDocumentAsync(id);
 
         if (document == null) { return NotFound(); }
 

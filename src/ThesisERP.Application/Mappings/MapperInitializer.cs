@@ -25,6 +25,7 @@ public class MapperInitializer : Profile
         _createInventoryLocationMaps();
         _createProductMaps();
         _createDocumentMaps();
+        _createOrderMaps();
         _createTemplateMaps();
         _createTaxMaps();
         _createDiscountMaps();
@@ -137,7 +138,9 @@ public class MapperInitializer : Profile
         CreateMap<Product, UpdateProductDTO>()
               .ReverseMap()
                  .ForMember(dest => dest.RelatedEntities,
-                            opt => opt.UseDestinationValue());
+                            opt => opt.UseDestinationValue())
+                 .ForMember(dest => dest.DateUpdated,
+                            opt => opt.MapFrom(val => DateTime.UtcNow));
     }
 
     private void _createStockLevelMaps()

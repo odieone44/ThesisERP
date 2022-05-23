@@ -6,13 +6,13 @@ namespace ThesisERP.Application.Interfaces.Transactions;
 
 public interface IOrderService 
 {
-    Task<GenericOrderDTO> Create(CreateOrderDTO createOrderDTO, string username);
-    Task<GenericOrderDTO> Update(int id, UpdateOrderDTO updateOrderDTO);
-    Task<GenericOrderDTO> Process(int id, ProcessOrderDTO processOrderDTO);
-    Task<GenericOrderDTO> Fulfill(int id, FulfillOrderDTO fulfillOrderDTO);
-    Task<GenericOrderDTO> Close(int id);
-    Task<GenericOrderDTO> Cancel(int id);
+    Task<GenericOrderDTO> CreateAsync(CreateOrderDTO createOrderDTO, string username);
+    Task<GenericOrderDTO> UpdateAsync(int id, UpdateOrderDTO updateOrderDTO);
+    Task<GenericOrderDTO> ProcessAsync(int id, ProcessOrderDTO processOrderDTO);
+    Task<GenericOrderDTO> FulfillAsync(int id, FulfillOrderDTO fulfillOrderDTO);
+    Task<GenericOrderDTO> CloseAsync(int id);
+    Task<GenericOrderDTO> CancelAsync(int id);
 
-    Task<List<GenericOrderDTO>> GetOrders();
-    Task<GenericOrderDTO?> GetOrder(int id);
+    Task<List<GenericOrderDTO>> GetOrdersAsync();
+    Task<GenericOrderDTO?> GetOrderAsync(int id);
 }

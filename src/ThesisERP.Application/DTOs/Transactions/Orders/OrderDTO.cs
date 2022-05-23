@@ -13,7 +13,7 @@ public class UpdateOrderDTO : UpdateTransactionBaseDTO<CreateOrderRowDTO>
 public class ProcessOrderDTO
 {
     [Required]
-    public int InventoryLocationId;
+    public int InventoryLocationId { get; set; }
 }
 public class FulfillOrderDTO
 {

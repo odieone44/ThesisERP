@@ -11,7 +11,7 @@ using ThesisERP.Application.Models;
 using ThesisERP.Core.Entities;
 
 
-namespace ThesisERP.Application.Services;
+namespace ThesisERP.Infrastracture.Authorization;
 
 public class AuthManager : IAuthManager
 {
