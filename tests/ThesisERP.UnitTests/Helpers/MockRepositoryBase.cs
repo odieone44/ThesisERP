@@ -1,12 +1,14 @@
 ﻿namespace ThesisERP.UnitTests.Helpers;
 
-using Moq;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Collections.Generic;
-using ThesisERP.Application.Interfaces;
 using Microsoft.EntityFrameworkCore.Query;
+
+using ThesisERP.Application.Interfaces;
+
+using Moq;
 
 public class MockRepositoryBase<T> : Mock<IRepositoryBase<T>>, IMockRepositoryBase<T> 
     where T : class
