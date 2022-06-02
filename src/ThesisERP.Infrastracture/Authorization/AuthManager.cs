@@ -1,15 +1,18 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using ThesisERP.Application.DTOs;
-using ThesisERP.Application.Interfaces;
-using ThesisERP.Application.Models;
-using ThesisERP.Core.Entities;
 
+using System.Text;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
+
+using ThesisERP.Core.Entities;
+using ThesisERP.Application.DTOs;
+using ThesisERP.Application.Models;
+using ThesisERP.Application.Interfaces;
+
+using AutoMapper;
 
 namespace ThesisERP.Infrastracture.Authorization;
 
@@ -18,13 +21,16 @@ public class AuthManager : IAuthManager
     private readonly UserManager<AppUser> _userManager;
     private readonly JwtSettings _jwtSettings;
     private readonly IAppDbContext _context;
+    private readonly IMapper _mapper;
+
     private AppUser _user;
 
-    public AuthManager(UserManager<AppUser> userManager, IOptions<JwtSettings> jwtSettings, IAppDbContext context)
+    public AuthManager(UserManager<AppUser> userManager, IOptions<JwtSettings> jwtSettings, IAppDbContext context, IMapper mapper)
     {
         _userManager = userManager;
         _jwtSettings = jwtSettings.Value;
         _context = context;
+        _mapper = mapper;
     }
 
     #region Actions
@@ -74,8 +80,7 @@ public class AuthManager : IAuthManager
             await _context.SaveChangesAsync();
         }
 
-        if (!refreshToken.IsActive)
-            return new AuthError();
+        if (!refreshToken.IsActive) { return new AuthError(); }
 
         // replace old refresh token with a new one (rotate token)
         var newRefreshToken = RefreshToken.RotateRefreshToken(refreshToken, ipAddress);
@@ -90,11 +95,46 @@ public class AuthManager : IAuthManager
         await _context.SaveChangesAsync();
 
         // generate new jwt
-        string jwtToken = await _CreateJwtToken();
+        var jwtToken = await _CreateJwtToken();
 
         return new AuthSuccess(jwtToken, newRefreshToken.Token);
 
     }
+    public async Task<IdentityResult> RegisterUser(RegisterUserDTO registerUserDTO)
+    {
+        var user = _mapper.Map<AppUser>(registerUserDTO);
+
+        user.UserName = registerUserDTO.Email;
+
+        var result = await _userManager.CreateAsync(user, registerUserDTO.Password);
+
+        if (!result.Succeeded)
+        {
+            return result;
+        }
+
+        await _userManager.AddToRolesAsync(user, new[] { "User" });
+
+        return result;
+    }
+
+    public async Task<IdentityResult> ChangePassword(string username, ChangeUserPasswordDTO changePasswordDTO)
+    {
+
+        if (string.IsNullOrEmpty(username)) { return null; }
+
+        var user = await _userManager.FindByNameAsync(username);
+
+        if (user is null)
+        {
+            return null;
+        }
+
+        var response = await _userManager.ChangePasswordAsync(user, changePasswordDTO.OldPassword, changePasswordDTO.NewPassword);
+
+        return response;
+    }
+
 
     #endregion
 
@@ -157,5 +197,7 @@ public class AuthManager : IAuthManager
 
         return user ?? throw new Exception("Invalid token");
     }
+
+
     #endregion
 }

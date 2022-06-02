@@ -1,13 +1,14 @@
-using AspNetCoreRateLimit;
-using Microsoft.OpenApi.Models;
-using Serilog;
 using System.Reflection;
+using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
-using ThesisERP;
-using ThesisERP.Api.Extensions;
+
 using ThesisERP.Application;
-using ThesisERP.Application.Models;
 using ThesisERP.Infrastracture;
+using ThesisERP.Api.Extensions;
+using ThesisERP.Application.Models;
+
+using AspNetCoreRateLimit;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 

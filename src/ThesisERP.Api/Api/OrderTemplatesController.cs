@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ThesisERP.Application.DTOs.Transactions.Orders;
-using ThesisERP.Application.Interfaces;
-using ThesisERP.Core.Entities;
+using ThesisERP.Application.Interfaces.TransactionTemplates;
 
 namespace ThesisERP.Api.Api;
 
@@ -12,14 +10,12 @@ namespace ThesisERP.Api.Api;
 public class OrderTemplatesController : BaseApiController
 {
     private readonly ILogger<OrderTemplatesController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IRepositoryBase<OrderTemplate> _templatesRepo;
+    private readonly IOrderTemplateService _templateService;
 
-    public OrderTemplatesController(ILogger<OrderTemplatesController> logger, IMapper mapper, IRepositoryBase<OrderTemplate> templatesRepo)
+    public OrderTemplatesController(ILogger<OrderTemplatesController> logger, IOrderTemplateService templateService)
     {
         _logger = logger;
-        _mapper = mapper;
-        _templatesRepo = templatesRepo;
+        _templateService = templateService;
     }
 
     /// <summary>
@@ -30,11 +26,8 @@ public class OrderTemplatesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<OrderTemplateDTO>))]
     public async Task<IActionResult> GetOrderTemplates()
     {
-        var templates = await _templatesRepo
-                            .GetAllAsync(orderBy: o => o.OrderBy(d => d.Id));
 
-        var results = _mapper.Map<List<OrderTemplateDTO>>(templates);
-
+        var results = await _templateService.GetAllAsync();
         return Ok(results);
     }
 
@@ -54,12 +47,11 @@ public class OrderTemplatesController : BaseApiController
             return BadRequest("valid Id has to be provided");
         }
 
-        var template = await _templatesRepo.GetByIdAsync(id);
+        var template = await _templateService.GetByIdAsync(id);
 
         if (template == null) { return NotFound(); }
 
-        var result = _mapper.Map<OrderTemplateDTO>(template);
-        return Ok(result);
+        return Ok(template);
     }
 
     /// <summary>
@@ -78,15 +70,9 @@ public class OrderTemplatesController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var template = _mapper.Map<OrderTemplate>(templateDTO);
+        var result = await _templateService.CreateAsync(templateDTO);
 
-        var result = _templatesRepo.Add(template);
-
-        await _templatesRepo.SaveChangesAsync();
-
-        var templateAdded = _mapper.Map<OrderTemplateDTO>(result);
-
-        return CreatedAtRoute("GetOrderTemplate", new { id = templateAdded.Id }, templateAdded);
+        return CreatedAtRoute("GetOrderTemplate", new { id = result.Id }, result);
     }
 
     /// <summary>
@@ -110,13 +96,9 @@ public class OrderTemplatesController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var template = await _templatesRepo.GetByIdAsync(id);
+        var template = await _templateService.UpdateAsync(id, templateDTO);
         if (template == null) { return NotFound(); }
 
-        _mapper.Map(templateDTO, template);
-        _templatesRepo.Update(template);
-
-        await _templatesRepo.SaveChangesAsync();
         return NoContent();
     }
 
@@ -136,15 +118,7 @@ public class OrderTemplatesController : BaseApiController
             return BadRequest("Id has to be provided for Delete action");
         }
 
-        var template = await _templatesRepo.GetByIdAsync(id);
-
-        if (template == null) { return NotFound(); }
-
-        template.IsDeleted = true;
-
-        _templatesRepo.Update(template);
-
-        await _templatesRepo.SaveChangesAsync();
+        await _templateService.DeleteAsync(id);
 
         return NoContent();
 
@@ -166,15 +140,7 @@ public class OrderTemplatesController : BaseApiController
             return BadRequest("Id has to be provided for Restore action");
         }
 
-        var template = await _templatesRepo.GetByIdAsync(id);
-
-        if (template == null) { return NotFound(); }
-
-        template.IsDeleted = false;
-
-        _templatesRepo.Update(template);
-
-        await _templatesRepo.SaveChangesAsync();
+        await _templateService.RestoreAsync(id);
 
         return NoContent();
 

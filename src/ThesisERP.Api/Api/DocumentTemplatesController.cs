@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ThesisERP.Application.DTOs.Transactions.Documents;
-using ThesisERP.Application.Interfaces;
-using ThesisERP.Core.Entities;
+using ThesisERP.Application.Interfaces.TransactionTemplates;
 
 namespace ThesisERP.Api.Api;
 
@@ -12,14 +10,12 @@ namespace ThesisERP.Api.Api;
 public class DocumentTemplatesController : BaseApiController
 {
     private readonly ILogger<DocumentTemplatesController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IRepositoryBase<DocumentTemplate> _templatesRepo;
+    private readonly IDocumentTemplateService _templateService;
 
-    public DocumentTemplatesController(ILogger<DocumentTemplatesController> logger, IMapper mapper, IRepositoryBase<DocumentTemplate> templatesRepo)
+    public DocumentTemplatesController(ILogger<DocumentTemplatesController> logger, IDocumentTemplateService templateService)
     {
         _logger = logger;
-        _mapper = mapper;
-        _templatesRepo = templatesRepo;
+        _templateService = templateService;
     }
 
     /// <summary>
@@ -30,11 +26,7 @@ public class DocumentTemplatesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DocumentTemplateDTO>))]
     public async Task<IActionResult> GetDocumentTemplates()
     {
-        var templates = await _templatesRepo
-                            .GetAllAsync(orderBy: o => o.OrderBy(d => d.Id));
-
-        var results = _mapper.Map<List<DocumentTemplateDTO>>(templates);
-
+        var results = await _templateService.GetAllAsync();
         return Ok(results);
     }
 
@@ -53,13 +45,11 @@ public class DocumentTemplatesController : BaseApiController
         {
             return BadRequest("valid Id has to be provided");
         }
-
-        var template = await _templatesRepo.GetByIdAsync(id);
+        var template = await _templateService.GetByIdAsync(id);
 
         if (template == null) { return NotFound(); }
 
-        var result = _mapper.Map<DocumentTemplateDTO>(template);
-        return Ok(result);
+        return Ok(template);
     }
 
     /// <summary>
@@ -78,15 +68,9 @@ public class DocumentTemplatesController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var template = _mapper.Map<DocumentTemplate>(templateDTO);
+        var result = await _templateService.CreateAsync(templateDTO);
 
-        var result = _templatesRepo.Add(template);
-
-        await _templatesRepo.SaveChangesAsync();
-
-        var templateAdded = _mapper.Map<DocumentTemplateDTO>(result);
-
-        return CreatedAtRoute("GetDocumentTemplate", new { id = templateAdded.Id }, templateAdded);
+        return CreatedAtRoute("GetDocumentTemplate", new { id = result.Id }, result);
     }
 
     /// <summary>
@@ -110,13 +94,10 @@ public class DocumentTemplatesController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var template = await _templatesRepo.GetByIdAsync(id);
+        var template = await _templateService.UpdateAsync(id, templateDTO);
+
         if (template == null) { return NotFound(); }
 
-        _mapper.Map(templateDTO, template);
-        _templatesRepo.Update(template);
-
-        await _templatesRepo.SaveChangesAsync();
         return NoContent();
     }
 
@@ -126,7 +107,6 @@ public class DocumentTemplatesController : BaseApiController
     /// <param name="id">The id of the template to delete</param>
     /// <response code="204">On success</response>
     /// <response code="400">If the request is invalid.</response>
-    /// <response code="404">If the template is not found.</response>
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteDocumentTemplate(int id)
@@ -136,15 +116,7 @@ public class DocumentTemplatesController : BaseApiController
             return BadRequest("Id has to be provided for Delete action");
         }
 
-        var template = await _templatesRepo.GetByIdAsync(id);
-
-        if (template == null) { return NotFound(); }
-
-        template.IsDeleted = true;
-
-        _templatesRepo.Update(template);
-
-        await _templatesRepo.SaveChangesAsync();
+        await _templateService.DeleteAsync(id);
 
         return NoContent();
 
@@ -155,8 +127,7 @@ public class DocumentTemplatesController : BaseApiController
     /// </summary>
     /// <param name="id">The id of the template to restore</param>
     /// <response code="204">On success</response>
-    /// <response code="400">If the request is invalid.</response>
-    /// <response code="404">If the template is not found.</response>
+    /// <response code="400">If the request is invalid.</response>    
     [HttpPut("{id:int}/Restore")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> RestoreDocumentTemplate(int id)
@@ -166,15 +137,7 @@ public class DocumentTemplatesController : BaseApiController
             return BadRequest("Id has to be provided for Restore action");
         }
 
-        var template = await _templatesRepo.GetByIdAsync(id);
-
-        if (template == null) { return NotFound(); }
-
-        template.IsDeleted = false;
-
-        _templatesRepo.Update(template);
-
-        await _templatesRepo.SaveChangesAsync();
+        await _templateService.RestoreAsync(id);
 
         return NoContent();
 

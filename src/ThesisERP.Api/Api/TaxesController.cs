@@ -1,10 +1,10 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using ThesisERP.Application.DTOs;
-using ThesisERP.Application.Interfaces;
-using ThesisERP.Core.Entities;
+﻿namespace ThesisERP.Api.Api;
 
-namespace ThesisERP.Api.Api;
+using Microsoft.AspNetCore.Mvc;
+
+using ThesisERP.Application.DTOs;
+using ThesisERP.Application.Interfaces.Pricing;
+
 
 /// <summary>
 /// Manage Taxes.
@@ -12,14 +12,13 @@ namespace ThesisERP.Api.Api;
 public class TaxesController : BaseApiController
 {
     private readonly ILogger<TaxesController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IRepositoryBase<Tax> _taxRepo;
+    private readonly ITaxService _taxService;
 
-    public TaxesController(ILogger<TaxesController> logger, IMapper mapper, IRepositoryBase<Tax> taxRepo)
+
+    public TaxesController(ILogger<TaxesController> logger, ITaxService taxService)
     {
         _logger = logger;
-        _mapper = mapper;
-        _taxRepo = taxRepo;
+        _taxService = taxService;
     }
 
     /// <summary>
@@ -30,13 +29,8 @@ public class TaxesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<TaxDTO>))]
     public async Task<IActionResult> GetTaxes() //[FromQuery] RequestParams requestParams
     {
-        var taxes = await _taxRepo
-                            .GetAllAsync
-                             (orderBy: o => o.OrderBy(d => d.Id));
-
-        var results = _mapper.Map<List<TaxDTO>>(taxes);
-
-        return Ok(results);
+        var taxes = await _taxService.GetAllAsync();
+        return Ok(taxes);
     }
 
     /// <summary>
@@ -49,12 +43,11 @@ public class TaxesController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TaxDTO))]
     public async Task<IActionResult> GetTax(int id)
     {
-        var tax = await _taxRepo.GetByIdAsync(id);
+        var tax = await _taxService.GetByIdAsync(id);
 
-        if (tax == null) { return NotFound(); }
+        if (tax is null) { return NotFound(); }
 
-        var result = _mapper.Map<TaxDTO>(tax);
-        return Ok(result);
+        return Ok(tax);
     }
 
     /// <summary>
@@ -77,11 +70,7 @@ public class TaxesController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var tax = _mapper.Map<Tax>(taxDTO);
-
-        var result = _taxRepo.Add(tax);
-        await _taxRepo.SaveChangesAsync();
-        var taxAdded = _mapper.Map<TaxDTO>(result);
+        var taxAdded = await _taxService.CreateAsync(taxDTO);
 
         return CreatedAtRoute("GetTax", new { id = taxAdded.Id }, taxAdded);
 
@@ -108,15 +97,9 @@ public class TaxesController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var tax = await _taxRepo.GetByIdAsync(id);
+        var result = await _taxService.UpdateAsync(id, taxDTO);
 
-        if (tax == null) { return NotFound(); }
-
-        _mapper.Map(taxDTO, tax);
-
-        _taxRepo.Update(tax);
-
-        await _taxRepo.SaveChangesAsync();
+        if (result is null) { return NotFound(); }
 
         return NoContent();
     }
@@ -127,7 +110,6 @@ public class TaxesController : BaseApiController
     /// <param name="id">The id of the tax to delete</param>
     /// <response code="204">On success</response>
     /// <response code="400">If the request is invalid.</response>
-    /// <response code="404">If the tax is not found.</response>
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteTax(int id)
@@ -137,14 +119,7 @@ public class TaxesController : BaseApiController
             return BadRequest("Id has to be provided for Delete action");
         }
 
-        var tax = await _taxRepo.GetByIdAsync(id);
-
-        if (tax == null) { return NotFound(); }
-
-        tax.IsDeleted = true;
-
-        _taxRepo.Update(tax);
-        await _taxRepo.SaveChangesAsync();
+        await _taxService.DeleteAsync(id);
 
         return NoContent();
     }
@@ -155,7 +130,6 @@ public class TaxesController : BaseApiController
     /// <param name="id">The id of the tax to restore</param>
     /// <response code="204">On success</response>
     /// <response code="400">If the request is invalid.</response>
-    /// <response code="404">If the tax is not found.</response>
     [HttpPut("{id:int}/Restore")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> RestoreTax(int id)
@@ -165,14 +139,7 @@ public class TaxesController : BaseApiController
             return BadRequest("Id has to be provided for Restore action");
         }
 
-        var tax = await _taxRepo.GetByIdAsync(id);
-
-        if (tax == null) { return NotFound(); }
-
-        tax.IsDeleted = false;
-
-        _taxRepo.Update(tax);
-        await _taxRepo.SaveChangesAsync();
+        await _taxService.RestoreAsync(id);
 
         return NoContent();
 

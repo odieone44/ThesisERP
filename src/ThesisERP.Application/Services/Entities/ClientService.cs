@@ -1,12 +1,12 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
-using ThesisERP.Application.DTOs.Entities;
-using ThesisERP.Application.Interfaces;
-using ThesisERP.Application.Interfaces.Entities;
-using ThesisERP.Core.Entities;
-using ThesisERP.Core.Enums;
+﻿namespace ThesisERP.Application.Services.Entities;
 
-namespace ThesisERP.Application.Services.Entities;
+using ThesisERP.Core.Enums;
+using ThesisERP.Core.Entities;
+using ThesisERP.Application.Interfaces;
+using ThesisERP.Application.DTOs.Entities;
+using ThesisERP.Application.Interfaces.Entities;
+
+using AutoMapper;
 
 public class ClientService : IClientService
 {

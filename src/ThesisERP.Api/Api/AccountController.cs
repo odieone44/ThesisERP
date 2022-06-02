@@ -1,11 +1,9 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
 using ThesisERP.Application.Models;
-using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api;
 
@@ -13,20 +11,14 @@ namespace ThesisERP.Api;
 /// Login and other account functions. 
 /// </summary>
 public class AccountController : BaseApiController
-{
-    private readonly UserManager<AppUser> _userManager;
-    private readonly ILogger<AccountController> _logger;
-    private readonly IMapper _mapper;
+{    
+    private readonly ILogger<AccountController> _logger;    
     private readonly IAuthManager _authManager;
 
-    public AccountController(UserManager<AppUser> userManager,
-                             ILogger<AccountController> logger,
-                             IMapper mapper,
+    public AccountController(ILogger<AccountController> logger,
                              IAuthManager authManager)
     {
-        _userManager = userManager;
         _logger = logger;
-        _mapper = mapper;
         _authManager = authManager;
     }
 
@@ -49,9 +41,7 @@ public class AccountController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var user = _mapper.Map<AppUser>(userDTO);
-        user.UserName = userDTO.Email;
-        var result = await _userManager.CreateAsync(user, userDTO.Password);
+        var result = await _authManager.RegisterUser(userDTO);
 
         if (!result.Succeeded)
         {
@@ -63,7 +53,6 @@ public class AccountController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        await _userManager.AddToRolesAsync(user, new[] { "User" });
         return Accepted();
     }
 
@@ -79,9 +68,9 @@ public class AccountController : BaseApiController
     [Route("login")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(AuthSuccessResponse))]
     public async Task<IActionResult> Login([FromBody] LoginUserDTO userDTO)
-    {        
+    {
         _logger.LogInformation($"Logging attempt for {userDTO.Email} ");
-        
+
         if (!ModelState.IsValid)
         {
             return BadRequest();
@@ -102,26 +91,19 @@ public class AccountController : BaseApiController
     [Route("change-password")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> ChangePassword([FromBody] ChangeUserPasswordDTO userDTO)
-    {        
+    {
         if (!ModelState.IsValid)
         {
             return BadRequest();
         }
 
-        var userName = HttpContext.User.Identity?.Name;
+        var username = HttpContext.User.Identity?.Name;
 
-        if (string.IsNullOrEmpty(userName)) { return Unauthorized(); }
+        _logger.LogInformation($"Password change attempt for {username} ");
 
-        _logger.LogInformation($"Password change attempt for {userName} ");
+        var response = await _authManager.ChangePassword(username!, userDTO);
 
-        var user = await _userManager.FindByNameAsync(userName);
-
-        if (user == null)
-        {
-            return Unauthorized();
-        }
-
-        var response = await _userManager.ChangePasswordAsync(user, userDTO.OldPassword, userDTO.NewPassword);
+        if (response is null) { return Unauthorized(); }
 
         return response.Succeeded ? NoContent() : Unauthorized();
     }
@@ -169,8 +151,8 @@ public class AccountController : BaseApiController
     {
         // get source ip address for the current request
         if (Request.Headers.ContainsKey("X-Forwarded-For"))
-        { 
-            return Request.Headers["X-Forwarded-For"]; 
+        {
+            return Request.Headers["X-Forwarded-For"];
         }
         else
         {

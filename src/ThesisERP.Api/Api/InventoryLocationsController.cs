@@ -1,12 +1,8 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿namespace ThesisERP.Api;
+
 using Microsoft.AspNetCore.Mvc;
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
-using ThesisERP.Core.Entities;
-
-namespace ThesisERP.Api;
 
 /// <summary>
 /// Manage your organization's Inventory Locations.
@@ -14,14 +10,12 @@ namespace ThesisERP.Api;
 public class InventoryLocationsController : BaseApiController
 {
     private readonly ILogger<InventoryLocationsController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IRepositoryBase<InventoryLocation> _locationsRepo;
+    private readonly ILocationService _locationService;
 
-    public InventoryLocationsController(ILogger<InventoryLocationsController> logger, IMapper mapper, IRepositoryBase<InventoryLocation> locationsRepo)
+    public InventoryLocationsController(ILogger<InventoryLocationsController> logger, ILocationService locationService)
     {
         _logger = logger;
-        _mapper = mapper;
-        _locationsRepo = locationsRepo;
+        _locationService = locationService;
     }
 
     /// <summary>
@@ -32,10 +26,7 @@ public class InventoryLocationsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLocations() //[FromQuery] RequestParams requestParams
     {
-        var locations = await _locationsRepo.GetAllAsync(orderBy: o => o.OrderBy(d => d.Id));
-
-        var results = _mapper.Map<List<InventoryLocationDTO>>(locations);
-
+        var results = await _locationService.GetAllAsync();
         return Ok(results);
     }
 
@@ -46,14 +37,12 @@ public class InventoryLocationsController : BaseApiController
     /// <response code="200">Returns the requested location.</response>
     /// <response code="404">If location does not exist.</response>
     [HttpGet("{id:int}", Name = "GetInventoryLocation")]
-    [ProducesResponseType(StatusCodes.Status200OK)]    
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetInventoryLocation(int id)
     {
-        var location = await _locationsRepo.GetByIdAsync(id);
+        var result = await _locationService.GetByIdAsync(id);
 
-        if (location == null) { return NotFound(); }
-
-        var result = _mapper.Map<InventoryLocationDTO>(location);
+        if (result == null) { return NotFound(); }
         return Ok(result);
     }
 
@@ -73,15 +62,9 @@ public class InventoryLocationsController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var location = _mapper.Map<InventoryLocation>(locationDTO);
+        var result = await _locationService.CreateAsync(locationDTO);
 
-        var result = _locationsRepo.Add(location);
-
-        await _locationsRepo.SaveChangesAsync();
-
-        var locationAdded = _mapper.Map<InventoryLocationDTO>(result);
-
-        return CreatedAtRoute("GetInventoryLocation", new { id = locationAdded.Id }, locationAdded);
+        return CreatedAtRoute("GetInventoryLocation", new { id = result.Id }, result);
 
     }
 
@@ -103,16 +86,9 @@ public class InventoryLocationsController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var location = await _locationsRepo.GetByIdAsync(id);
+        var location = await _locationService.UpdateAsync(id, locationDTO);
 
         if (location == null) { return NotFound(); }
-
-        _mapper.Map(locationDTO, location);
-
-        _locationsRepo.Update(location);
-
-        await _locationsRepo.SaveChangesAsync();
-
         return NoContent();
     }
 
@@ -126,7 +102,6 @@ public class InventoryLocationsController : BaseApiController
     /// <param name="id">The id of the location to delete</param>
     /// <response code="204">On success</response>
     /// <response code="400">If the request is invalid.</response>
-    /// <response code="404">If the location is not found.</response>
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteInventoryLocation(int id)
@@ -137,15 +112,7 @@ public class InventoryLocationsController : BaseApiController
             return BadRequest("Id has to be provided for Delete action");
         }
 
-        var location = await _locationsRepo.GetByIdAsync(id);
-
-        if (location == null) { return NotFound(); }
-
-        location.IsDeleted = true;
-        _locationsRepo.Update(location);
-
-        //_locationsRepo.Delete(location);
-        await _locationsRepo.SaveChangesAsync();
+        await _locationService.DeleteAsync(id);
 
         return NoContent();
 
@@ -157,24 +124,16 @@ public class InventoryLocationsController : BaseApiController
     /// <param name="id">The id of the location to restore</param>
     /// <response code="204">On success</response>
     /// <response code="400">If the request is invalid.</response>
-    /// <response code="404">If the location is not found.</response>
     [HttpPut("{id:int}/Restore")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> RestoreInventoryLocation(int id)
     {
         if (id < 1)
-        {            
+        {
             return BadRequest("Id has to be provided for Restore action");
         }
 
-        var location = await _locationsRepo.GetByIdAsync(id);
-
-        if (location == null) { return NotFound(); }
-
-        location.IsDeleted = false;
-        _locationsRepo.Update(location);
-        
-        await _locationsRepo.SaveChangesAsync();
+        await _locationService.RestoreAsync(id);
 
         return NoContent();
 

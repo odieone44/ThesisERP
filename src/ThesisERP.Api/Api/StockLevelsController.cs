@@ -1,9 +1,6 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ThesisERP.Application.DTOs;
 using ThesisERP.Application.Interfaces;
-using ThesisERP.Application.Services.Stock;
-using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Api;
 
@@ -12,7 +9,7 @@ namespace ThesisERP.Api;
 /// </summary>
 public class StockLevelsController : BaseApiController
 {
-    private readonly ILogger<StockLevelsController> _logger;    
+    private readonly ILogger<StockLevelsController> _logger;
     private readonly IStockService _stockService;
 
     public StockLevelsController(ILogger<StockLevelsController> logger, IStockService stockService)

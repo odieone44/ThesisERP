@@ -13,6 +13,9 @@ using Moq;
 public class MockRepositoryBase<T> : Mock<IRepositoryBase<T>>, IMockRepositoryBase<T> 
     where T : class
 {
+    /// <summary>
+    /// Exposes the Mocked Instance. 
+    /// </summary>
     public IRepositoryBase<T> MockInstance { get; }
 
     public MockRepositoryBase() : base()

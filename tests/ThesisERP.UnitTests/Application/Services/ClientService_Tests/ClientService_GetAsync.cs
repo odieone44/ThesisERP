@@ -30,7 +30,7 @@ public class ClientService_GetAsync
 
         _mapper = mockMapper.CreateMapper();
 
-        _clientService = new ClientService(_mapper, _mockRepo.Object);
+        _clientService = new ClientService(_mapper, _mockRepo.MockInstance);
     }
 
     [Fact]

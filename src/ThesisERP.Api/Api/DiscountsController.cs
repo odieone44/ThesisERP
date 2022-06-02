@@ -1,10 +1,10 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using ThesisERP.Application.DTOs;
-using ThesisERP.Application.Interfaces;
-using ThesisERP.Core.Entities;
+﻿namespace ThesisERP.Api.Api;
 
-namespace ThesisERP.Api.Api;
+using Microsoft.AspNetCore.Mvc;
+
+using ThesisERP.Application.DTOs;
+using ThesisERP.Application.Interfaces.Pricing;
+
 
 /// <summary>
 /// Manage Discounts.
@@ -12,14 +12,12 @@ namespace ThesisERP.Api.Api;
 public class DiscountsController : BaseApiController
 {
     private readonly ILogger<DiscountsController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IRepositoryBase<Discount> _discountRepo;
+    private readonly IDiscountService _discountService;
 
-    public DiscountsController(ILogger<DiscountsController> logger, IMapper mapper, IRepositoryBase<Discount> discountRepo)
+    public DiscountsController(ILogger<DiscountsController> logger, IDiscountService discountService)
     {
         _logger = logger;
-        _mapper = mapper;
-        _discountRepo = discountRepo;
+        _discountService = discountService;
     }
 
     /// <summary>
@@ -30,13 +28,8 @@ public class DiscountsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<DiscountDTO>))]
     public async Task<IActionResult> GetDiscounts() //[FromQuery] RequestParams requestParams
     {
-        var discounts = await _discountRepo
-                            .GetAllAsync
-                             (orderBy: o => o.OrderBy(d => d.Id));
-
-        var results = _mapper.Map<List<DiscountDTO>>(discounts);
-
-        return Ok(results);
+        var discounts = await _discountService.GetAllAsync();
+        return Ok(discounts);
     }
 
     /// <summary>
@@ -49,12 +42,11 @@ public class DiscountsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DiscountDTO))]
     public async Task<IActionResult> GetDiscount(int id)
     {
-        var discount = await _discountRepo.GetByIdAsync(id);
+        var discount = await _discountService.GetByIdAsync(id);
 
-        if (discount == null) { return NotFound(); }
+        if (discount is null) { return NotFound(); }
 
-        var result = _mapper.Map<DiscountDTO>(discount);
-        return Ok(result);
+        return Ok(discount);
     }
 
     /// <summary>
@@ -77,11 +69,7 @@ public class DiscountsController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var discount = _mapper.Map<Discount>(discountDTO);
-
-        var result = _discountRepo.Add(discount);
-        await _discountRepo.SaveChangesAsync();
-        var discountAdded = _mapper.Map<DiscountDTO>(result);
+        var discountAdded = await _discountService.CreateAsync(discountDTO);
 
         return CreatedAtRoute("GetDiscount", new { id = discountAdded.Id }, discountAdded);
 
@@ -108,15 +96,9 @@ public class DiscountsController : BaseApiController
             return BadRequest(ModelState);
         }
 
-        var discount = await _discountRepo.GetByIdAsync(id);
+        var result = await _discountService.UpdateAsync(id, discountDTO);
 
-        if (discount == null) { return NotFound(); }
-
-        _mapper.Map(discountDTO, discount);
-
-        _discountRepo.Update(discount);
-
-        await _discountRepo.SaveChangesAsync();
+        if (result is null) { return NotFound(); }
 
         return NoContent();
     }
@@ -137,14 +119,7 @@ public class DiscountsController : BaseApiController
             return BadRequest("Id has to be provided for Delete action");
         }
 
-        var discount = await _discountRepo.GetByIdAsync(id);
-
-        if (discount == null) { return NotFound(); }
-
-        discount.IsDeleted = true;
-
-        _discountRepo.Update(discount);
-        await _discountRepo.SaveChangesAsync();
+        await _discountService.DeleteAsync(id);
 
         return NoContent();
     }
@@ -165,14 +140,7 @@ public class DiscountsController : BaseApiController
             return BadRequest("Id has to be provided for Restore action");
         }
 
-        var discount = await _discountRepo.GetByIdAsync(id);
-
-        if (discount == null) { return NotFound(); }
-
-        discount.IsDeleted = false;
-
-        _discountRepo.Update(discount);
-        await _discountRepo.SaveChangesAsync();
+        await _discountService.RestoreAsync(id);
 
         return NoContent();
 

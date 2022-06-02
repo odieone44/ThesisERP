@@ -113,7 +113,6 @@ public class SuppliersController : BaseApiController
     /// <param name="id">The id of the supplier to restore</param>
     /// <response code="204">On success</response>
     /// <response code="400">If the request is invalid.</response>
-    /// <response code="404">If the supplier is not found.</response>
     [HttpPut("{id:int}/Restore")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> RestoreSupplier(int id)
