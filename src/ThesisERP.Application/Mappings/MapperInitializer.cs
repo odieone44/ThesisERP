@@ -181,7 +181,11 @@ public class MapperInitializer : Profile
             .ForMember(x => x.DiscountName, opt => opt.MapFrom(src => src.Discount.Name));
 
 
-        CreateMap<Order, GenericOrderDTO>();
+        CreateMap<Order, GenericOrderDTO>()
+            .ForMember( dto => dto.RelatedDocumentIDs, 
+                        o => o.MapFrom(
+                            src => src.RelatedDocuments.Select(d => d.Id))
+                        );
     }
 
     private void _createTemplateMaps()

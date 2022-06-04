@@ -9,6 +9,7 @@ using ThesisERP.Application.Models;
 
 using AspNetCoreRateLimit;
 using Serilog;
+using ThesisERP;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -132,19 +133,19 @@ app.UseEndpoints(endpoints => endpoints.MapControllers());
 
 app.MapControllers();
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var services = scope.ServiceProvider;
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
 
-//    try
-//    {
-//        await SeedDatabase.Initialize(services, app.Configuration);
-//    }
-//    catch (Exception ex)
-//    {
-//        Log.Error(ex, "Failed to seed database.");
-//    }
-//}
+    try
+    {
+        await SeedDatabase.Initialize(services, app.Configuration);
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Failed to seed database.");
+    }
+}
 
 Log.Information("App is starting...");
 app.Run();

@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ThesisERP.Core.Entities;
 
 namespace ThesisERP.Infrastracture.Data.Configurations.Entities;
@@ -27,6 +22,11 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
         orderBuilder.HasOne(t => t.InventoryLocation)
                     .WithMany()
                     .HasForeignKey(t => t.InventoryLocationId);
+
+        //defined at document config
+        //orderBuilder.HasMany(d => d.RelatedDocuments)
+        //            .WithOne(e => e.ParentOrder)
+        //            .HasForeignKey(e => e.ParentOrderId);
 
         orderBuilder.Property(d => d.Timestamp).IsRowVersion();
 

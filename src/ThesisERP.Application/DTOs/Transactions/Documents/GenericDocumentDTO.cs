@@ -7,7 +7,7 @@ public class CreateDocumentDTO : CreateTransactionBaseDTO<CreateDocumentRowDTO>
 {   
     [Required]
     public int InventoryLocationId { get; set; }
-    public bool CreateAsFulfilled { get; set; } = false;
+    public bool CreateAsFulfilled { get; set; } 
 
 }
 
@@ -25,6 +25,7 @@ public class BaseDocumentDTO : TransactionBaseDTO<DocumentRowDTO>
 public class GenericDocumentDTO : BaseDocumentDTO
 {
     public EntityBaseInfoDTO Entity { get; set; }
+    public int? ParentOrderId { get; set; }
 }
 
 //public class SalesDocumentDTO : BaseDocumentDTO
