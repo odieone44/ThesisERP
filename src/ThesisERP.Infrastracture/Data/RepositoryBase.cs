@@ -17,30 +17,15 @@ public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
         _dbContext = dbContext;
     }
 
-    public virtual T Add(T entity)
+    public async virtual Task<T?> GetByIdAsync<TId>(TId id) where TId : notnull
     {
-        _dbContext.Set<T>().Add(entity);
-
-        return entity;
+        return await _dbContext.Set<T>().FindAsync(new object[] { id });
     }
 
-    public virtual void Update(T entity)
-    {
-        _dbContext.Entry(entity).State = EntityState.Modified;
-    }
-
-    public virtual void Delete(T entity)
-    {
-        _dbContext.Set<T>().Remove(entity);
-    }
-
-    public virtual void DeleteRange(IEnumerable<T> entities)
-    {
-        _dbContext.Set<T>().RemoveRange(entities);
-
-    }
-
-    public async virtual Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? expression = null, Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null, Func<IQueryable<T>, IIncludableQueryable<T, object?>>? include = null)
+    public async virtual Task<List<T>> GetAllAsync(
+        Expression<Func<T, bool>>? expression = null,
+        Func<IQueryable<T>, IOrderedQueryable<T>>? orderBy = null,
+        Func<IQueryable<T>, IIncludableQueryable<T, object?>>? include = null)
     {
         IQueryable<T> query = _dbContext.Set<T>();
 
@@ -62,13 +47,33 @@ public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
         return await query.ToListAsync();
     }
 
-    public async virtual Task<T?> GetByIdAsync<TId>(TId id) where TId : notnull
+
+    public virtual T Add(T entity)
     {
-        return await _dbContext.Set<T>().FindAsync(new object[] { id });
+        _dbContext.Set<T>().Add(entity);
+
+        return entity;
     }
+
+    public virtual void Update(T entity)
+    {
+        _dbContext.Entry(entity).State = EntityState.Modified;
+    }
+
+    public virtual void Delete(T entity)
+    {
+        _dbContext.Set<T>().Remove(entity);
+    }
+    
     public async virtual Task<int> CountAsync(Expression<Func<T, bool>>? expression = null)
     {
         return await _dbContext.Set<T>().CountAsync(expression);
+    }
+
+    public virtual void DeleteRange(IEnumerable<T> entities)
+    {
+        _dbContext.Set<T>().RemoveRange(entities);
+
     }
 
     public async virtual Task SaveChangesAsync()
